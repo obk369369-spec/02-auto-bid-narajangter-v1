@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>입찰도구 v2 – 예정가격·예비가격·하한가 시각화</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: "Segoe UI", Arial, sans-serif; background:#f5f6fa; margin:0; }
+    header { background:#0046ff; color:#fff; padding:12px 20px; font-size:1.1rem; }
+    .container { max-width:1100px; margin:20px auto; background:#fff; border-radius:12px;
+                 padding:20px 24px; box-shadow:0 2px 10px rgba(0,0,0,0.08); }
+    h2 { margin-top:0; color:#0033aa; border-bottom:2px solid #0033aa; padding-bottom:6px; }
+    label { font-weight:bold; display:block; margin-top:10px; }
+    input { width:100%; padding:8px; margin-top:4px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; }
+    small { color:#666; }
+    button { margin-top:14px; padding:10px 18px; background:#0046ff; color:#fff;
+             border:none; border-radius:6px; cursor:pointer; font-weight:bold; }
+    button:hover { background:#0033aa; }
+    .grid { display:grid; grid-template-columns:1.1fr 0.9fr; gap:20px; margin-top:10px; }
+    .card { background:#f7f8ff; border-radius:10px; padding:12px 14px; }
+    .card h3 { margin-top:0; font-size:1rem; color:#0033aa; }
+    table { border-collapse:collapse; width:100%; font-size:0.9rem; margin-top:8px; }
+    th, td { border:1px solid #ccc; padding:6px 8px; text-align:center; }
+    th { background:#e9edf8; }
+    .output { margin-top:20px; }
+    .tag { display:inline-block; padding:3px 8px; border-radius:999px; font-size:0.8rem;
+           margin-right:6px; margin-top:4px; }
+    .tag-blue { background:#e3eeff; color:#0046ff; }
+    .tag-red { background:#ffe5e5; color:#c40000; }
+    .tag-green { background:#e3ffe9; color:#007a2f; }
+    .explain { font-size:0.9rem; margin-top:10px; line-height:1.5; }
+    .muted { color:#555; font-size:0.85rem; }
+    .highlight { font-weight:bold; color:#c40000; }
+  </style>
+</head>
+<body>
+<header>입찰도구 v2 – 예정가격 · 예비가격 15개 · 낙찰하한가 시각화</header>
+
+<div class="container">
+  <h2>① 기본 값 입력</h2>
+  <p class="muted">
+    • <b>예정가격</b> 또는 <b>배정예산(부가세 포함)</b> 둘 중 하나만 알아도 계산이 가능합니다.<br>
+    • 배정예산만 아는 경우, 부가세를 빼서 추정가격(예정가격 근사값)을 자동으로 계산합니다.
+  </p>
+
+  <label>예정가격 (부가세 제외, ₩)</label>
+  <input type="number" id="expectedPrice" placeholder="예: 226766364">
+
+  <label>배정예산 (부가세 포함, ₩)</label>
+  <input type="number" id="assignedBudget" placeholder="모를 경우 비워둠">
+
+  <label>부가세율 (%)</label>
+  <input type="number" id="vatRate" value="10">
+
+  <label>낙찰하한율 (%)</label>
+  <input type="number" id="threshold" value="87.745">
+
+  <label>예비가격 ±변동 범위 (%)</label>
+  <input type="number" id="range" value="2">
+  <small class="muted">예: 2% → 예정가격 기준 -2% ~ +2% 구간에서 15개 예비가격 생성</small>
+
+  <label>추천 투찰율 목록 (%)</label>
+  <input type="text" id="bidRates" value="100,99.7,99.5,99,98.7,98.5,98,97.5,97">
+  <small class="muted">쉼표로 구분: 예) 100,99.5,99,98.5,98,97</small>
+
+  <button onclick="runCalc()">계산 실행</button>
+
+  <div id="output" class="output" style="display:none;">
+    <h2>② 계산 결과 요약</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>금액 요약</h3>
+        <table>
+          <tr><th>항목</th><th>값</th></tr>
+          <tr><td>사용된 예정가격</td><td id="outExpected"></td></tr>
+          <tr><td>입력한 배정예산</td><td id="outBudget"></td></tr>
+          <tr><td>부가세율</td><td id="outVat"></td></tr>
+          <tr><td>낙찰하한율</td><td id="outThresh"></td></tr>
+          <tr><td>낙찰하한가</td><td id="outMinPrice"></td></tr>
+          <tr><td>예비가격 범위</td><td id="outRange"></td></tr>
+        </table>
+        <div id="tags" style="margin-top:6px;"></div>
+      </div>
+
+      <div class="card">
+        <h3>예비가격 15개 (시뮬레이션)</h3>
+        <div class="muted">예정가격 기준 ±범위 안에서 균등하게 15개를 생성한 예시입니다.</div>
+        <table>
+          <tr><th>No.</th><th>예비가격(₩)</th><th>예정가격 대비 (%)</th></tr>
+          <tbody id="prelimBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <h2 style="margin-top:24px;">③ 투찰율별 입찰금액 비교</h2>
+    <div class="card">
+      <h3>추천 투찰 시나리오</h3>
+      <table>
+        <tr>
+          <th>투찰율(%)</th>
+          <th>입찰금액(₩)</th>
+          <th>하한가 대비</th>
+          <th>판단</th>
+        </tr>
+        <tbody id="bidBody"></tbody>
+      </table>
+      <div class="explain" id="explainText"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function formatWon(n) {
+  return n.toLocaleString("ko-KR") + " 원";
+}
+
+// 메인 계산 함수
+function runCalc() {
+  const expectedInput = Number(document.getElementById("expectedPrice").value);
+  const budgetInput   = Number(document.getElementById("assignedBudget").value);
+  const vatRate       = Number(document.getElementById("vatRate").value) || 10;
+  const threshold     = Number(document.getElementById("threshold").value);
+  const range         = Number(document.getElementById("range").value) || 2;
+  const bidRatesStr   = document.getElementById("bidRates").value.trim();
+
+  if ((!expectedInput || expectedInput <= 0) && (!budgetInput || budgetInput <= 0)) {
+    alert("예정가격 또는 배정예산 중 하나는 반드시 입력해야 합니다.");
+    return;
+  }
+  if (!threshold || threshold <= 0) {
+    alert("낙찰하한율을 입력하세요.");
+    return;
+  }
+
+  // 1. 예정가격 결정 로직
+  let usedExpected = 0;
+  let sourceText = "";
+
+  if (expectedInput && expectedInput > 0) {
+    usedExpected = expectedInput;
+    sourceText = "직접 입력한 예정가격 사용";
+  } else {
+    // 배정예산 기준으로 예정가격 근사
+    usedExpected = Math.round(budgetInput / (1 + vatRate / 100));
+    sourceText = "배정예산에서 부가세를 제외하여 예정가격을 근사 계산";
+  }
+
+  // 2. 하한가 계산
+  const minPrice = Math.round(usedExpected * (threshold / 100));
+
+  // 3. 예비가격 15개 생성 (±range%)
+  const low = usedExpected * (1 - range / 100);
+  const high = usedExpected * (1 + range / 100);
+  const prelimBody = document.getElementById("prelimBody");
+  prelimBody.innerHTML = "";
+  const prelimList = [];
+  for (let i = 0; i < 15; i++) {
+    const ratio = i / 14; // 0 ~ 1
+    const val = Math.round(low + (high - low) * ratio);
+    prelimList.push(val);
+    const tr = document.createElement("tr");
+    const tdNo = document.createElement("td");
+    const tdVal = document.createElement("td");
+    const tdRate = document.createElement("td");
+    tdNo.textContent = (i + 1).toString();
+    tdVal.textContent = val.toLocaleString("ko-KR");
+    const diffRate = (val / usedExpected * 100) - 100;
+    tdRate.textContent = (diffRate >= 0 ? "+" : "") + diffRate.toFixed(3) + " %";
+    tr.appendChild(tdNo);
+    tr.appendChild(tdVal);
+    tr.appendChild(tdRate);
+    prelimBody.appendChild(tr);
+  }
+
+  // 4. 추천 투찰율 분석
+  const bidBody = document.getElementById("bidBody");
+  bidBody.innerHTML = "";
+  const rates = bidRatesStr.split(",").map(s => Number(s.trim())).filter(x => x > 0);
+  let safeCount = 0, belowCount = 0;
+
+  rates.forEach(rate => {
+    const bidAmount = Math.round(usedExpected * (rate / 100));
+    const tr = document.createElement("tr");
+    const tdRate = document.createElement("td");
+    const tdAmt = document.createElement("td");
+    const tdCompare = document.createElement("td");
+    const tdJudge = document.createElement("td");
+
+    tdRate.textContent = rate.toFixed(3) + " %";
+    tdAmt.textContent = bidAmount.toLocaleString("ko-KR");
+    const gap = bidAmount - minPrice;
+    const gapRate = (bidAmount / minPrice * 100) - 100;
+    tdCompare.textContent = (gap >= 0 ? "+" : "") + gapRate.toFixed(3) + " %";
+
+    if (bidAmount < minPrice) {
+      tdJudge.innerHTML = "<span class='tag tag-red'>하한가 미만(위험)</span>";
+      belowCount++;
+    } else if (bidAmount === minPrice) {
+      tdJudge.innerHTML = "<span class='tag tag-blue'>하한가 일치</span>";
+      safeCount++;
+    } else {
+      tdJudge.innerHTML = "<span class='tag tag-green'>하한가 이상(가능)</span>";
+      safeCount++;
+    }
+
+    tr.appendChild(tdRate);
+    tr.appendChild(tdAmt);
+    tr.appendChild(tdCompare);
+    tr.appendChild(tdJudge);
+    bidBody.appendChild(tr);
+  });
+
+  // 5. 요약 영역 채우기
+  document.getElementById("outExpected").textContent = formatWon(usedExpected);
+  document.getElementById("outBudget").textContent   =
+    budgetInput && budgetInput > 0 ? formatWon(budgetInput) : "입력 없음";
+  document.getElementById("outVat").textContent      = vatRate.toFixed(1) + " %";
+  document.getElementById("outThresh").textContent   = threshold.toFixed(3) + " %";
+  document.getElementById("outMinPrice").textContent = formatWon(minPrice);
+  document.getElementById("outRange").textContent    =
+    formatWon(Math.round(low)) + " ~ " + formatWon(Math.round(high));
+
+  const tagsDiv = document.getElementById("tags");
+  tagsDiv.innerHTML = "";
+  const t1 = document.createElement("span");
+  t1.className = "tag tag-blue";
+  t1.textContent = sourceText;
+  tagsDiv.appendChild(t1);
+
+  const t2 = document.createElement("span");
+  t2.className = "tag tag-green";
+  t2.textContent = "예정가격 기준 ±" + range + "% 범위에서 15개 예비가격 생성";
+  tagsDiv.appendChild(t2);
+
+  // 6. 설명 문장 생성
+  const explain = document.getElementById("explainText");
+  let msg = "";
+  msg += "① 먼저 예정가격을 ";
+  if (expectedInput && expectedInput > 0) {
+    msg += "직접 입력값 " + formatWon(expectedInput) + " 으로 사용했습니다. ";
+  } else {
+    msg += "배정예산 " + formatWon(budgetInput) + " 에서 부가세 " +
+           vatRate.toFixed(1) + "% 를 제외하여 " + formatWon(usedExpected) +
+           " 으로 계산했습니다. ";
+  }
+  msg += "<br>② 이 예정가격을 기준으로 ±" + range +
+         "% 범위를 잡아 총 15개의 예비가격을 균등 간격으로 생성했습니다. ";
+  msg += "<br>③ 낙찰하한율 " + threshold.toFixed(3) +
+         "% 를 곱해 낙찰하한가는 <span class='highlight'>" +
+         formatWon(minPrice) + "</span> 로 계산되었습니다. ";
+  msg += "<br>④ 위의 표에서 각 투찰율별 입찰금액을 하한가와 비교하여 " +
+         "‘하한가 미만(위험)’과 ‘하한가 이상(가능)’ 구간을 한 눈에 볼 수 있습니다.";
+  msg += "<br><br><span class='muted'>※ 실제 나라장터에서는 예비가격 15개 중 4개를 무작위로 선택하여 " +
+         "그 평균으로 예정가격을 확정합니다. 이 도구의 예비가격 15개는 해당 구조를 이해하기 위한 시뮬레이션입니다.</span>";
+
+  explain.innerHTML = msg;
+
+  // 최종 출력 보이기
+  document.getElementById("output").style.display = "block";
+}
+</script>
+</body>
+</html>
