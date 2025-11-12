@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>입찰도구_v2 — 조달요청 시뮬레이터 (테스트용)</title>
+<style>
+  :root{font-family:system-ui,-apple-system,'Noto Sans KR',sans-serif;color:#111}
+  body{margin:0;background:#f6f8fb}
+  header{background:#0b63c6;color:#fff;padding:12px 16px}
+  header h1{margin:0;font-size:16px}
+  .wrap{padding:12px;max-width:1100px;margin:14px auto}
+  /* 탭바 */
+  .tabbar{display:flex;gap:8px;overflow:auto;padding:8px 4px;background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .tab{white-space:nowrap;padding:8px 12px;border-radius:6px;background:#eef4ff;color:#0b63c6;cursor:pointer;font-weight:600}
+  .tab.inactive{background:#fff;color:#333;border:1px solid #e6eefc}
+  .tab.highlight{outline:3px solid rgba(11,99,198,0.12)}
+  /* layout */
+  .grid{display:grid;grid-template-columns:380px 1fr;gap:12px;margin-top:12px}
+  .card{background:#fff;padding:12px;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  label{display:block;font-size:13px;margin-bottom:6px;color:#333}
+  input[type="text"], input[type="number"], select {width:100%;padding:8px;border:1px solid #ddd;border-radius:6px}
+  button{padding:10px 12px;border:0;border-radius:6px;background:#0b63c6;color:#fff;cursor:pointer}
+  .small{font-size:12px;color:#666}
+  /* results */
+  .result-steps{margin-top:10px}
+  .step{padding:8px;border-radius:6px;background:linear-gradient(90deg,#fff,#fbfdff);margin-bottom:8px;border:1px solid #eef3ff}
+  .bar{height:14px;border-radius:6px;background:#eee;overflow:hidden}
+  .bar-inner{height:100%;width:0;background:#0b63c6;border-radius:6px}
+  canvas{width:100%;height:200px;background:#fff;border-radius:6px;display:block}
+  .explain{font-size:13px;color:#222;margin-top:8px}
+  .muted{color:#888;font-size:12px}
+  .danger{color:#b00020;font-weight:700}
+  footer{padding:12px;text-align:center;color:#555;font-size:12px}
+  /* responsive */
+  @media (max-width:880px){.grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<header><h1>입찰도구_v2 — 조달요청공고 실전 테스트(이미지 기준)</h1></header>
+<div class="wrap">
+  <div class="tabbar" id="tabbar">
+    <div class="tab inactive">입찰공고</div>
+    <div class="tab inactive">입찰가격</div>
+    <div class="tab inactive">견적요청목록</div>
+    <div class="tab inactive">물품견적요청공고</div>
+    <div class="tab inactive">용역견적요청공고</div>
+    <div class="tab inactive" id="tab-조달">조달요청공고</div>
+    <div class="tab inactive">견적요청결과</div>
+  </div>
+
+  <div class="grid">
+    <!-- left: controls -->
+    <div class="card">
+      <label>이미지 업로드 (현재 화면 캡처 → 탭 보이는 위치 확인)</label>
+      <input type="file" id="imgUpload" accept="image/*">
+      <div style="height:8px"></div>
+      <button id="forceShow">조달요청공고 탭 보이기(오른쪽 스크롤)</button>
+      <div style="height:10px"></div>
+
+      <label>기관명</label>
+      <input id="agency" type="text" value="한국생산기술연구원">
+
+      <label>공고/품명 키워드</label>
+      <input id="keyword" type="text" value="스마트 텍스타일">
+
+      <label>예상(기준) 예정가격 (원)</label>
+      <input id="basePrice" type="number" value="20000000">
+
+      <label>하한율 입력(%)</label>
+      <input id="lowRate" type="number" step="0.001" value="87.745">
+
+      <div style="height:10px"></div>
+      <button id="runSim">예비가격 15개 시뮬레이션 & 계산</button>
+
+      <div style="height:12px"></div>
+      <div class="muted">화면 기준으로 동작합니다. 이미지 업로드 후 '조달요청공고' 탭 위치를 시각표시합니다.</div>
+    </div>
+
+    <!-- right: visualization and results -->
+    <div>
+      <div class="card" id="imageCard" style="display:none">
+        <label>업로드 이미지 (탭 위치 하이라이트)</label>
+        <div style="position:relative">
+          <img id="uploadedImage" src="" alt="" style="max-width:100%;border-radius:6px;display:block">
+          <div id="overlay" style="position:absolute;left:0;top:0;"></div>
+        </div>
+        <div class="muted">이미지 위에 빨간 박스가 조달요청공고 위치입니다.</div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <label>시뮬레이션 결과 (단계별)</label>
+        <div id="simResults" class="result-steps"></div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <label>예비가격 표 & 그래프</label>
+        <canvas id="chart"></canvas>
+        <div id="chartExplain" class="explain"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>테스트용 단일파일. 화면에서 보이는 탭 구조 기준으로 동작합니다.</footer>
+
+<script>
+/* 기본 UI 행위 */
+const tab조달 = document.getElementById('tab-조달');
+const tabbar = document.getElementById('tabbar');
+document.getElementById('forceShow').addEventListener('click', ()=> {
+  // 오른쪽으로 스크롤하여 조달 탭 보이게
+  tab조달.scrollIntoView({behavior:'smooth',inline:'end'});
+  tab조달.classList.add('highlight');
+  setTimeout(()=> tab조달.classList.remove('highlight'),1600);
+});
+
+/* 이미지 업로드 -> 탭 위치 하이라이트 (단순 heuristic) */
+const imgUpload = document.getElementById('imgUpload');
+const imageCard = document.getElementById('imageCard');
+const uploadedImage = document.getElementById('uploadedImage');
+const overlay = document.getElementById('overlay');
+
+imgUpload.addEventListener('change', e=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  const url = URL.createObjectURL(f);
+  uploadedImage.src = url;
+  uploadedImage.onload = ()=>{
+    imageCard.style.display='block';
+    // 이미지 상단 우측 가정: 탭바가 이미지 상단 10~60px 영역에 있다면 하이라이트 위치 표시
+    const W = uploadedImage.clientWidth, H = uploadedImage.clientHeight;
+    overlay.style.width = W+'px';
+    overlay.style.height = H+'px';
+    overlay.innerHTML = '';
+    // 보이는 환경에서 보통 탭은 상단 가로줄에 모여있으므로, 오른쪽 끝 영역을 빨간 박스로 표시
+    const box = document.createElement('div');
+    box.style.position='absolute';
+    box.style.right='6%';
+    box.style.top='6%';
+    box.style.width='22%';
+    box.style.height='8%';
+    box.style.border='3px solid rgba(180,10,10,0.9)';
+    box.style.borderRadius='6px';
+    box.style.background='rgba(180,10,10,0.06)';
+    overlay.appendChild(box);
+  };
+});
+
+/* 시뮬레이션 로직: 예비가격 15개 ±2% 범위 생성, 4개 랜덤 선택, 하한율 계산, 시각화 */
+function randRange(min,max){return min + Math.random()*(max-min)}
+function toKRW(n){ return n.toLocaleString('ko-KR') + ' 원'; }
+
+document.getElementById('runSim').addEventListener('click', ()=>{
+  const base = Number(document.getElementById('basePrice').value) || 0;
+  const lowRate = Number(document.getElementById('lowRate').value) || 87.745;
+  const simResults = document.getElementById('simResults');
+  simResults.innerHTML = '';
+
+  // 예비가격 15개: base ±2% 균등 분포
+  const arr = [];
+  for(let i=0;i<15;i++){
+    const pct = randRange(-2,2);
+    const price = Math.round(base * (1 + pct/100));
+    arr.push({idx:i+1,pct:pct.toFixed(3),price});
+  }
+
+  // 4개 무작위 추첨
+  const shuffled = arr.slice().sort(()=>Math.random()-0.5);
+  const picked = shuffled.slice(0,4);
+
+  // 낙찰하한가 계산
+  const lowPrice = Math.round(base * (lowRate/100));
+
+  // 단계별 텍스트 출력 (간단 명료)
+  const step1 = document.createElement('div'); step1.className='step';
+  step1.innerHTML = `<strong>단계 1 — 예비가격 생성</strong><div class="muted">기준 예정가격 ${toKRW(base)} 에 대해 ±2% 범위로 15개 시뮬레이션을 생성했습니다.</div>`;
+  simResults.appendChild(step1);
+
+  const step2 = document.createElement('div'); step2.className='step';
+  step2.innerHTML = `<strong>단계 2 — 무작위 추첨 4개</strong><div class="muted">무작위로 선택된 4개의 예비가격을 표시합니다.</div>
+    <ul>${picked.map(p=>`<li>예비#${p.idx}: ${toKRW(p.price)} (변동 ${p.pct}%)</li>`).join('')}</ul>`;
+  simResults.appendChild(step2);
+
+  const step3 = document.createElement('div'); step3.className='step';
+  step3.innerHTML = `<strong>단계 3 — 낙찰하한가 계산</strong><div class="muted">입력 하한율 ${lowRate}% 기준 하한가 = ${toKRW(lowPrice)}</div>`;
+  simResults.appendChild(step3);
+
+  // 위험도: 예비가격이 하한가보다 낮으면 위험 표시
+  const step4 = document.createElement('div'); step4.className='step';
+  step4.innerHTML = `<strong>단계 4 — 안전성 분석</strong><div class="muted">각 예비가격이 하한가 대비 안전한지 계산.</div>
+    <ul>${arr.map(p=>{
+      const ok = p.price >= lowPrice;
+      return `<li>${toKRW(p.price)} — ${ok?'<span style="color:green">안전</span>':'<span class="danger">위험(하한가 미만)</span>'}</li>`;
+    }).join('')}</ul>`;
+  simResults.appendChild(step4);
+
+  // 차트 그리기 (막대: 하한가 대비 퍼센트)
+  const c = document.getElementById('chart');
+  c.width = c.clientWidth; c.height = 260;
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  // 계산값
+  const labels = arr.map(a=>`#${a.idx}`);
+  const percents = arr.map(a => +(100 * a.price / lowPrice).toFixed(3));
+  // draw simple bar chart
+  const padding = 40;
+  const w = c.width - padding*2;
+  const bw = Math.floor(w / arr.length) - 6;
+  const maxPct = Math.max(...percents, 110);
+  // axes
+  ctx.fillStyle='#222'; ctx.font='12px system-ui';
+  ctx.fillText('하한가 대비 % (100% = 하한가)', 10, 14);
+  // bars
+  arr.forEach((a,i)=>{
+    const pct = percents[i];
+    const barH = Math.max(6, (c.height - 80) * (pct / maxPct));
+    const x = padding + i*(bw+6);
+    const y = c.height - padding - barH;
+    // color based on range
+    let color = '#0b63c6';
+    if(pct < 100) color = '#d32f2f';
+    else if(pct < 102) color = '#f57c00';
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, bw, barH);
+    ctx.fillStyle = '#333';
+    ctx.fillText(labels[i], x, c.height - padding + 14);
+    ctx.fillText(pct.toFixed(2)+'%', x, y - 6);
+  });
+
+  // 설명 텍스트 자동 생성 (간단한 해석)
+  const explain = document.getElementById('chartExplain');
+  const below = arr.filter((a)=>a.price < lowPrice).length;
+  explain.innerHTML = `<strong>자동 해석:</strong> 총 ${arr.length}개 예비가격 중 ${below}개가 하한가 미만으로 <span class="danger">위험</span>합니다. 추천 투찰구간은 하한가(100%) 대비 1.0~3.0% 위인 구간을 우선 검토하세요. (예: ${ (lowPrice*1.01).toLocaleString() } 원 이상)`;
+
+});
+</script>
+</body>
+</html>
