@@ -2,591 +2,591 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>2번 도구 v1.0 – 나라장터 입찰 계산·분석기</title>
+  <title>입찰도구 v2 – 예정가격·예비가격·하한가 시각화</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      margin: 16px;
-      background: #f5f5f5;
+      margin: 0;
+      background:#f3f4f6;
+      color:#111827;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
     }
     h1 {
-      font-size: 20px;
-      margin-bottom: 8px;
+      font-size: 22px;
+      margin-bottom: 12px;
     }
     h2 {
-      font-size: 16px;
-      margin-top: 24px;
-      margin-bottom: 8px;
+      font-size: 18px;
+      margin: 24px 0 8px;
     }
     .card {
-      background: white;
+      background:#ffffff;
       border-radius: 10px;
-      padding: 12px 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      padding:16px 18px 18px;
+      box-shadow:0 4px 10px rgba(15,23,42,0.06);
+      margin-bottom: 18px;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
+    .section-title {
+      font-weight:600;
+      margin-bottom: 10px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .section-title span.step {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:22px;
+      height:22px;
+      border-radius:999px;
+      background:#2563eb;
+      color:white;
+      font-size:13px;
+      font-weight:700;
+    }
+    .grid-2 {
+      display:grid;
+      grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+      gap: 10px 18px;
     }
     label {
-      font-size: 13px;
-      display: block;
-      margin-bottom: 4px;
+      font-size:13px;
+      font-weight:500;
+      display:block;
+      margin-bottom:4px;
     }
-    input[type="number"],
-    input[type="text"],
-    select {
-      width: 100%;
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 13px;
-      box-sizing: border-box;
+    input[type="text"], input[type="number"] {
+      width:100%;
+      padding:7px 9px;
+      border-radius:7px;
+      border:1px solid #d1d5db;
+      font-size:13px;
     }
-    input[type="checkbox"] {
-      transform: scale(1.1);
-      margin-right: 4px;
+    input:focus {
+      outline:none;
+      border-color:#2563eb;
+      box-shadow:0 0 0 1px rgba(37,99,235,0.3);
     }
-    .btn {
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 999px;
-      padding: 8px 16px;
-      font-size: 13px;
-      cursor: pointer;
+    small {
+      display:block;
+      font-size:11px;
+      color:#6b7280;
+      margin-top:2px;
     }
-    .btn.secondary {
-      background: #4b5563;
+    button {
+      padding:8px 16px;
+      border-radius:999px;
+      border:none;
+      font-size:14px;
+      font-weight:600;
+      cursor:pointer;
+      background:#2563eb;
+      color:white;
     }
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: default;
-    }
-    .result-highlight {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      font-size: 13px;
-    }
-    .pill {
-      background: #eef2ff;
-      border-radius: 999px;
-      padding: 6px 10px;
-    }
-    .pill.bad {
-      background: #fee2e2;
-      color: #b91c1c;
-    }
-    .pill.good {
-      background: #dcfce7;
-      color: #166534;
-    }
-    .pill.warn {
-      background: #fef9c3;
-      color: #854d0e;
+    button:disabled {
+      opacity:0.5;
+      cursor:not-allowed;
     }
     table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-      margin-top: 8px;
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
     }
     th, td {
-      border: 1px solid #ddd;
-      padding: 4px 6px;
-      text-align: right;
-      white-space: nowrap;
+      padding:6px 8px;
+      border-bottom:1px solid #e5e7eb;
+      text-align:right;
+      white-space:nowrap;
     }
     th {
-      background: #f3f4f6;
+      background:#f9fafb;
+      font-weight:600;
+      color:#374151;
     }
     th:first-child, td:first-child {
-      text-align: left;
+      text-align:left;
+    }
+    .summary-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+      gap:10px 14px;
+      margin-top:6px;
+    }
+    .summary-item {
+      padding:8px 10px;
+      border-radius:8px;
+      background:#f9fafb;
+      border:1px solid #e5e7eb;
+      font-size:13px;
+    }
+    .summary-label {
+      font-size:11px;
+      color:#6b7280;
+      margin-bottom:2px;
+    }
+    .summary-value {
+      font-weight:600;
     }
     .badge {
-      display: inline-block;
-      font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: #e5e7eb;
-      margin-right: 4px;
+      display:inline-flex;
+      padding:2px 7px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:600;
     }
-    .badge.critical {
-      background: #fee2e2;
-      color: #b91c1c;
+    .badge-safe   { background:#dcfce7; color:#166534; }
+    .badge-warn   { background:#fef9c3; color:#854d0e; }
+    .badge-danger { background:#fee2e2; color:#b91c1c; }
+    .bar-wrap {
+      width:120px;
+      background:#e5e7eb;
+      border-radius:999px;
+      overflow:hidden;
+      height:8px;
+      margin-left:auto;
     }
-    .badge.info {
-      background: #e0f2fe;
-      color: #0369a1;
+    .bar-inner {
+      height:100%;
     }
-    .badge.safe {
-      background: #dcfce7;
-      color: #166534;
+    .bar-safe   { background:#22c55e; }
+    .bar-warn   { background:#fbbf24; }
+    .bar-danger { background:#ef4444; }
+    .note {
+      font-size:11px;
+      color:#6b7280;
+      margin-top:6px;
+      line-height:1.4;
     }
-    .badge.warn {
-      background: #fef9c3;
-      color: #854d0e;
+    #autoExplain {
+      font-size:13px;
+      line-height:1.5;
     }
-    .explain {
-      font-size: 12px;
-      line-height: 1.5;
-      white-space: pre-line;
+    #autoExplain p { margin:4px 0; }
+    #autoExplain ul {
+      margin:4px 0 4px 18px;
+      padding:0;
     }
-    canvas {
-      background: #ffffff;
-      border-radius: 8px;
-      padding: 8px;
+    #autoExplain li { margin:2px 0; }
+    .highlight {
+      font-weight:600;
+      color:#2563eb;
     }
-    .sub {
-      font-size: 11px;
-      color: #6b7280;
-    }
-    .tag-row {
-      font-size: 11px;
-      margin-top: 4px;
-    }
-    .tag {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: #e5e7eb;
-      margin-right: 4px;
+    .margin-warn { color:#b91c1c; font-weight:600; }
+    .margin-ok   { color:#166534; font-weight:600; }
+    @media (max-width:640px){
+      h1 { font-size:18px; }
     }
   </style>
 </head>
 <body>
-  <h1>2번 도구 v1.0 – 나라장터 입찰 계산·분석기</h1>
+  <div class="container">
+    <h1>입찰도구 v2 – 예정가격·예비가격 15개·낙찰하한가 시각화</h1>
 
-  <!-- 안내 카드 -->
-  <div class="card">
-    <p class="sub">
-      🔹 공고 유형, 추정가격, 하한율, 정가, 커미션을 넣으면<br />
-      &nbsp;&nbsp;→ 하한가, 여러 투찰율 후보, 우리 마진, 그래프, 해석 텍스트까지 한 번에 보여줍니다.<br />
-      🔹 수의시담 건은 자동으로 “참가 불가”로 표시되고 계산을 막습니다.
-    </p>
-  </div>
-
-  <!-- 1. 입력 영역 -->
-  <div class="card">
-    <h2>1단계. 공고 기본 정보 입력</h2>
-    <div class="grid">
-      <div>
-        <label>공고 유형</label>
-        <select id="bidType">
-          <option value="normal">일반입찰</option>
-          <option value="quote">견적요청공고</option>
-          <option value="nego">수의시담 / 다자간수의시담</option>
-        </select>
+    <!-- 1. 기본 값 입력 -->
+    <div class="card">
+      <div class="section-title">
+        <span class="step">1</span>
+        기본 값 입력
       </div>
-      <div>
-        <label>발주 기관명 (예: 한국생산기술연구원)</label>
-        <input type="text" id="agencyName" placeholder="기관명을 적어두면 해석에 같이 표시됩니다." />
+      <div class="grid-2">
+        <div>
+          <label>예정가격 (부가세 제외, ₩)</label>
+          <input id="inputEstimated" type="text" placeholder="예: 7600000" />
+          <small>배정예산을 모를 때 사용. 예정가격 또는 배정예산 둘 중 하나만 넣어도 됩니다.</small>
+        </div>
+        <div>
+          <label>배정예산 (부가세 포함, ₩)</label>
+          <input id="inputBudget" type="text" placeholder="예: 8360000" />
+          <small>예정가격을 모를 때 사용. 부가세를 제외해 예정가격을 근사 계산합니다.</small>
+        </div>
+        <div>
+          <label>부가세율 (%)</label>
+          <input id="inputVat" type="number" value="10" step="0.1" />
+        </div>
+        <div>
+          <label>낙찰하한율 (%)</label>
+          <input id="inputLimitRate" type="number" value="87.745" step="0.001" />
+          <small>예: 87.745 → 예정가격 × 0.87745 가 하한가.</small>
+        </div>
+        <div>
+          <label>예비가격 ±변동 범위 (%)</label>
+          <input id="inputRange" type="number" value="2" step="0.1" />
+          <small>예: 2 → 예정가격 기준 -2% ~ +2% 구간에서 15개 예비가격 생성.</small>
+        </div>
+        <div>
+          <label>추천 투찰율 목록 (%) (쉼표로 구분)</label>
+          <input id="inputBidRates" type="text"
+                 value="100,99.7,99.5,99,98.7,98.5,98,97.5,97" />
+          <small>예: 100,99.7,99.5 …</small>
+        </div>
       </div>
-      <div>
-        <label>공고명 (간단히 메모용)</label>
-        <input type="text" id="noticeTitle" placeholder="예: ○○ 시장 및 기술자료 구매" />
+      <div style="margin-top:12px;">
+        <button id="btnCalc">계산 실행</button>
       </div>
-    </div>
-
-    <h2>2단계. 숫자 입력</h2>
-    <div class="grid">
-      <div>
-        <label>추정가격 / 기초금액 기준 (원)</label>
-        <input type="number" id="basePrice" placeholder="예: 20000000" />
-      </div>
-      <div>
-        <label>낙찰하한율 (%)</label>
-        <input type="number" id="lowerRate" step="0.001" value="87.745" />
-      </div>
-      <div>
-        <label>우리 보고서 정가 (원, 발행사 정가 기준)</label>
-        <input type="number" id="listPrice" placeholder="예: 12000000" />
-      </div>
-      <div>
-        <label>커미션 / 할인율 (%) (발행사에 지급 비율)</label>
-        <input type="number" id="commissionRate" step="0.1" value="20" />
-      </div>
-      <div>
-        <label>추정가격의 부가세 처리</label>
-        <select id="vatType">
-          <option value="included">추정가격에 부가세 포함</option>
-          <option value="excluded">추정가격 + 부가세 별도(10%)</option>
-        </select>
-      </div>
-      <div>
-        <label>투찰율 범위 설명 (표시용 텍스트)</label>
-        <input type="text" id="bidRange" value="하한율 +0.05% ~ +1.00% (0.05 단위)" />
+      <div class="note">
+        ※ 예정가격과 배정예산을 동시에 입력하면, <b>예정가격 입력값</b>을 우선 사용합니다.
       </div>
     </div>
 
-    <h2>3단계. 투찰 후보 구간 설정</h2>
-    <div class="grid">
-      <div>
-        <label>하한율 대비 최소 여유 (%)</label>
-        <input type="number" id="extraStart" step="0.01" value="0.05" />
+    <!-- 2. 계산 결과 요약 -->
+    <div class="card">
+      <div class="section-title">
+        <span class="step">2</span>
+        계산 결과 요약
       </div>
-      <div>
-        <label>하한율 대비 최대 여유 (%)</label>
-        <input type="number" id="extraEnd" step="0.01" value="1.00" />
+      <div id="summaryArea" class="summary-grid">
+        <!-- JS로 채움 -->
       </div>
-      <div>
-        <label>간격(step, %) – 예: 0.05</label>
-        <input type="number" id="extraStep" step="0.01" value="0.05" />
+      <div class="note">
+        ▪ <b>배정예산</b>: 발주기관이 이 건에 배정한 총 예산 (부가세 포함).<br/>
+        ▪ <b>예정가격</b>: 예비가격 15개 중 4개를 뽑아 평균낸 값. 여기서는 근사값으로 사용합니다.<br/>
+        ▪ <b>낙찰하한가</b>: 예정가격 × 낙찰하한율. 이 금액 미만으로는 낙찰될 수 없습니다.
       </div>
     </div>
 
-    <div style="margin-top: 12px;">
-      <button class="btn" id="calcBtn" onclick="runCalc()">계산하기</button>
-      <button class="btn secondary" onclick="resetForm()">입력 초기화</button>
-    </div>
-    <div class="tag-row">
-      <span class="tag">면세사업자 가정: 마진 = 입찰가 – (정가 × (1–커미션))</span>
-      <span class="tag">부가세는 발주기관 세금으로 보고 마진 계산에서 분리</span>
-    </div>
-  </div>
-
-  <!-- 4. 핵심 결과 -->
-  <div class="card">
-    <h2>4단계. 핵심 요약</h2>
-    <div class="result-highlight" id="summaryArea">
-      <span class="sub">위에서 공고 유형과 숫자를 넣고 “계산하기”를 누르면 요약이 나옵니다.</span>
-    </div>
-  </div>
-
-  <!-- 5. 투찰율별 표 -->
-  <div class="card">
-    <h2>5단계. 투찰율별 입찰가·마진 상세표</h2>
-    <div class="sub">
-      각 행은 하나의 “투찰 전략”입니다. 붉은 색 경고는 하한가 미만(탈락 위험), 노란색은 근접(주의), 초록색은 비교적 안전 구간입니다.
-    </div>
-    <div id="tableArea"></div>
-  </div>
-
-  <!-- 6. 그래프 -->
-  <div class="card">
-    <h2>6단계. 그래프 – 입찰가·하한가·우리 마진</h2>
-    <div class="sub">파란선: 입찰가 / 빨간선: 하한가 수평선 / 초록선: 우리 마진 (우측 축)</div>
-    <canvas id="chartCanvas" height="220"></canvas>
-  </div>
-
-  <!-- 7. 자동 해석 텍스트 -->
-  <div class="card">
-    <h2>7단계. 자동 해석 텍스트 (학습용 설명)</h2>
-    <div id="explainArea" class="explain">
-      아직 데이터가 없습니다. 숫자를 넣고 계산을 돌리면,<br />
-      • 하한가가 어디인지<br />
-      • 어느 투찰율 구간이 “너무 낮지도, 너무 높지도 않은지”<br />
-      • 우리에게 남는 예상 마진이 어느 정도인지<br />
-      글로 정리해서 보여줍니다.
-    </div>
-  </div>
-
-  <!-- 8. 예비가격 시뮬레이션 -->
-  <div class="card">
-    <h2>8단계. 예비가격 15개(±2%) & 4개 추첨 평균</h2>
-    <div class="sub">
-      실제 나라장터 구조를 단순 모델로 표현한 것입니다. (±2% 구간에서 15개 만들고, 그 중 4개를 뽑아 평균)
-    </div>
-    <div id="prePriceArea" class="explain"></div>
-  </div>
-
-  <script>
-    let chart;
-
-    function formatKRW(value) {
-      if (isNaN(value)) return '-';
-      return value.toLocaleString('ko-KR') + '원';
-    }
-
-    function resetForm() {
-      document.getElementById('bidType').value = 'normal';
-      document.getElementById('agencyName').value = '';
-      document.getElementById('noticeTitle').value = '';
-      document.getElementById('basePrice').value = '';
-      document.getElementById('lowerRate').value = 87.745;
-      document.getElementById('listPrice').value = '';
-      document.getElementById('commissionRate').value = 20;
-      document.getElementById('vatType').value = 'included';
-      document.getElementById('extraStart').value = 0.05;
-      document.getElementById('extraEnd').value = 1.0;
-      document.getElementById('extraStep').value = 0.05;
-      document.getElementById('summaryArea').innerHTML =
-        '<span class="sub">위에서 공고 유형과 숫자를 넣고 “계산하기”를 누르면 요약이 나옵니다.</span>';
-      document.getElementById('tableArea').innerHTML = '';
-      document.getElementById('explainArea').textContent =
-        '아직 데이터가 없습니다. 숫자를 넣고 계산을 돌리면,\n• 하한가가 어디인지\n• 어느 투찰율 구간이 “너무 낮지도, 너무 높지도 않은지”\n• 우리에게 남는 예상 마진이 어느 정도인지\n글로 정리해서 보여줍니다.';
-      document.getElementById('prePriceArea').textContent = '';
-      if (chart) chart.destroy();
-    }
-
-    function runCalc() {
-      const bidType = document.getElementById('bidType').value;
-      const agencyName = document.getElementById('agencyName').value.trim();
-      const noticeTitle = document.getElementById('noticeTitle').value.trim();
-      const basePrice = Number(document.getElementById('basePrice').value);
-      const lowerRate = Number(document.getElementById('lowerRate').value);
-      const listPrice = Number(document.getElementById('listPrice').value);
-      const commissionRate = Number(document.getElementById('commissionRate').value);
-      const vatType = document.getElementById('vatType').value;
-      const extraStart = Number(document.getElementById('extraStart').value);
-      const extraEnd = Number(document.getElementById('extraEnd').value);
-      const extraStep = Number(document.getElementById('extraStep').value);
-
-      const summaryArea = document.getElementById('summaryArea');
-      const tableArea = document.getElementById('tableArea');
-      const explainArea = document.getElementById('explainArea');
-      const preArea = document.getElementById('prePriceArea');
-
-      // 수의시담 차단
-      if (bidType === 'nego') {
-        summaryArea.innerHTML = `
-          <span class="pill bad"><b>수의시담 / 다자간수의시담</b> 공고는 정보 공개용이며, 계약대상자가 아닌 업체는 참가할 수 없습니다.</span>
-          <span class="pill">이 건은 계산·투찰 대상에서 제외해야 합니다.</span>
-        `;
-        tableArea.innerHTML = '';
-        explainArea.textContent =
-          '이 공고는 수의시담/다자간수의시담 유형으로 인식되었습니다.\n\n' +
-          '· 나라장터 안내처럼 “계약대상자가 아닌 업체는 참가할 수 없음”으로 보아,\n' +
-          '  WIC가 새로 참여할 수 있는 건이 아니라고 판단하는 것이 안전합니다.\n\n' +
-          '따라서 이 도구에서는 입찰가·마진 계산을 하지 않고, 화면에서만 “참가 불가”로 표시합니다.';
-        preArea.textContent = '';
-        if (chart) chart.destroy();
-        return;
-      }
-
-      if (!basePrice || !lowerRate) {
-        alert('추정가격(또는 기초금액)과 낙찰하한율을 먼저 입력해 주세요.');
-        return;
-      }
-
-      // 부가세 처리 (단순 10% 가정)
-      let effectiveBase = basePrice;
-      if (vatType === 'excluded') {
-        effectiveBase = basePrice * 1.1;
-      }
-
-      const lowerLimit = effectiveBase * (lowerRate / 100);
-
-      // 투찰율 범위 생성
-      const rows = [];
-      const eps = 1e-9;
-      for (let extra = extraStart; extra <= extraEnd + eps; extra += extraStep) {
-        const rate = lowerRate + extra; // %
-        const bidPrice = effectiveBase * (rate / 100);
-        const diffFromLower = bidPrice - lowerLimit;
-        const diffRatio = (bidPrice / lowerLimit - 1) * 100;
-
-        let margin = NaN;
-        if (listPrice && commissionRate >= 0) {
-          const costToUs = listPrice * (1 - commissionRate / 100);
-          margin = bidPrice - costToUs; // 면세 가정
-        }
-
-        rows.push({ rate, bidPrice, diffFromLower, diffRatio, margin });
-      }
-
-      // 임시 추천: 하한가보다 조금 위이면서 마진이 양수인 첫 구간
-      let recommended = rows.find(r => r.diffFromLower > 0 && (isNaN(r.margin) || r.margin > 0));
-      if (!recommended) {
-        recommended = rows[Math.floor(rows.length / 2)];
-      }
-
-      const safeBadgeClass = recommended.diffFromLower > 0 ? 'good' : 'bad';
-      const typeLabel =
-        bidType === 'normal' ? '일반입찰' :
-        bidType === 'quote' ? '견적요청공고' : '수의시담';
-
-      summaryArea.innerHTML = `
-        <span class="pill">
-          유형: <b>${typeLabel}</b>
-          ${agencyName ? ' / 기관: <b>' + agencyName + '</b>' : ''}
-        </span>
-        ${noticeTitle ? '<span class="pill">공고명: <b>' + noticeTitle + '</b></span>' : ''}
-        <span class="pill">하한가: <b>${formatKRW(lowerLimit)}</b> (${lowerRate.toFixed(3)}%)</span>
-        <span class="pill ${safeBadgeClass}">
-          임시 추천 투찰율: <b>${recommended.rate.toFixed(3)}%</b>,
-          입찰가: <b>${formatKRW(recommended.bidPrice)}</b>
-        </span>
-        ${!isNaN(recommended.margin) ? `
-        <span class="pill">
-          이 투찰에서 예상 마진: <b>${formatKRW(recommended.margin)}</b>
-        </span>` : ''}
-      `;
-
-      // 표
-      let html = `
-        <table>
+    <!-- 3. 예비가격 15개 시뮬레이션 -->
+    <div class="card">
+      <div class="section-title">
+        <span class="step">3</span>
+        예비가격 15개 (시뮬레이션)
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="tablePrePrices">
           <thead>
             <tr>
-              <th>투찰율(%)</th>
-              <th>입찰가</th>
-              <th>하한가 대비 차이</th>
-              <th>하한가 대비 비율</th>
-              <th>예상 마진</th>
-              <th>비고</th>
+              <th>No.</th>
+              <th>예비가격 (₩)</th>
+              <th>예정가격 대비 (%)</th>
             </tr>
           </thead>
           <tbody>
-      `;
-      rows.forEach(r => {
-        const isBelow = r.bidPrice < lowerLimit;
-        const gapPercent = r.diffRatio;
-        let note, className;
-        if (isBelow) {
-          note = '<span class="badge critical">하한가 미만 (탈락 위험)</span>';
-          className = 'critical';
-        } else if (gapPercent >= 0 && gapPercent < 0.1) {
-          note = '<span class="badge warn">하한가 근접 (주의)</span>';
-          className = 'warn';
-        } else {
-          note = '<span class="badge safe">안전 구간</span>';
-          className = 'safe';
-        }
-        html += `
-          <tr>
-            <td>${r.rate.toFixed(3)}</td>
-            <td>${formatKRW(r.bidPrice)}</td>
-            <td>${formatKRW(r.diffFromLower)}</td>
-            <td>${r.diffRatio.toFixed(3)}%</td>
-            <td>${isNaN(r.margin) ? '-' : formatKRW(r.margin)}</td>
-            <td>${note}</td>
-          </tr>
-        `;
-      });
-      html += '</tbody></table>';
-      tableArea.innerHTML = html;
+            <!-- JS로 채움 -->
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        실제 나라장터에서는 이 15개 중 4개를 무작위 선택하여 <b>예정가격</b>을 결정합니다.
+        여기서는 분포와 범위를 이해하기 위한 참고용 시뮬레이션입니다.
+      </div>
+    </div>
 
-      // 그래프
-      const labels = rows.map(r => r.rate.toFixed(3));
-      const dataBid = rows.map(r => Math.round(r.bidPrice));
-      const dataLower = rows.map(() => Math.round(lowerLimit));
-      const dataMargin = rows.map(r => isNaN(r.margin) ? null : Math.round(r.margin));
+    <!-- 4. 투찰율별 입찰금액 비교 -->
+    <div class="card">
+      <div class="section-title">
+        <span class="step">4</span>
+        투찰율별 입찰금액 비교
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="tableBids">
+          <thead>
+            <tr>
+              <th>투찰율 (%)</th>
+              <th>입찰금액 (₩)</th>
+              <th>하한가 대비 (%)</th>
+              <th>판단</th>
+              <th>안전도 시각화</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- JS로 채움 -->
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        ▪ <span class="badge badge-safe">초록</span> : 하한가 대비 약 0~3% 위 (일반적으로 많이 선택되는 안정 구간).<br/>
+        ▪ <span class="badge badge-warn">노랑</span> : 여유는 있지만 경쟁사보다 너무 높은 구간일 수 있습니다.<br/>
+        ▪ <span class="badge badge-danger">빨강</span> : 하한가 미만 또는 지나치게 높은 구간 – 주의 필요.
+      </div>
+    </div>
 
-      const ctx = document.getElementById('chartCanvas').getContext('2d');
-      if (chart) chart.destroy();
-      chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [
-            {
-              label: '입찰가',
-              data: dataBid,
-              borderWidth: 2,
-              tension: 0.2
-            },
-            {
-              label: '하한가 (수평선)',
-              data: dataLower,
-              borderWidth: 1,
-              borderDash: [4, 4],
-              tension: 0
-            },
-            {
-              label: '우리 마진',
-              data: dataMargin,
-              borderWidth: 2,
-              tension: 0.2,
-              yAxisID: 'y1'
-            }
-          ]
-        },
-        options: {
-          interaction: { mode: 'index', intersect: false },
-          stacked: false,
-          plugins: {
-            legend: { labels: { font: { size: 11 } } }
-          },
-          scales: {
-            y: {
-              type: 'linear',
-              position: 'left',
-              ticks: { font: { size: 10 } }
-            },
-            y1: {
-              type: 'linear',
-              position: 'right',
-              ticks: { font: { size: 10 } },
-              grid: { drawOnChartArea: false }
-            }
-          }
-        }
-      });
+    <!-- 5. 우리 마진 계산 -->
+    <div class="card">
+      <div class="section-title">
+        <span class="step">5</span>
+        우리 마진 계산 (보고서 사업용)
+      </div>
+      <div class="grid-2">
+        <div>
+          <label>마진 계산에 사용할 투찰율 (%)</label>
+          <input id="inputMarginRate" type="number" step="0.01" placeholder="예: 98.7" />
+          <small>위 투찰율 표에서 선택한 값과 동일하게 입력.</small>
+        </div>
+        <div>
+          <label>보고서 정가 합계 (부가세 포함, ₩)</label>
+          <input id="inputBookPrice" type="text" placeholder="예: 9000000" />
+          <small>출판사에서 제시한 보고서 묶음 정가의 합계.</small>
+        </div>
+        <div>
+          <label>우리 커미션율 (%)</label>
+          <input id="inputCommission" type="number" step="0.1" placeholder="예: 30" />
+          <small>정가에서 우리가 가져가는 비율. 예: 30% → 정가의 30%가 우리 몫.</small>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <button id="btnMargin">마진 계산</button>
+      </div>
+      <div id="marginResult" class="summary-grid" style="margin-top:8px;">
+        <!-- JS로 채움 -->
+      </div>
+      <div class="note">
+        우리는 면세사업자이므로, 기관에 청구하는 <b>입찰가(부가세 포함)</b>에서
+        출판사에 지급하는 금액을 뺀 값이 실질적으로 남는 마진이라고 보고 계산합니다.
+      </div>
+    </div>
 
-      // 자동 해석 텍스트
-      const bestSafe = rows.find(
-        r => r.diffFromLower > 0 && (isNaN(r.margin) || r.margin > 0)
-      ) || recommended;
+    <!-- 6. 자동 해석 -->
+    <div class="card">
+      <div class="section-title">
+        <span class="step">6</span>
+        자동 해석
+      </div>
+      <div id="autoExplain">
+        아직 계산 전입니다. 위에서 값을 입력하고 <b>계산 실행</b>을 눌러주세요.
+      </div>
+    </div>
+  </div>
 
-      const marginText = isNaN(bestSafe.margin)
-        ? '정가·커미션 정보가 없어서 마진 분석은 생략되었습니다.'
-        : `이 구간에서 예상 마진은 약 ${formatKRW(bestSafe.margin)} 수준입니다. (면세사업자 가정)`;
-
-      const typeExplain =
-        bidType === 'normal'
-          ? '이 건은 일반입찰로 판단되며, 통상적인 낙찰하한율 구조를 따릅니다.'
-          : '이 건은 견적요청공고로, 경쟁 강도가 일반입찰보다 낮을 수 있지만, 기본 원리는 동일한 하한가 구조를 따릅니다.';
-
-      explainArea.textContent =
-`[1] 하한가 위치
-· 하한가는 ${formatKRW(lowerLimit)} (투찰율 ${lowerRate.toFixed(3)}%) 입니다.
-· 이 선 아래로 떨어지는 순간, 형식적으로는 바로 탈락 위험 구간에 들어갑니다.
-
-[2] 추천 구간 해석
-· 현재 설정에서 비교적 균형이 좋아 보이는 지점은 투찰율 ${bestSafe.rate.toFixed(3)}% 부근입니다.
-· 이 때 입찰가는 약 ${formatKRW(bestSafe.bidPrice)} 로, 하한가보다 약 ${formatKRW(bestSafe.diffFromLower)} (${bestSafe.diffRatio.toFixed(3)}%) 위에 있습니다.
-· 너무 낮지도, 너무 높지도 않은 “완충 구간”을 확보하는 것이 목적입니다.
-
-[3] 우리 사업장 마진 관점
-· ${marginText}
-· 발행사 정가: ${listPrice ? formatKRW(listPrice) : '입력 없음'}
-· 커미션(할인율): ${isNaN(commissionRate) ? '-' : commissionRate.toFixed(1) + '%'}
-→ 입찰가 – (정가 × (1–커미션)) 구조로 계산했습니다.
-
-[4] 입찰 유형 관점
-· ${typeExplain}
-${agencyName ? '· 기관: ' + agencyName + ' / ' : ''}${noticeTitle ? '공고명: ' + noticeTitle : ''}
-
-[5] 그래프 읽는 법
-· 파란선(입찰가)이 빨간선(하한가)보다 아래로 내려가는 구간은 절대 피해야 하는 구간입니다.
-· 파란선이 빨간선을 살짝 위에서 따라가면서, 초록선(우리 마진)이 충분히 플러스인 구간이 “현실적인 후보”입니다.
-· 표와 그래프를 같이 보면서, 실제 투찰율을 결정하면 됩니다.
-`;
-
-      // 예비가격 15개 시뮬레이션
-      const prePrices = [];
-      const minFactor = 0.98;
-      const maxFactor = 1.02;
-      for (let i = 0; i < 15; i++) {
-        const factor = minFactor + (maxFactor - minFactor) * (i / 14);
-        prePrices.push(effectiveBase * factor);
-      }
-      const chosen = [];
-      for (let i = 0; i < 4; i++) {
-        const idx = Math.floor(Math.random() * prePrices.length);
-        chosen.push(prePrices[idx]);
-      }
-      const avg = chosen.reduce((a, b) => a + b, 0) / chosen.length;
-
-      let preText =
-`[예비가격 15개 (±2%) 단순 시뮬레이션]
-
-· 예비가격 범위: 약 ${formatKRW(prePrices[0])} ~ ${formatKRW(prePrices[prePrices.length - 1])}
-· 임의로 뽑힌 4개 예비가격(예시):
-  - ${chosen.map(v => formatKRW(v)).join(', ')}
-· 이 4개의 평균(임시 예정가격): ${formatKRW(avg)}
-
-→ 실제 나라장터에서는 이런 구조로 예정가격이 정해지고,
-   “낙찰하한율 × 예정가격 = 하한가”가 됩니다.
-   여기서는 구조를 이해하기 위한 학습용 모델입니다.`;
-      preArea.textContent = preText;
+  <script>
+    function parseNumber(str) {
+      if (!str) return NaN;
+      return Number(String(str).replace(/,/g, "").trim());
     }
+
+    function formatCurrency(n) {
+      if (isNaN(n)) return "-";
+      return n.toLocaleString("ko-KR", { maximumFractionDigits: 0 });
+    }
+
+    function formatPercent(n, digits = 3) {
+      if (isNaN(n)) return "-";
+      return n.toFixed(digits);
+    }
+
+    function classifySafety(diffPercent) {
+      // diffPercent: 하한가 대비 (입찰가 / 하한가 - 1) * 100
+      if (diffPercent < 0) return { label: "하한가 미만 (낙찰 불가)", badge:"danger", bar:"danger" };
+      if (diffPercent <= 3) return { label: "하한가 인근 (안정 구간)", badge:"safe", bar:"safe" };
+      if (diffPercent <= 7) return { label: "다소 여유 (경쟁사 대비 높을 수 있음)", badge:"warn", bar:"warn" };
+      return { label: "여유가 큼 (낙찰 확률↓)", badge:"warn", bar:"warn" };
+    }
+
+    let lastEstimated = NaN;
+    let lastLimitPrice = NaN;
+    let lastBidRows = [];
+
+    function runCalc() {
+      const estimatedInput = parseNumber(document.getElementById("inputEstimated").value);
+      const budgetInput    = parseNumber(document.getElementById("inputBudget").value);
+      const vatRate        = Number(document.getElementById("inputVat").value) || 0;
+      const limitRate      = Number(document.getElementById("inputLimitRate").value) || 0;
+      const range          = Number(document.getElementById("inputRange").value) || 0;
+      const bidRatesStr    = document.getElementById("inputBidRates").value || "";
+
+      let estimated = NaN;
+      let usedBudget = NaN;
+
+      if (!isNaN(estimatedInput)) {
+        estimated = estimatedInput;
+      } else if (!isNaN(budgetInput)) {
+        usedBudget = budgetInput;
+        const divisor = 1 + vatRate / 100;
+        estimated = budgetInput / divisor;
+      }
+
+      if (!isNaN(estimated)) {
+        lastEstimated = estimated;
+      } else {
+        alert("예정가격 또는 배정예산 중 하나는 반드시 입력해야 합니다.");
+        return;
+      }
+      if (isNaN(usedBudget) && !isNaN(budgetInput)) {
+        usedBudget = budgetInput;
+      }
+
+      const limitPrice = estimated * (limitRate / 100);
+      lastLimitPrice = limitPrice;
+
+      // 요약 영역
+      const minPre = estimated * (1 - range / 100);
+      const maxPre = estimated * (1 + range / 100);
+
+      const summaryArea = document.getElementById("summaryArea");
+      summaryArea.innerHTML = "";
+      const items = [
+        { label:"사용된 예정가격 (부가세 제외)", value: formatCurrency(Math.round(estimated)) + " 원" },
+        { label:"입력한 배정예산 (부가세 포함)", value: isNaN(usedBudget) ? "입력 안함" : formatCurrency(Math.round(usedBudget)) + " 원" },
+        { label:"낙찰하한가", value: formatCurrency(Math.round(limitPrice)) + " 원" },
+        { label:"예비가격 범위 (근사)", value: formatCurrency(Math.round(minPre)) + " ~ " + formatCurrency(Math.round(maxPre)) + " 원" }
+      ];
+      items.forEach(it => {
+        const div = document.createElement("div");
+        div.className = "summary-item";
+        div.innerHTML = '<div class="summary-label">' + it.label + '</div>' +
+                        '<div class="summary-value">' + it.value + '</div>';
+        summaryArea.appendChild(div);
+      });
+
+      // 예비가격 15개
+      const tbodyPre = document.querySelector("#tablePrePrices tbody");
+      tbodyPre.innerHTML = "";
+      const rowsPre = [];
+      if (range > 0) {
+        for (let i = 0; i < 15; i++) {
+          const ratio = -range + (2 * range) * (i / 14); // -range ~ +range
+          const price = estimated * (1 + ratio / 100);
+          rowsPre.push({ idx:i+1, price, diff:ratio });
+        }
+      }
+      rowsPre.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td>" + r.idx + "</td>" +
+          "<td>" + formatCurrency(Math.round(r.price)) + "</td>" +
+          "<td>" + formatPercent(r.diff, 3) + " %</td>";
+        tbodyPre.appendChild(tr);
+      });
+
+      // 투찰율별 입찰금액
+      const tbodyBid = document.querySelector("#tableBids tbody");
+      tbodyBid.innerHTML = "";
+      lastBidRows = [];
+      const rateTokens = bidRatesStr.split(",").map(s => s.trim()).filter(s => s.length>0);
+      rateTokens.forEach(token => {
+        const rate = Number(token);
+        if (isNaN(rate)) return;
+        const bidPrice = estimated * (rate / 100);
+        const diffPercent = (bidPrice / limitPrice - 1) * 100;
+        const info = classifySafety(diffPercent);
+        const barWidth = Math.min(100, Math.abs(diffPercent)); // 최대 100%
+        const tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td>" + formatPercent(rate, 3) + "</td>" +
+          "<td>" + formatCurrency(Math.round(bidPrice)) + "</td>" +
+          "<td>" + formatPercent(diffPercent, 3) + " %</td>" +
+          '<td><span class="badge badge-' + info.badge + '">' + info.label + "</span></td>" +
+          '<td><div class="bar-wrap"><div class="bar-inner bar-' + info.bar +
+          '" style="width:' + barWidth + '%"></div></div></td>';
+        tbodyBid.appendChild(tr);
+        lastBidRows.push({
+          rate,
+          bidPrice,
+          diffPercent,
+          info
+        });
+      });
+
+      updateAutoExplain();
+    }
+
+    function updateAutoExplain() {
+      const area = document.getElementById("autoExplain");
+      if (!lastEstimated || !lastLimitPrice || lastBidRows.length === 0) {
+        area.innerHTML = "계산 결과가 아직 없습니다. 위에서 값을 입력하고 <b>계산 실행</b>을 눌러주세요.";
+        return;
+      }
+
+      // 안전 구간: 하한가 대비 0~3% 위
+      const safeCandidates = lastBidRows.filter(r => r.diffPercent >= 0 && r.diffPercent <= 3);
+      // 너무 위험(하한가 미만)
+      const dangerCandidates = lastBidRows.filter(r => r.diffPercent < 0);
+      // 상단 여유 구간
+      const highCandidates = lastBidRows.filter(r => r.diffPercent > 3);
+
+      const bestSafe = safeCandidates.sort((a,b)=>Math.abs(a.diffPercent-1.5)-Math.abs(b.diffPercent-1.5))[0];
+      const bestHigh = highCandidates.sort((a,b)=>a.diffPercent-b.diffPercent)[0];
+
+      let html = "";
+      html += "<p>이번 입력값으로 계산된 <span class=\"highlight\">핵심 지표</span>는 다음과 같습니다.</p>";
+      html += "<ul>";
+      html += "<li>예정가격(근사): <b>" + formatCurrency(Math.round(lastEstimated)) + " 원</b></li>";
+      html += "<li>낙찰하한가: <b>" + formatCurrency(Math.round(lastLimitPrice)) + " 원</b></li>";
+      html += "</ul>";
+
+      if (bestSafe) {
+        html += "<p>하한가 대비 0~3% 구간(안정 구간) 중에서, 가장 균형 잡힌 후보는</p>";
+        html += "<ul><li>투찰율 <b>" + formatPercent(bestSafe.rate,3) + " %</b> (하한가 대비 " +
+                formatPercent(bestSafe.diffPercent,3) + " %) 입니다.</li></ul>";
+      } else {
+        html += "<p>이번에 입력한 투찰율 목록에는 <b>하한가 대비 0~3% 구간</b>이 포함되지 않았습니다.</p>";
+      }
+
+      if (dangerCandidates.length > 0) {
+        const minDanger = dangerCandidates.sort((a,b)=>a.diffPercent-b.diffPercent)[0];
+        html += "<p class=\"margin-warn\">주의: 일부 투찰율은 하한가 미만입니다.</p>";
+        html += "<ul><li>예: 투찰율 <b>" + formatPercent(minDanger.rate,3) +
+                " %</b> → 하한가 대비 " + formatPercent(minDanger.diffPercent,3) +
+                " % (낙찰 불가)</li></ul>";
+      }
+
+      if (bestHigh) {
+        html += "<p>하한가보다 여유가 있는 구간에서 가장 낮은(그래도 높은) 후보는</p>";
+        html += "<ul><li>투찰율 <b>" + formatPercent(bestHigh.rate,3) +
+                " %</b> → 하한가 대비 " + formatPercent(bestHigh.diffPercent,3) +
+                " % 입니다.</li></ul>";
+      }
+
+      html += "<p style=\"margin-top:6px;\">위 해석은 <b>단순 계산 기준</b>이며, 실제 낙찰 여부는 참여 업체 수, 기술점수, 기관 특성 등에 따라 달라질 수 있습니다.</p>";
+
+      area.innerHTML = html;
+    }
+
+    function runMarginCalc() {
+      if (!lastEstimated || !lastLimitPrice) {
+        alert("먼저 기본 계산을 실행해 예정가격을 계산해 주세요.");
+        return;
+      }
+      const marginRate   = Number(document.getElementById("inputMarginRate").value);
+      const bookPrice    = parseNumber(document.getElementById("inputBookPrice").value);
+      const commission   = Number(document.getElementById("inputCommission").value);
+
+      if (!marginRate || isNaN(bookPrice) || isNaN(commission)) {
+        alert("투찰율, 보고서 정가 합계, 커미션율을 모두 입력해 주세요.");
+        return;
+      }
+
+      const bidPrice = lastEstimated * (marginRate / 100); // 부가세 제외 입찰금액
+      // 기관에 청구하는 금액(부가세 포함)은 여기서 단순히 10% 부가세라고 가정하지 않고,
+      // 이미 배정예산·예정가격 자체를 기준으로 본다고 보고, bidPrice를 그대로 사용.
+      // 출판사 지급액: 정가 × (1 - 커미션율)
+      const publisherPay = bookPrice * (1 - commission / 100);
+      const margin = bidPrice - publisherPay;
+      const marginRateReal = margin / bidPrice * 100;
+
+      const div = document.getElementById("marginResult");
+      div.innerHTML = "";
+
+      const items = [
+        { label:"선택 투찰율 기준 입찰금액 (부가세 제외 기준 근사)", value: formatCurrency(Math.round(bidPrice)) + " 원" },
+        { label:"출판사 지급 예상액", value: formatCurrency(Math.round(publisherPay)) + " 원" },
+        { label:"우리 예상 마진", value: formatCurrency(Math.round(margin)) + " 원 (" + formatPercent(marginRateReal,2) + " %)" }
+      ];
+      items.forEach(it => {
+        const el = document.createElement("div");
+        el.className = "summary-item";
+        el.innerHTML =
+          '<div class="summary-label">' + it.label + '</div>' +
+          '<div class="summary-value">' + it.value + '</div>';
+        div.appendChild(el);
+      });
+
+      const explain = document.createElement("div");
+      explain.style.gridColumn = "1 / -1";
+      let cls = marginRateReal < 5 ? "margin-warn" : "margin-ok";
+      let msg = marginRateReal < 5
+        ? "마진이 5% 미만입니다. 보고서 난이도·추가 업무를 고려하면 비추천 구간일 수 있습니다."
+        : "마진이 어느 정도 확보되었습니다. 기술·서류 부담을 고려해 참여 여부를 판단하면 됩니다.";
+      explain.innerHTML = '<div class="' + cls + '" style="margin-top:6px;">' + msg + '</div>';
+      div.appendChild(explain);
+    }
+
+    document.getElementById("btnCalc").addEventListener("click", runCalc);
+    document.getElementById("btnMargin").addEventListener("click", runMarginCalc);
   </script>
 </body>
 </html>
