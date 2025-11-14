@@ -1,592 +1,73 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <title>2번 도구 v1.0 – 나라장터 입찰 계산·분석기</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      margin: 16px;
-      background: #f5f5f5;
-    }
-    h1 {
-      font-size: 20px;
-      margin-bottom: 8px;
-    }
-    h2 {
-      font-size: 16px;
-      margin-top: 24px;
-      margin-bottom: 8px;
-    }
-    .card {
-      background: white;
-      border-radius: 10px;
-      padding: 12px 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-    }
-    label {
-      font-size: 13px;
-      display: block;
-      margin-bottom: 4px;
-    }
-    input[type="number"],
-    input[type="text"],
-    select {
-      width: 100%;
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 13px;
-      box-sizing: border-box;
-    }
-    input[type="checkbox"] {
-      transform: scale(1.1);
-      margin-right: 4px;
-    }
-    .btn {
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 999px;
-      padding: 8px 16px;
-      font-size: 13px;
-      cursor: pointer;
-    }
-    .btn.secondary {
-      background: #4b5563;
-    }
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: default;
-    }
-    .result-highlight {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      font-size: 13px;
-    }
-    .pill {
-      background: #eef2ff;
-      border-radius: 999px;
-      padding: 6px 10px;
-    }
-    .pill.bad {
-      background: #fee2e2;
-      color: #b91c1c;
-    }
-    .pill.good {
-      background: #dcfce7;
-      color: #166534;
-    }
-    .pill.warn {
-      background: #fef9c3;
-      color: #854d0e;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-      margin-top: 8px;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 4px 6px;
-      text-align: right;
-      white-space: nowrap;
-    }
-    th {
-      background: #f3f4f6;
-    }
-    th:first-child, td:first-child {
-      text-align: left;
-    }
-    .badge {
-      display: inline-block;
-      font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: #e5e7eb;
-      margin-right: 4px;
-    }
-    .badge.critical {
-      background: #fee2e2;
-      color: #b91c1c;
-    }
-    .badge.info {
-      background: #e0f2fe;
-      color: #0369a1;
-    }
-    .badge.safe {
-      background: #dcfce7;
-      color: #166534;
-    }
-    .badge.warn {
-      background: #fef9c3;
-      color: #854d0e;
-    }
-    .explain {
-      font-size: 12px;
-      line-height: 1.5;
-      white-space: pre-line;
-    }
-    canvas {
-      background: #ffffff;
-      border-radius: 8px;
-      padding: 8px;
-    }
-    .sub {
-      font-size: 11px;
-      color: #6b7280;
-    }
-    .tag-row {
-      font-size: 11px;
-      margin-top: 4px;
-    }
-    .tag {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: #e5e7eb;
-      margin-right: 4px;
-    }
-  </style>
-</head>
-<body>
-  <h1>2번 도구 v1.0 – 나라장터 입찰 계산·분석기</h1>
+  <head>
+    <meta charset="utf-8" />
+    <title>WIC 자동화 안내서 (1번 도구 전용 v1.2)</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1>☀ WIC 자동화 안내서 (1번 도구 전용 v1.2)</h1>
+      <p class="subtitle">
+        이 화면은 <strong>1번 도구(자동화 안내서)</strong>만 남기고,
+        나머지 129개 도구를 모두 지운 뒤
+        <strong>Trigger → Observe → Lock-in → Propagate → Sync</strong>를
+        알멩이 로직으로 고정하는 중앙 안내 모듈이다.
+      </p>
+      <nav class="tags">
+        <span>1번 도구만 유지</span>
+        <span>129개 도구 삭제</span>
+        <span>질문 최소</span>
+        <span>사용자 의도 추입</span>
+      </nav>
+    </header>
 
-  <!-- 안내 카드 -->
-  <div class="card">
-    <p class="sub">
-      🔹 공고 유형, 추정가격, 하한율, 정가, 커미션을 넣으면<br />
-      &nbsp;&nbsp;→ 하한가, 여러 투찰율 후보, 우리 마진, 그래프, 해석 텍스트까지 한 번에 보여줍니다.<br />
-      🔹 수의시담 건은 자동으로 “참가 불가”로 표시되고 계산을 막습니다.
-    </p>
-  </div>
+    <main class="layout">
+      <!-- 왼쪽: 자동화 루프 실행 -->
+      <section class="panel">
+        <h2>1. 자동화 루프 실행</h2>
+        <p class="panel-desc">
+          아래 버튼을 누르면, 기록 기반 <strong>사용자 의도</strong>를 읽어서<br />
+          ① 상태 진단 → ② 단계별 체크 → ③ 보고서 자동 생성까지 한 번에 실행한다.
+        </p>
 
-  <!-- 1. 입력 영역 -->
-  <div class="card">
-    <h2>1단계. 공고 기본 정보 입력</h2>
-    <div class="grid">
-      <div>
-        <label>공고 유형</label>
-        <select id="bidType">
-          <option value="normal">일반입찰</option>
-          <option value="quote">견적요청공고</option>
-          <option value="nego">수의시담 / 다자간수의시담</option>
-        </select>
-      </div>
-      <div>
-        <label>발주 기관명 (예: 한국생산기술연구원)</label>
-        <input type="text" id="agencyName" placeholder="기관명을 적어두면 해석에 같이 표시됩니다." />
-      </div>
-      <div>
-        <label>공고명 (간단히 메모용)</label>
-        <input type="text" id="noticeTitle" placeholder="예: ○○ 시장 및 기술자료 구매" />
-      </div>
-    </div>
+        <button id="run-loop" class="primary-btn">자동화 루프 실행</button>
 
-    <h2>2단계. 숫자 입력</h2>
-    <div class="grid">
-      <div>
-        <label>추정가격 / 기초금액 기준 (원)</label>
-        <input type="number" id="basePrice" placeholder="예: 20000000" />
-      </div>
-      <div>
-        <label>낙찰하한율 (%)</label>
-        <input type="number" id="lowerRate" step="0.001" value="87.745" />
-      </div>
-      <div>
-        <label>우리 보고서 정가 (원, 발행사 정가 기준)</label>
-        <input type="number" id="listPrice" placeholder="예: 12000000" />
-      </div>
-      <div>
-        <label>커미션 / 할인율 (%) (발행사에 지급 비율)</label>
-        <input type="number" id="commissionRate" step="0.1" value="20" />
-      </div>
-      <div>
-        <label>추정가격의 부가세 처리</label>
-        <select id="vatType">
-          <option value="included">추정가격에 부가세 포함</option>
-          <option value="excluded">추정가격 + 부가세 별도(10%)</option>
-        </select>
-      </div>
-      <div>
-        <label>투찰율 범위 설명 (표시용 텍스트)</label>
-        <input type="text" id="bidRange" value="하한율 +0.05% ~ +1.00% (0.05 단위)" />
-      </div>
-    </div>
+        <div class="log-box">
+          <h3>실행 로그</h3>
+          <pre id="log-output">(아직 엑셀/온라인 연동 전 • 최소 동작 버전)</pre>
+        </div>
+      </section>
 
-    <h2>3단계. 투찰 후보 구간 설정</h2>
-    <div class="grid">
-      <div>
-        <label>하한율 대비 최소 여유 (%)</label>
-        <input type="number" id="extraStart" step="0.01" value="0.05" />
-      </div>
-      <div>
-        <label>하한율 대비 최대 여유 (%)</label>
-        <input type="number" id="extraEnd" step="0.01" value="1.00" />
-      </div>
-      <div>
-        <label>간격(step, %) – 예: 0.05</label>
-        <input type="number" id="extraStep" step="0.01" value="0.05" />
-      </div>
-    </div>
+      <!-- 오른쪽: 자동 생성 보고서 + 워드 안내서 -->
+      <section class="panel">
+        <h2>2. 자동 생성 보고서 / 워드 안내서</h2>
 
-    <div style="margin-top: 12px;">
-      <button class="btn" id="calcBtn" onclick="runCalc()">계산하기</button>
-      <button class="btn secondary" onclick="resetForm()">입력 초기화</button>
-    </div>
-    <div class="tag-row">
-      <span class="tag">면세사업자 가정: 마진 = 입찰가 – (정가 × (1–커미션))</span>
-      <span class="tag">부가세는 발주기관 세금으로 보고 마진 계산에서 분리</span>
-    </div>
-  </div>
+        <div class="report-box">
+          <h3>자동 생성 보고서 (복사해서 쓰는 용도)</h3>
+          <textarea id="report-output" rows="10" spellcheck="false"></textarea>
+        </div>
 
-  <!-- 4. 핵심 결과 -->
-  <div class="card">
-    <h2>4단계. 핵심 요약</h2>
-    <div class="result-highlight" id="summaryArea">
-      <span class="sub">위에서 공고 유형과 숫자를 넣고 “계산하기”를 누르면 요약이 나옵니다.</span>
-    </div>
-  </div>
+        <div class="word-box">
+          <h3>고객용 잠금 워드 안내서</h3>
+          <p class="panel-desc">
+            아래 버튼을 누르면, <strong>잠금 설정된 guide-template.docx</strong>를
+            다운로드한다. (연구비/관심분야 자동 반영은 다음 단계에서 붙인다.)
+          </p>
+          <button id="download-docx" class="secondary-btn">
+            잠금 워드 안내서 다운로드
+          </button>
+        </div>
+      </section>
+    </main>
 
-  <!-- 5. 투찰율별 표 -->
-  <div class="card">
-    <h2>5단계. 투찰율별 입찰가·마진 상세표</h2>
-    <div class="sub">
-      각 행은 하나의 “투찰 전략”입니다. 붉은 색 경고는 하한가 미만(탈락 위험), 노란색은 근접(주의), 초록색은 비교적 안전 구간입니다.
-    </div>
-    <div id="tableArea"></div>
-  </div>
+    <footer class="footer">
+      <small>
+        현재 버전: 최소 동작 v1.0 (버튼 작동 + 잠금 워드 템플릿 다운로드까지 확인용)  
+        → 이후 단계에서: 엑셀 연구비 분석 · 온라인 연구비 추정 · 고객별 맞춤 문단 자동 삽입 추가
+      </small>
+    </footer>
 
-  <!-- 6. 그래프 -->
-  <div class="card">
-    <h2>6단계. 그래프 – 입찰가·하한가·우리 마진</h2>
-    <div class="sub">파란선: 입찰가 / 빨간선: 하한가 수평선 / 초록선: 우리 마진 (우측 축)</div>
-    <canvas id="chartCanvas" height="220"></canvas>
-  </div>
-
-  <!-- 7. 자동 해석 텍스트 -->
-  <div class="card">
-    <h2>7단계. 자동 해석 텍스트 (학습용 설명)</h2>
-    <div id="explainArea" class="explain">
-      아직 데이터가 없습니다. 숫자를 넣고 계산을 돌리면,<br />
-      • 하한가가 어디인지<br />
-      • 어느 투찰율 구간이 “너무 낮지도, 너무 높지도 않은지”<br />
-      • 우리에게 남는 예상 마진이 어느 정도인지<br />
-      글로 정리해서 보여줍니다.
-    </div>
-  </div>
-
-  <!-- 8. 예비가격 시뮬레이션 -->
-  <div class="card">
-    <h2>8단계. 예비가격 15개(±2%) & 4개 추첨 평균</h2>
-    <div class="sub">
-      실제 나라장터 구조를 단순 모델로 표현한 것입니다. (±2% 구간에서 15개 만들고, 그 중 4개를 뽑아 평균)
-    </div>
-    <div id="prePriceArea" class="explain"></div>
-  </div>
-
-  <script>
-    let chart;
-
-    function formatKRW(value) {
-      if (isNaN(value)) return '-';
-      return value.toLocaleString('ko-KR') + '원';
-    }
-
-    function resetForm() {
-      document.getElementById('bidType').value = 'normal';
-      document.getElementById('agencyName').value = '';
-      document.getElementById('noticeTitle').value = '';
-      document.getElementById('basePrice').value = '';
-      document.getElementById('lowerRate').value = 87.745;
-      document.getElementById('listPrice').value = '';
-      document.getElementById('commissionRate').value = 20;
-      document.getElementById('vatType').value = 'included';
-      document.getElementById('extraStart').value = 0.05;
-      document.getElementById('extraEnd').value = 1.0;
-      document.getElementById('extraStep').value = 0.05;
-      document.getElementById('summaryArea').innerHTML =
-        '<span class="sub">위에서 공고 유형과 숫자를 넣고 “계산하기”를 누르면 요약이 나옵니다.</span>';
-      document.getElementById('tableArea').innerHTML = '';
-      document.getElementById('explainArea').textContent =
-        '아직 데이터가 없습니다. 숫자를 넣고 계산을 돌리면,\n• 하한가가 어디인지\n• 어느 투찰율 구간이 “너무 낮지도, 너무 높지도 않은지”\n• 우리에게 남는 예상 마진이 어느 정도인지\n글로 정리해서 보여줍니다.';
-      document.getElementById('prePriceArea').textContent = '';
-      if (chart) chart.destroy();
-    }
-
-    function runCalc() {
-      const bidType = document.getElementById('bidType').value;
-      const agencyName = document.getElementById('agencyName').value.trim();
-      const noticeTitle = document.getElementById('noticeTitle').value.trim();
-      const basePrice = Number(document.getElementById('basePrice').value);
-      const lowerRate = Number(document.getElementById('lowerRate').value);
-      const listPrice = Number(document.getElementById('listPrice').value);
-      const commissionRate = Number(document.getElementById('commissionRate').value);
-      const vatType = document.getElementById('vatType').value;
-      const extraStart = Number(document.getElementById('extraStart').value);
-      const extraEnd = Number(document.getElementById('extraEnd').value);
-      const extraStep = Number(document.getElementById('extraStep').value);
-
-      const summaryArea = document.getElementById('summaryArea');
-      const tableArea = document.getElementById('tableArea');
-      const explainArea = document.getElementById('explainArea');
-      const preArea = document.getElementById('prePriceArea');
-
-      // 수의시담 차단
-      if (bidType === 'nego') {
-        summaryArea.innerHTML = `
-          <span class="pill bad"><b>수의시담 / 다자간수의시담</b> 공고는 정보 공개용이며, 계약대상자가 아닌 업체는 참가할 수 없습니다.</span>
-          <span class="pill">이 건은 계산·투찰 대상에서 제외해야 합니다.</span>
-        `;
-        tableArea.innerHTML = '';
-        explainArea.textContent =
-          '이 공고는 수의시담/다자간수의시담 유형으로 인식되었습니다.\n\n' +
-          '· 나라장터 안내처럼 “계약대상자가 아닌 업체는 참가할 수 없음”으로 보아,\n' +
-          '  WIC가 새로 참여할 수 있는 건이 아니라고 판단하는 것이 안전합니다.\n\n' +
-          '따라서 이 도구에서는 입찰가·마진 계산을 하지 않고, 화면에서만 “참가 불가”로 표시합니다.';
-        preArea.textContent = '';
-        if (chart) chart.destroy();
-        return;
-      }
-
-      if (!basePrice || !lowerRate) {
-        alert('추정가격(또는 기초금액)과 낙찰하한율을 먼저 입력해 주세요.');
-        return;
-      }
-
-      // 부가세 처리 (단순 10% 가정)
-      let effectiveBase = basePrice;
-      if (vatType === 'excluded') {
-        effectiveBase = basePrice * 1.1;
-      }
-
-      const lowerLimit = effectiveBase * (lowerRate / 100);
-
-      // 투찰율 범위 생성
-      const rows = [];
-      const eps = 1e-9;
-      for (let extra = extraStart; extra <= extraEnd + eps; extra += extraStep) {
-        const rate = lowerRate + extra; // %
-        const bidPrice = effectiveBase * (rate / 100);
-        const diffFromLower = bidPrice - lowerLimit;
-        const diffRatio = (bidPrice / lowerLimit - 1) * 100;
-
-        let margin = NaN;
-        if (listPrice && commissionRate >= 0) {
-          const costToUs = listPrice * (1 - commissionRate / 100);
-          margin = bidPrice - costToUs; // 면세 가정
-        }
-
-        rows.push({ rate, bidPrice, diffFromLower, diffRatio, margin });
-      }
-
-      // 임시 추천: 하한가보다 조금 위이면서 마진이 양수인 첫 구간
-      let recommended = rows.find(r => r.diffFromLower > 0 && (isNaN(r.margin) || r.margin > 0));
-      if (!recommended) {
-        recommended = rows[Math.floor(rows.length / 2)];
-      }
-
-      const safeBadgeClass = recommended.diffFromLower > 0 ? 'good' : 'bad';
-      const typeLabel =
-        bidType === 'normal' ? '일반입찰' :
-        bidType === 'quote' ? '견적요청공고' : '수의시담';
-
-      summaryArea.innerHTML = `
-        <span class="pill">
-          유형: <b>${typeLabel}</b>
-          ${agencyName ? ' / 기관: <b>' + agencyName + '</b>' : ''}
-        </span>
-        ${noticeTitle ? '<span class="pill">공고명: <b>' + noticeTitle + '</b></span>' : ''}
-        <span class="pill">하한가: <b>${formatKRW(lowerLimit)}</b> (${lowerRate.toFixed(3)}%)</span>
-        <span class="pill ${safeBadgeClass}">
-          임시 추천 투찰율: <b>${recommended.rate.toFixed(3)}%</b>,
-          입찰가: <b>${formatKRW(recommended.bidPrice)}</b>
-        </span>
-        ${!isNaN(recommended.margin) ? `
-        <span class="pill">
-          이 투찰에서 예상 마진: <b>${formatKRW(recommended.margin)}</b>
-        </span>` : ''}
-      `;
-
-      // 표
-      let html = `
-        <table>
-          <thead>
-            <tr>
-              <th>투찰율(%)</th>
-              <th>입찰가</th>
-              <th>하한가 대비 차이</th>
-              <th>하한가 대비 비율</th>
-              <th>예상 마진</th>
-              <th>비고</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-      rows.forEach(r => {
-        const isBelow = r.bidPrice < lowerLimit;
-        const gapPercent = r.diffRatio;
-        let note, className;
-        if (isBelow) {
-          note = '<span class="badge critical">하한가 미만 (탈락 위험)</span>';
-          className = 'critical';
-        } else if (gapPercent >= 0 && gapPercent < 0.1) {
-          note = '<span class="badge warn">하한가 근접 (주의)</span>';
-          className = 'warn';
-        } else {
-          note = '<span class="badge safe">안전 구간</span>';
-          className = 'safe';
-        }
-        html += `
-          <tr>
-            <td>${r.rate.toFixed(3)}</td>
-            <td>${formatKRW(r.bidPrice)}</td>
-            <td>${formatKRW(r.diffFromLower)}</td>
-            <td>${r.diffRatio.toFixed(3)}%</td>
-            <td>${isNaN(r.margin) ? '-' : formatKRW(r.margin)}</td>
-            <td>${note}</td>
-          </tr>
-        `;
-      });
-      html += '</tbody></table>';
-      tableArea.innerHTML = html;
-
-      // 그래프
-      const labels = rows.map(r => r.rate.toFixed(3));
-      const dataBid = rows.map(r => Math.round(r.bidPrice));
-      const dataLower = rows.map(() => Math.round(lowerLimit));
-      const dataMargin = rows.map(r => isNaN(r.margin) ? null : Math.round(r.margin));
-
-      const ctx = document.getElementById('chartCanvas').getContext('2d');
-      if (chart) chart.destroy();
-      chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [
-            {
-              label: '입찰가',
-              data: dataBid,
-              borderWidth: 2,
-              tension: 0.2
-            },
-            {
-              label: '하한가 (수평선)',
-              data: dataLower,
-              borderWidth: 1,
-              borderDash: [4, 4],
-              tension: 0
-            },
-            {
-              label: '우리 마진',
-              data: dataMargin,
-              borderWidth: 2,
-              tension: 0.2,
-              yAxisID: 'y1'
-            }
-          ]
-        },
-        options: {
-          interaction: { mode: 'index', intersect: false },
-          stacked: false,
-          plugins: {
-            legend: { labels: { font: { size: 11 } } }
-          },
-          scales: {
-            y: {
-              type: 'linear',
-              position: 'left',
-              ticks: { font: { size: 10 } }
-            },
-            y1: {
-              type: 'linear',
-              position: 'right',
-              ticks: { font: { size: 10 } },
-              grid: { drawOnChartArea: false }
-            }
-          }
-        }
-      });
-
-      // 자동 해석 텍스트
-      const bestSafe = rows.find(
-        r => r.diffFromLower > 0 && (isNaN(r.margin) || r.margin > 0)
-      ) || recommended;
-
-      const marginText = isNaN(bestSafe.margin)
-        ? '정가·커미션 정보가 없어서 마진 분석은 생략되었습니다.'
-        : `이 구간에서 예상 마진은 약 ${formatKRW(bestSafe.margin)} 수준입니다. (면세사업자 가정)`;
-
-      const typeExplain =
-        bidType === 'normal'
-          ? '이 건은 일반입찰로 판단되며, 통상적인 낙찰하한율 구조를 따릅니다.'
-          : '이 건은 견적요청공고로, 경쟁 강도가 일반입찰보다 낮을 수 있지만, 기본 원리는 동일한 하한가 구조를 따릅니다.';
-
-      explainArea.textContent =
-`[1] 하한가 위치
-· 하한가는 ${formatKRW(lowerLimit)} (투찰율 ${lowerRate.toFixed(3)}%) 입니다.
-· 이 선 아래로 떨어지는 순간, 형식적으로는 바로 탈락 위험 구간에 들어갑니다.
-
-[2] 추천 구간 해석
-· 현재 설정에서 비교적 균형이 좋아 보이는 지점은 투찰율 ${bestSafe.rate.toFixed(3)}% 부근입니다.
-· 이 때 입찰가는 약 ${formatKRW(bestSafe.bidPrice)} 로, 하한가보다 약 ${formatKRW(bestSafe.diffFromLower)} (${bestSafe.diffRatio.toFixed(3)}%) 위에 있습니다.
-· 너무 낮지도, 너무 높지도 않은 “완충 구간”을 확보하는 것이 목적입니다.
-
-[3] 우리 사업장 마진 관점
-· ${marginText}
-· 발행사 정가: ${listPrice ? formatKRW(listPrice) : '입력 없음'}
-· 커미션(할인율): ${isNaN(commissionRate) ? '-' : commissionRate.toFixed(1) + '%'}
-→ 입찰가 – (정가 × (1–커미션)) 구조로 계산했습니다.
-
-[4] 입찰 유형 관점
-· ${typeExplain}
-${agencyName ? '· 기관: ' + agencyName + ' / ' : ''}${noticeTitle ? '공고명: ' + noticeTitle : ''}
-
-[5] 그래프 읽는 법
-· 파란선(입찰가)이 빨간선(하한가)보다 아래로 내려가는 구간은 절대 피해야 하는 구간입니다.
-· 파란선이 빨간선을 살짝 위에서 따라가면서, 초록선(우리 마진)이 충분히 플러스인 구간이 “현실적인 후보”입니다.
-· 표와 그래프를 같이 보면서, 실제 투찰율을 결정하면 됩니다.
-`;
-
-      // 예비가격 15개 시뮬레이션
-      const prePrices = [];
-      const minFactor = 0.98;
-      const maxFactor = 1.02;
-      for (let i = 0; i < 15; i++) {
-        const factor = minFactor + (maxFactor - minFactor) * (i / 14);
-        prePrices.push(effectiveBase * factor);
-      }
-      const chosen = [];
-      for (let i = 0; i < 4; i++) {
-        const idx = Math.floor(Math.random() * prePrices.length);
-        chosen.push(prePrices[idx]);
-      }
-      const avg = chosen.reduce((a, b) => a + b, 0) / chosen.length;
-
-      let preText =
-`[예비가격 15개 (±2%) 단순 시뮬레이션]
-
-· 예비가격 범위: 약 ${formatKRW(prePrices[0])} ~ ${formatKRW(prePrices[prePrices.length - 1])}
-· 임의로 뽑힌 4개 예비가격(예시):
-  - ${chosen.map(v => formatKRW(v)).join(', ')}
-· 이 4개의 평균(임시 예정가격): ${formatKRW(avg)}
-
-→ 실제 나라장터에서는 이런 구조로 예정가격이 정해지고,
-   “낙찰하한율 × 예정가격 = 하한가”가 됩니다.
-   여기서는 구조를 이해하기 위한 학습용 모델입니다.`;
-      preArea.textContent = preText;
-    }
-  </script>
-</body>
+    <script src="app.js"></script>
+  </body>
 </html>
