@@ -2,920 +2,145 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>나라장터 입찰 도구 v2 - 보고서/자료 입찰용</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- Chart.js CDN -->
+  <title>입찰 계산·시각화 도구 v2</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- 그래프용 Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background: #f5f7fb;
-      color: #222;
-    }
-
-    .app-root {
-      display: flex;
-      min-height: 100vh;
-    }
-
-    .sidebar {
-      width: 340px;
-      padding: 20px 18px;
-      background: #ffffff;
-      border-right: 1px solid #dde1ee;
-    }
-
-    .sidebar h1 {
-      font-size: 18px;
-      margin: 0 0 8px;
-    }
-
-    .sidebar small {
-      color: #666;
-    }
-
-    .field-group {
-      margin-top: 14px;
-    }
-
-    .field-group label {
-      display: block;
-      font-size: 12px;
-      margin-bottom: 4px;
-      color: #555;
-    }
-
-    .field-group input {
-      width: 100%;
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid #ccd1e0;
-      font-size: 13px;
-    }
-
-    .field-row {
-      display: flex;
-      gap: 8px;
-    }
-
-    .field-row .field-group {
-      flex: 1;
-      margin-top: 0;
-    }
-
-    .btn-main {
-      margin-top: 16px;
-      width: 100%;
-      padding: 9px 12px;
-      border-radius: 8px;
-      border: none;
-      font-size: 14px;
-      font-weight: 600;
-      background: #2563eb;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    .btn-main:hover {
-      opacity: 0.93;
-    }
-
-    .hint-box {
-      margin-top: 10px;
-      font-size: 11px;
-      background: #eff4ff;
-      border-radius: 8px;
-      padding: 8px 10px;
-      color: #444;
-      line-height: 1.4;
-    }
-
-    .main-panel {
-      flex: 1;
-      padding: 16px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .meta-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      background: #ffffff;
-      border: 1px solid #dde1ee;
-      font-size: 12px;
-    }
-
-    .meta-title {
-      font-weight: 600;
-    }
-
-    .meta-sub {
-      color: #555;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 6px;
-      margin-top: 4px;
-    }
-
-    .tab-btn {
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid #c8d0e5;
-      background: #f4f5fb;
-      font-size: 12px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .tab-btn.active {
-      background: #2563eb;
-      color: #fff;
-      border-color: #2563eb;
-    }
-
-    .content-panel {
-      flex: 1;
-      background: #ffffff;
-      border-radius: 12px;
-      border: 1px solid #dde1ee;
-      padding: 14px 14px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      min-height: 0;
-    }
-
-    .chart-wrapper {
-      position: relative;
-      height: 300px;
-    }
-
-    .tab-content {
-      display: none;
-      flex-direction: column;
-      gap: 10px;
-      height: 100%;
-    }
-
-    .tab-content.active {
-      display: flex;
-    }
-
-    .analysis-box {
-      font-size: 12px;
-      padding: 8px 10px;
-      border-radius: 8px;
-      background: #f7fafc;
-      border: 1px solid #e2e8f0;
-      line-height: 1.5;
-    }
-
-    .analysis-box b {
-      color: #2563eb;
-    }
-
-    .table-box {
-      max-height: 130px;
-      overflow: auto;
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 11px;
-    }
-
-    th,
-    td {
-      padding: 4px 6px;
-      border-bottom: 1px solid #edf2f7;
-      text-align: right;
-      white-space: nowrap;
-    }
-
-    th {
-      background: #f0f4ff;
-      font-weight: 600;
-    }
-
-    td:first-child,
-    th:first-child {
-      text-align: left;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 6px;
-      border-radius: 999px;
-      font-size: 10px;
-      background: #e0f2fe;
-      color: #0369a1;
-      margin-left: 6px;
-    }
-
-    @media (max-width: 900px) {
-      .app-root {
-        flex-direction: column;
-      }
-      .sidebar {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid #dde1ee;
-      }
-    }
-  </style>
 </head>
 <body>
-  <div class="app-root">
-    <!-- 좌측 입력 패널 -->
-    <aside class="sidebar">
-      <h1>입찰 계산 도구 v2</h1>
-      <small>보고서·기술자료 위주 나라장터/견적용</small>
+  <div class="app-container">
+    <header class="header">
+      <h1>입찰 계산·시각화 도구 v2</h1>
+      <p class="subtitle">배정예산·하한율·투찰율을 한 번에 계산·그래프로 확인</p>
+    </header>
 
-      <div class="field-group">
-        <label>공고명</label>
-        <input id="input-notice-name" placeholder="예) 스마트 텍스타일 및 테크니컬 텍스타일 시장 및 기술자료" />
-      </div>
-
-      <div class="field-group">
-        <label>기관명</label>
-        <input id="input-agency" placeholder="예) 한국생산기술연구원" />
-      </div>
-
-      <div class="field-group">
-        <label>배정예산(원) <span style="color:#888;">※ 부가세 포함/미포함 그대로</span></label>
-        <input id="input-budget" type="number" placeholder="예) 11466000" />
-      </div>
-
-      <div class="field-row" style="margin-top:10px;">
-        <div class="field-group">
-          <label>낙찰하한율(%)</label>
-          <input id="input-floor" type="number" step="0.001" placeholder="예) 87.745" />
+    <!-- 메타데이터 영역 -->
+    <section class="section">
+      <h2>1. 공고 기본 정보</h2>
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label for="noticeTitle">공고명</label>
+          <input id="noticeTitle" type="text" placeholder="예: 2025년 연구성과 분석 및 보고서 제작" />
         </div>
-        <div class="field-group">
-          <label>우리 투찰율(%)</label>
-          <input id="input-our-rate" type="number" step="0.01" placeholder="예) 88.1" />
+        <div class="form-group">
+          <label for="agencyName">기관명</label>
+          <input id="agencyName" type="text" placeholder="예: 한국생산기술연구원" />
+        </div>
+        <div class="form-group">
+          <label for="noticeNumber">공고번호</label>
+          <input id="noticeNumber" type="text" placeholder="예: 20251118-00000" />
+        </div>
+        <div class="form-group">
+          <label for="itemCode">물품/용역 분류번호</label>
+          <input id="itemCode" type="text" placeholder="예: 81111500 (컨설팅 서비스)" />
         </div>
       </div>
+    </section>
 
-      <div class="field-row" style="margin-top:10px;">
-        <div class="field-group">
-          <label>정가(보고서 총액, 원)</label>
-          <input id="input-list-price" type="number" placeholder="예) 13000000" />
+    <!-- 숫자 입력 영역 -->
+    <section class="section">
+      <h2>2. 금액·비율 입력</h2>
+      <div class="grid grid-3">
+        <div class="form-group">
+          <label for="budget">배정예산 (원)</label>
+          <input id="budget" type="number" placeholder="예: 11466000" />
         </div>
-        <div class="field-group">
-          <label>공급사 할인율(%)</label>
-          <input id="input-discount" type="number" step="0.1" placeholder="예) 20" />
+        <div class="form-group">
+          <label for="estimate">추정가격 (원, 선택)</label>
+          <input id="estimate" type="number" placeholder="없으면 비워두기" />
+        </div>
+        <div class="form-group">
+          <label for="threshold">낙찰하한율 (%)</label>
+          <input id="threshold" type="number" placeholder="예: 87.74" />
+        </div>
+        <div class="form-group">
+          <label for="bidRates">투찰율 후보 (%)</label>
+          <input id="bidRates" type="text" placeholder="예: 87.8, 87.9, 88.0, 88.1" />
+          <small>쉼표(,)로 여러 개 입력</small>
+        </div>
+        <div class="form-group">
+          <label for="marginRate">우리 마진율 (%)</label>
+          <input id="marginRate" type="number" placeholder="예: 20" />
+          <small>보고서 정가·커미션 반영용</small>
+        </div>
+        <div class="form-group">
+          <label for="vatType">부가세 구분</label>
+          <select id="vatType">
+            <option value="exempt">면세 (우리 쪽)</option>
+            <option value="taxable">과세 10%</option>
+          </select>
         </div>
       </div>
+      <button id="calcButton" class="btn-primary">계산하기</button>
+      <div id="errorBox" class="error-box" style="display:none;"></div>
+    </section>
 
-      <button class="btn-main" id="btn-calc">계산하기 / 그래프 갱신</button>
-
-      <div class="hint-box">
-        <b>사용 팁</b><br />
-        1) <b>배정예산</b>·<b>낙찰하한율</b>·<b>우리 투찰율</b>만 넣어도 기본 분석 가능.<br />
-        2) 정가와 할인율을 넣으면 <b>우리 마진(원/%)</b>도 자동 계산.<br />
-        3) 공고명·기관명은 <b>메타데이터</b>로 저장되어 나중에 학습·필터링에 사용 가능.
-      </div>
-    </aside>
-
-    <!-- 우측 그래프/해석 패널 -->
-    <main class="main-panel">
-      <div class="meta-bar">
-        <div>
-          <div class="meta-title" id="meta-notice-title">공고를 입력해 주세요.</div>
-          <div class="meta-sub" id="meta-notice-sub">
-            기관 / 배정예산 / 우리 투찰율 / 낙찰하한율 요약
-          </div>
-        </div>
-        <div>
-          <span class="pill">B안 강조: 숫자 안 가리는 진한 밴드</span>
-        </div>
+    <!-- 결과 테이블 + 추천 요약 -->
+    <section class="section">
+      <h2>3. 투찰 시나리오별 계산 결과</h2>
+      <div class="summary-box">
+        <p><strong>공고 요약:</strong>
+          <span id="summaryTitle">-</span>
+        </p>
+        <p><strong>기준금액:</strong>
+          <span id="summaryBase">-</span>
+        </p>
+        <p><strong>낙찰하한가:</strong>
+          <span id="summaryThreshold">-</span>
+        </p>
+        <p><strong>추천 투찰율·입찰가:</strong>
+          <span id="summaryRecommendation">-</span>
+        </p>
       </div>
 
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>투찰율 (%)</th>
+              <th>입찰가 (원)</th>
+              <th>하한가 대비 여유 (원)</th>
+              <th>여유율 (%)</th>
+              <th>마진 (원)</th>
+              <th>마진율 (%)</th>
+              <th>판정</th>
+            </tr>
+          </thead>
+          <tbody id="resultBody">
+            <!-- JS에서 채움 -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 그래프 탭 영역 -->
+    <section class="section">
+      <h2>4. 시각화 (그래프 탭 전환)</h2>
       <div class="tabs">
-        <button class="tab-btn active" data-tab="tab-band">
-          낙찰권역 강조
-        </button>
-        <button class="tab-btn" data-tab="tab-prices">
-          예비가격 15개 분포
-        </button>
-        <button class="tab-btn" data-tab="tab-margin">
-          투찰율-마진 분석
-        </button>
+        <button class="tab-button active" data-chart="bidAmount">입찰가 곡선</button>
+        <button class="tab-button" data-chart="gap">하한가 대비 여유</button>
+        <button class="tab-button" data-chart="margin">마진 곡선</button>
       </div>
-
-      <section class="content-panel">
-        <!-- TAB 1: 낙찰권역 강조 -->
-        <div class="tab-content active" id="tab-band">
-          <div class="chart-wrapper">
-            <canvas id="chart-band"></canvas>
-          </div>
-          <div class="analysis-box" id="analysis-band">
-            배정예산과 낙찰하한율, 우리 투찰율을 입력한 뒤
-            <b>[계산하기]</b>를 눌러 주세요.  
-            그래프의 초록색 반투명 밴드가 <b>안전한 낙찰권역</b>입니다.
-          </div>
-          <div class="table-box" id="table-band-box">
-            <table id="table-band">
-              <thead>
-                <tr>
-                  <th>투찰율(%)</th>
-                  <th>입찰가(원)</th>
-                  <th>구간</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+      <div class="chart-container">
+        <canvas id="mainChart"></canvas>
+        <div class="legend">
+          <span class="legend-color legend-safe"></span> 우리 낙찰권역 (하한가 + 0.1% ~ 0.3% 구간)
+          <span class="legend-color legend-recommend"></span> 추천 지점
         </div>
+      </div>
+      <div class="analysis-box">
+        <h3>그래프·숫자 자동 해석</h3>
+        <p id="analysisText">
+          아직 계산 전입니다. 위에서 값을 입력하고 [계산하기]를 눌러 그래프와 해석을 확인해 주세요.
+        </p>
+      </div>
+    </section>
 
-        <!-- TAB 2: 예비가격 15개 분포 -->
-        <div class="tab-content" id="tab-prices">
-          <div class="chart-wrapper">
-            <canvas id="chart-prices"></canvas>
-          </div>
-          <div class="analysis-box" id="analysis-prices">
-            배정예산 기준으로 ±1% 범위 안에서 <b>예비가격 15개</b>를
-            가정해 분포를 보여줍니다.  
-            점들이 한쪽으로 몰려 있으면 예정가격이
-            <b>특정 구간에 치우칠 가능성</b>을 의미합니다.
-          </div>
-          <div class="table-box" id="table-prices-box">
-            <table id="table-prices">
-              <thead>
-                <tr>
-                  <th>번호</th>
-                  <th>예비가격(원)</th>
-                  <th>배정예산 대비(%)</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- TAB 3: 투찰율-마진 분석 -->
-        <div class="tab-content" id="tab-margin">
-          <div class="chart-wrapper">
-            <canvas id="chart-margin"></canvas>
-          </div>
-          <div class="analysis-box" id="analysis-margin">
-            정가와 할인율을 입력하면 우리 <b>실구매가</b>와
-            <b>입찰가 대비 마진</b>을 계산해 줍니다.  
-            그래프가 위로 갈수록 우리에게 <b>유리한 수익 구간</b>입니다.
-          </div>
-          <div class="table-box" id="table-margin-box">
-            <table id="table-margin">
-              <thead>
-                <tr>
-                  <th>투찰율(%)</th>
-                  <th>입찰가(원)</th>
-                  <th>우리 실구매가(원)</th>
-                  <th>마진(원)</th>
-                  <th>마진율(%)</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-    </main>
+    <footer class="footer">
+      <p>입찰 실무 참고용 계산·시각화 도구 v2 (로컬 HTML로 사용 가능)</p>
+    </footer>
   </div>
 
-  <script>
-    // =========================
-    // 상태 및 공통 유틸
-    // =========================
-    let chartBand;
-    let chartPrices;
-    let chartMargin;
-
-    function formatNumber(n) {
-      if (isNaN(n)) return "-";
-      return n.toLocaleString("ko-KR");
-    }
-
-    function formatPercent(n, digits = 2) {
-      if (isNaN(n)) return "-";
-      return n.toFixed(digits);
-    }
-
-    // =========================
-    // 탭 전환
-    // =========================
-    document.querySelectorAll(".tab-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const tabId = btn.getAttribute("data-tab");
-        document
-          .querySelectorAll(".tab-btn")
-          .forEach((b) => b.classList.remove("active"));
-        document
-          .querySelectorAll(".tab-content")
-          .forEach((c) => c.classList.remove("active"));
-
-        btn.classList.add("active");
-        document.getElementById(tabId).classList.add("active");
-      });
-    });
-
-    // =========================
-    // 낙찰권역 강조용 플러그인 (B안: 단색 + 반투명)
-    // =========================
-    const bandHighlightPlugin = {
-      id: "bandHighlight",
-      beforeDatasetsDraw(chart, args, opts) {
-        const {
-          ctx,
-          chartArea: { left, right, top, bottom },
-          scales: { x, y },
-        } = chart;
-
-        const lowRate = opts.lowRate;
-        const highRate = opts.highRate;
-
-        if (!lowRate || !highRate) return;
-
-        const xStart = x.getPixelForValue(lowRate);
-        const xEnd = x.getPixelForValue(highRate);
-
-        ctx.save();
-        ctx.fillStyle = "rgba(34, 197, 94, 0.4)"; // 진한 초록, 반투명 (B안)
-        ctx.fillRect(xStart, top, xEnd - xStart, bottom - top);
-        ctx.restore();
-      },
-    };
-
-    Chart.register(bandHighlightPlugin);
-
-    // =========================
-    // 그래프 초기화
-    // =========================
-    function initCharts() {
-      const ctxBand = document.getElementById("chart-band").getContext("2d");
-      const ctxPrices = document
-        .getElementById("chart-prices")
-        .getContext("2d");
-      const ctxMargin = document
-        .getElementById("chart-margin")
-        .getContext("2d");
-
-      chartBand = new Chart(ctxBand, {
-        type: "line",
-        data: {
-          labels: [],
-          datasets: [
-            {
-              label: "입찰가(원)",
-              data: [],
-              borderWidth: 2,
-              pointRadius: 2,
-              tension: 0.2,
-            },
-            {
-              label: "우리 투찰가",
-              data: [],
-              type: "scatter",
-              pointRadius: 5,
-              pointBackgroundColor: "#1d4ed8",
-            },
-          ],
-        },
-        options: {
-          plugins: {
-            legend: {
-              display: true,
-            },
-            bandHighlight: {
-              lowRate: null,
-              highRate: null,
-            },
-          },
-          scales: {
-            x: {
-              title: {
-                display: true,
-                text: "투찰율(%)",
-              },
-            },
-            y: {
-              title: {
-                display: true,
-                text: "입찰가(원)",
-              },
-              ticks: {
-                callback: (val) => formatNumber(val),
-              },
-            },
-          },
-        },
-      });
-
-      chartPrices = new Chart(ctxPrices, {
-        type: "scatter",
-        data: {
-          datasets: [
-            {
-              label: "예비가격(15개)",
-              data: [],
-              pointRadius: 4,
-            },
-          ],
-        },
-        options: {
-          plugins: {
-            legend: {
-              display: false,
-            },
-          },
-          scales: {
-            x: {
-              title: {
-                display: true,
-                text: "번호",
-              },
-              ticks: {
-                stepSize: 1,
-              },
-            },
-            y: {
-              title: {
-                display: true,
-                text: "예비가격(원)",
-              },
-              ticks: {
-                callback: (val) => formatNumber(val),
-              },
-            },
-          },
-        },
-      });
-
-      chartMargin = new Chart(ctxMargin, {
-        type: "line",
-        data: {
-          labels: [],
-          datasets: [
-            {
-              label: "마진(원)",
-              data: [],
-              borderWidth: 2,
-              pointRadius: 3,
-              tension: 0.2,
-            },
-          ],
-        },
-        options: {
-          plugins: {
-            legend: {
-              display: false,
-            },
-          },
-          scales: {
-            x: {
-              title: {
-                display: true,
-                text: "투찰율(%)",
-              },
-            },
-            y: {
-              title: {
-                display: true,
-                text: "마진(원)",
-              },
-              ticks: {
-                callback: (val) => formatNumber(val),
-              },
-            },
-          },
-        },
-      });
-    }
-
-    // =========================
-    // 메타 정보 갱신
-    // =========================
-    function updateMeta(info) {
-      const { name, agency, budget, floor, ourRate } = info;
-      const title =
-        name && name.trim()
-          ? name.trim()
-          : "공고명을 입력해 주세요.";
-      const subParts = [];
-      if (agency) subParts.push(`기관: ${agency}`);
-      if (!isNaN(budget)) subParts.push(`배정예산: ${formatNumber(budget)}원`);
-      if (!isNaN(floor))
-        subParts.push(`하한율: ${formatPercent(floor, 3)}%`);
-      if (!isNaN(ourRate))
-        subParts.push(`우리 투찰율: ${formatPercent(ourRate, 2)}%`);
-
-      document.getElementById("meta-notice-title").textContent = title;
-      document.getElementById("meta-notice-sub").textContent =
-        subParts.length > 0
-          ? subParts.join(" / ")
-          : "기관 / 배정예산 / 우리 투찰율 / 낙찰하한율 요약";
-    }
-
-    // =========================
-    // TAB1: 낙찰권역 계산/표시
-    // =========================
-    function updateBandChart(budget, floorRate, ourRate) {
-      if (isNaN(budget) || isNaN(floorRate)) return;
-
-      // 투찰율 범위: (하한율 - 1%) ~ (하한율 + 3%) 사이, 0.1% 간격
-      const startRate = Math.max(80, floorRate - 1);
-      const endRate = Math.min(100, floorRate + 3);
-      const rates = [];
-      const prices = [];
-      for (let r = startRate; r <= endRate + 0.0001; r += 0.1) {
-        const rate = parseFloat(r.toFixed(2));
-        rates.push(rate);
-        prices.push(Math.round((budget * rate) / 100));
-      }
-
-      // 추천 낙찰권역: 하한율 +0.1% ~ +1.0% (간단한 모델)
-      const safeLow = floorRate + 0.1;
-      const safeHigh = floorRate + 1.0;
-
-      chartBand.data.labels = rates;
-      chartBand.data.datasets[0].data = prices;
-
-      // 우리 투찰점
-      if (!isNaN(ourRate)) {
-        chartBand.data.datasets[1].data = [
-          {
-            x: ourRate,
-            y: Math.round((budget * ourRate) / 100),
-          },
-        ];
-      } else {
-        chartBand.data.datasets[1].data = [];
-      }
-
-      chartBand.options.plugins.bandHighlight.lowRate = safeLow;
-      chartBand.options.plugins.bandHighlight.highRate = safeHigh;
-
-      chartBand.update();
-
-      // 표/해석 텍스트
-      const tbody = document
-        .getElementById("table-band")
-        .querySelector("tbody");
-      tbody.innerHTML = "";
-      rates.forEach((r, idx) => {
-        const tr = document.createElement("tr");
-        const price = prices[idx];
-        const zone =
-          r < floorRate
-            ? "하한가 미만(위험)"
-            : r <= safeHigh
-            ? "낙찰권역(안전)"
-            : "상한쪽(과도)";
-        tr.innerHTML = `
-          <td>${formatPercent(r, 2)}</td>
-          <td>${formatNumber(price)}</td>
-          <td>${zone}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      const analysis = document.getElementById("analysis-band");
-      let text = `배정예산 ${formatNumber(
-        budget
-      )}원을 기준으로 했을 때, 낙찰하한율 ${formatPercent(
-        floorRate,
-        3
-      )}%입니다. `;
-      text += `그래프의 진한 초록 밴드는 하한가보다 약간 위, 즉 대략 ${formatPercent(
-        safeLow,
-        2
-      )}% ~ ${formatPercent(
-        safeHigh,
-        2
-      )}% 구간을 보여 줍니다. `;
-      if (!isNaN(ourRate)) {
-        if (ourRate < floorRate) {
-          text += `지금 우리 투찰율 ${formatPercent(
-            ourRate,
-            2
-          )}%는 하한가보다 낮아서 ${"하한가 미만 위험"} 구간입니다. `;
-        } else if (ourRate <= safeHigh) {
-          text += `우리 투찰율 ${formatPercent(
-            ourRate,
-            2
-          )}%는 초록 밴드 안에 있어, 통상적으로는 비교적 안전한 낙찰권역에 들어갑니다. `;
-        } else {
-          text += `우리 투찰율 ${formatPercent(
-            ourRate,
-            2
-          )}%는 권장 밴드보다 높아, 낙찰 가능성보다 예산 여유가 더 많이 남는 쪽일 수 있습니다. `;
-        }
-      } else {
-        text += `우리 투찰율을 입력하면 그래프 위의 파란 점으로 위치가 표시됩니다. `;
-      }
-      analysis.textContent = text;
-    }
-
-    // =========================
-    // TAB2: 예비가격 15개 분포
-    // =========================
-    function updatePricesChart(budget) {
-      if (isNaN(budget) || budget <= 0) return;
-
-      const points = [];
-      const tbody = document
-        .getElementById("table-prices")
-        .querySelector("tbody");
-      tbody.innerHTML = "";
-
-      // 간단한 ±1% 분포 모델 (대칭형)
-      for (let i = 0; i < 15; i++) {
-        const offset = (i - 7) / 700; // -1% ~ +1% 사이
-        const price = Math.round(budget * (1 + offset));
-        points.push({ x: i + 1, y: price });
-
-        const diffPct = ((price - budget) / budget) * 100;
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${i + 1}</td>
-          <td>${formatNumber(price)}</td>
-          <td>${formatPercent(diffPct, 2)}</td>
-        `;
-        tbody.appendChild(tr);
-      }
-
-      chartPrices.data.datasets[0].data = points;
-      chartPrices.update();
-
-      const analysis = document.getElementById("analysis-prices");
-      const lowest = points[0].y;
-      const highest = points[points.length - 1].y;
-      const diffPct = ((highest - lowest) / budget) * 100;
-
-      analysis.textContent =
-        `배정예산 ${formatNumber(
-          budget
-        )}원을 기준으로 ±1% 안에서 예비가격 15개를 가정했습니다. ` +
-        `가장 낮은 예비가격은 약 ${formatNumber(
-          lowest
-        )}원, 가장 높은 예비가격은 약 ${formatNumber(
-          highest
-        )}원으로, 두 값의 차이는 약 ${formatPercent(
-          diffPct,
-          2
-        )}% 정도입니다. ` +
-        `점들이 한쪽으로 몰리면 예정가격이 그쪽에 더 가깝게 형성될 가능성이 있습니다.`;
-    }
-
-    // =========================
-    // TAB3: 투찰율-마진 분석
-    // =========================
-    function updateMarginChart(budget, listPrice, discount, ourRate) {
-      const tbody = document
-        .getElementById("table-margin")
-        .querySelector("tbody");
-      tbody.innerHTML = "";
-
-      if (
-        isNaN(budget) ||
-        isNaN(listPrice) ||
-        isNaN(discount) ||
-        budget <= 0 ||
-        listPrice <= 0
-      ) {
-        chartMargin.data.labels = [];
-        chartMargin.data.datasets[0].data = [];
-        chartMargin.update();
-        document.getElementById("analysis-margin").textContent =
-          "정가와 공급사 할인율을 입력하면, 입찰가 대비 우리 마진 곡선을 볼 수 있습니다.";
-        return;
-      }
-
-      const netCost = Math.round(listPrice * (1 - discount / 100)); // 우리 실구매가
-      const rates = [];
-      const margins = [];
-      const minRate = 80;
-      const maxRate = 100;
-
-      for (let r = minRate; r <= maxRate; r += 0.5) {
-        const rate = parseFloat(r.toFixed(1));
-        const bidPrice = Math.round((budget * rate) / 100);
-        const margin = bidPrice - netCost;
-        rates.push(rate);
-        margins.push(margin);
-      }
-
-      chartMargin.data.labels = rates;
-      chartMargin.data.datasets[0].data = margins;
-      chartMargin.update();
-
-      // 표
-      rates.forEach((r, idx) => {
-        const bidPrice = Math.round((budget * r) / 100);
-        const margin = bidPrice - netCost;
-        const marginPct = (margin / netCost) * 100;
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${formatPercent(r, 1)}</td>
-          <td>${formatNumber(bidPrice)}</td>
-          <td>${formatNumber(netCost)}</td>
-          <td>${formatNumber(margin)}</td>
-          <td>${formatPercent(marginPct, 2)}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      const analysis = document.getElementById("analysis-margin");
-      let text =
-        `보고서 정가가 ${formatNumber(
-          listPrice
-        )}원이고, 공급사 할인율이 ${formatPercent(
-          discount,
-          1
-        )}%이면 우리 실구매가는 약 ${formatNumber(
-          netCost
-        )}원입니다. ` +
-        `그래프에서 선이 0보다 위에 있을수록 우리에게 마진이 남는 구간입니다. `;
-      if (!isNaN(ourRate)) {
-        const ourBid = Math.round((budget * ourRate) / 100);
-        const ourMargin = ourBid - netCost;
-        const ourMarginPct = (ourMargin / netCost) * 100;
-        text += `현재 우리 투찰율 ${formatPercent(
-          ourRate,
-          2
-        )}% 기준 입찰가는 약 ${formatNumber(
-          ourBid
-        )}원, 마진은 약 ${formatNumber(
-          ourMargin
-        )}원(약 ${formatPercent(
-          ourMarginPct,
-          2
-        )}%)입니다. `;
-        if (ourMargin < 0) {
-          text += `0선 아래에 있다면, 이 투찰율에서는 손해가 발생한다는 뜻이라 재검토가 필요합니다.`;
-        } else {
-          text += `0선보다 충분히 위쪽이라면, 낙찰 가능성과 함께 수익성도 함께 고려해 볼 수 있는 구간입니다.`;
-        }
-      } else {
-        text += `우리 투찰율을 입력하면 해당 지점의 마진도 함께 해석할 수 있습니다.`;
-      }
-      analysis.textContent = text;
-    }
-
-    // =========================
-    // 메인 계산 버튼
-    // =========================
-    document
-      .getElementById("btn-calc")
-      .addEventListener("click", function () {
-        const name = document.getElementById("input-notice-name").value;
-        const agency = document.getElementById("input-agency").value;
-        const budget = parseFloat(
-          document.getElementById("input-budget").value
-        );
-        const floorRate = parseFloat(
-          document.getElementById("input-floor").value
-        );
-        const ourRate = parseFloat(
-          document.getElementById("input-our-rate").value
-        );
-        const listPrice = parseFloat(
-          document.getElementById("input-list-price").value
-        );
-        const discount = parseFloat(
-          document.getElementById("input-discount").value
-        );
-
-        updateMeta({ name, agency, budget, floor: floorRate, ourRate });
-
-        // TAB1
-        updateBandChart(budget, floorRate, ourRate);
-        // TAB2
-        updatePricesChart(budget);
-        // TAB3
-        updateMarginChart(budget, listPrice, discount, ourRate);
-      });
-
-    // 초기화
-    initCharts();
-  </script>
+  <script src="logic.js"></script>
 </body>
 </html>
