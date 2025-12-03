@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>2번 도구 - 입찰 자동 계산기</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 16px;
+      background-color: #f4f4f7;
+      color: #222;
+    }
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+    .app-container {
+      max-width: 960px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .section {
+      margin-bottom: 20px;
+      padding: 16px;
+      border-radius: 10px;
+      background: #fafafa;
+      border: 1px solid #e0e0e0;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .section-header h2 {
+      font-size: 1rem;
+      margin: 0;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      background: #fff;
+    }
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37,99,235,0.3);
+    }
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+    @media (min-width: 720px) {
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s ease;
+      background: #2563eb;
+      color: #fff;
+    }
+    button.secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+    button.outline {
+      background: transparent;
+      border: 1px solid #d1d5db;
+      color: #111827;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+    button:not(:disabled):hover {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      transform: translateY(-1px);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+    .badge.success {
+      background: #ecfdf3;
+      border-color: #bbf7d0;
+      color: #15803d;
+    }
+    .badge.warn {
+      background: #fff7ed;
+      border-color: #fed7aa;
+      color: #c2410c;
+    }
+    .text-small {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+    .text-mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    .result-highlight {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 4px 0 2px;
+    }
+    .result-sub {
+      font-size: 0.9rem;
+      color: #4b5563;
+    }
+    .error-msg {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: #b91c1c;
+    }
+    .log-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.8rem;
+    }
+    .log-table th,
+    .log-table td {
+      border: 1px solid #e5e7eb;
+      padding: 4px 6px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .log-table th {
+      background: #f3f4f6;
+      font-weight: 600;
+    }
+    .pill {
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.75rem;
+      background: #eef2ff;
+      color: #4338ca;
+      display: inline-block;
+    }
+    .footer-note {
+      margin-top: 12px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <h1>2번 도구 – 입찰 자동 계산/기록 도구</h1>
+    <p class="text-small">
+      이 화면은 <strong>입찰 공고 1건 입력 → 조건 1개 분석 → 결과 1개 출력</strong>을 기본 세트로 동작하며,  
+      화면에 보이는 요소만 사용합니다.
+    </p>
+
+    <!-- 입력 구역 -->
+    <section class="section" id="section-input">
+      <div class="section-header">
+        <h2>① 입찰 정보 입력</h2>
+        <span class="badge">입력 영역</span>
+      </div>
+      <div class="grid grid-2">
+        <div>
+          <label for="orgSelect">기관 선택</label>
+          <select id="orgSelect">
+            <option value="나라장터">나라장터</option>
+            <option value="KISTI">KISTI</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+        <div>
+          <label for="bidNo">공고번호</label>
+          <input type="text" id="bidNo" placeholder="예: 20251234-001" />
+        </div>
+        <div>
+          <label for="expectedPrice">예정가격 (원)</label>
+          <input type="number" id="expectedPrice" min="0" step="1" placeholder="예: 100000000" />
+        </div>
+        <div>
+          <label for="rate">낙찰하한율 (%)</label>
+          <input type="number" id="rate" min="0" max="100" step="0.001" placeholder="예: 87.745" />
+        </div>
+      </div>
+      <div class="grid grid-2" style="margin-top: 10px;">
+        <div>
+          <label for="closingDate">입찰 마감일</label>
+          <input type="date" id="closingDate" />
+        </div>
+        <div>
+          <label for="memo">내부 메모(선택)</label>
+          <input type="text" id="memo" placeholder="예: ○○사업 입찰, 협상계약" />
+        </div>
+      </div>
+      <div class="btn-row">
+        <button id="btnCalc">
+          ✨ 입찰 계산 실행
+        </button>
+        <button id="btnClear" class="secondary" type="button">
+          🔁 초기화
+        </button>
+      </div>
+      <div class="error-msg" id="inputError"></div>
+    </section>
+
+    <!-- 결과 구역 -->
+    <section class="section" id="section-result">
+      <div class="section-header">
+        <h2>② 계산 결과 / 안내</h2>
+        <span class="badge success" id="statusBadge">대기 중</span>
+      </div>
+      <div id="resultBox">
+        <p class="text-small">입찰 정보를 입력하고 <strong>“입찰 계산 실행”</strong> 버튼을 누르면 결과가 여기 표시됩니다.</p>
+      </div>
+      <div class="btn-row">
+        <button id="btnSave" class="secondary" type="button" disabled>
+          💾 이번 결과 저장
+        </button>
+        <button id="btnDownload" class="outline" type="button" disabled>
+          📄 산출 내역 텍스트 다운로드
+        </button>
+      </div>
+    </section>
+
+    <!-- 로그 구역 -->
+    <section class="section" id="section-log">
+      <div class="section-header">
+        <h2>③ 최근 계산 로그</h2>
+        <span class="badge warn">화면 표시용 로그</span>
+      </div>
+      <p class="text-small">
+        이 표는 <strong>이 화면에서만</strong> 보이는 간단한 로그입니다. 새로고침하면 초기화됩니다.
+      </p>
+      <div id="logWrapper">
+        <p class="text-small">아직 저장된 로그가 없습니다.</p>
+      </div>
+    </section>
+
+    <div class="footer-note">
+      2번 도구 – 입찰 자동화 화면 (입찰 공고 1건 기준)
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const orgSelect = document.getElementById("orgSelect");
+      const bidNoInput = document.getElementById("bidNo");
+      const expectedPriceInput = document.getElementById("expectedPrice");
+      const rateInput = document.getElementById("rate");
+      const closingDateInput = document.getElementById("closingDate");
+      const memoInput = document.getElementById("memo");
+
+      const btnCalc = document.getElementById("btnCalc");
+      const btnClear = document.getElementById("btnClear");
+      const btnSave = document.getElementById("btnSave");
+      const btnDownload = document.getElementById("btnDownload");
+
+      const inputError = document.getElementById("inputError");
+      const resultBox = document.getElementById("resultBox");
+      const statusBadge = document.getElementById("statusBadge");
+      const logWrapper = document.getElementById("logWrapper");
+
+      /** 내부 상태 (화면 표시용) */
+      let lastResult = null;
+      let logs = [];
+
+      function formatNumber(value) {
+        if (value === null || value === undefined || isNaN(value)) return "";
+        return value.toLocaleString("ko-KR");
+      }
+
+      function setStatus(text, type) {
+        statusBadge.textContent = text;
+        statusBadge.classList.remove("success", "warn");
+        if (type === "success") statusBadge.classList.add("success");
+        if (type === "warn") statusBadge.classList.add("warn");
+      }
+
+      function validateInputs() {
+        inputError.textContent = "";
+        const errors = [];
+
+        const org = orgSelect.value;
+        const bidNo = bidNoInput.value.trim();
+        const expectedRaw = expectedPriceInput.value;
+        const rateRaw = rateInput.value;
+
+        if (!org) errors.push("기관을 선택하세요.");
+        if (!bidNo) errors.push("공고번호를 입력하세요.");
+
+        const expected = Number(expectedRaw);
+        if (!expectedRaw || isNaN(expected) || expected <= 0) {
+          errors.push("예정가격을 0보다 큰 숫자로 입력하세요.");
+        }
+
+        const rate = Number(rateRaw);
+        if (!rateRaw || isNaN(rate) || rate <= 0 || rate > 100) {
+          errors.push("낙찰하한율(%)을 0~100 사이의 숫자로 입력하세요.");
+        }
+
+        if (errors.length > 0) {
+          inputError.textContent = errors.join(" ");
+          setStatus("입력 오류", "warn");
+          return null;
+        }
+
+        return {
+          org,
+          bidNo,
+          expected,
+          rate,
+          closingDate: closingDateInput.value || "",
+          memo: memoInput.value.trim()
+        };
+      }
+
+      function renderResult(result) {
+        const {
+          org,
+          bidNo,
+          expected,
+          rate,
+          bidPrice,
+          closingDate,
+          memo
+        } = result;
+
+        const orgText = org || "-";
+        const closingText = closingDate || "미입력";
+        const memoText = memo || "없음";
+
+        resultBox.innerHTML = `
+          <div>
+            <div class="result-highlight text-mono">
+              추천 입찰가: ${formatNumber(bidPrice)} 원
+            </div>
+            <div class="result-sub">
+              기관: <span class="pill">${orgText}</span> ·
+              공고번호: <span class="text-mono">${bidNo}</span><br/>
+              예정가격: <span class="text-mono">${formatNumber(expected)} 원</span> ·
+              낙찰하한율: <span class="text-mono">${rate}%</span><br/>
+              마감일: <span class="text-mono">${closingText}</span><br/>
+              메모: <span class="text-mono">${memoText}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderLogs() {
+        if (!logs.length) {
+          logWrapper.innerHTML = '<p class="text-small">아직 저장된 로그가 없습니다.</p>';
+          return;
+        }
+
+        const rows = logs.map((log, index) => {
+          return `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${log.time}</td>
+              <td>${log.org}</td>
+              <td>${log.bidNo}</td>
+              <td class="text-mono">${formatNumber(log.expected)}</td>
+              <td class="text-mono">${log.rate}%</td>
+              <td class="text-mono">${formatNumber(log.bidPrice)}</td>
+            </tr>
+          `;
+        }).join("");
+
+        logWrapper.innerHTML = `
+          <table class="log-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>시간</th>
+                <th>기관</th>
+                <th>공고번호</th>
+                <th>예정가격</th>
+                <th>하한율</th>
+                <th>추천 입찰가</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        `;
+      }
+
+      function buildTextReport(result) {
+        const lines = [];
+        const now = new Date();
+        lines.push("[입찰가 산출 내역]");
+        lines.push("");
+        lines.push("- 생성 시각: " + now.toLocaleString("ko-KR"));
+        lines.push("");
+        lines.push("1. 기본 정보");
+        lines.push("   · 기관: " + result.org);
+        lines.push("   · 공고번호: " + result.bidNo);
+        lines.push("   · 입찰 마감일: " + (result.closingDate || "미입력"));
+        lines.push("   · 메모: " + (result.memo || "없음"));
+        lines.push("");
+        lines.push("2. 금액 정보");
+        lines.push("   · 예정가격: " + formatNumber(result.expected) + " 원");
+        lines.push("   · 낙찰하한율: " + result.rate + " %");
+        lines.push("   · 추천 입찰가: " + formatNumber(result.bidPrice) + " 원");
+        lines.push("");
+        lines.push("3. 산식");
+        lines.push("   추천 입찰가 = 예정가격 × (낙찰하한율 ÷ 100)");
+        lines.push("");
+        lines.push("[참고] 이 파일은 2번 도구(입찰 자동 계산기)에서 자동 생성된 텍스트 리포트입니다.");
+
+        return lines.join("\r\n");
+      }
+
+      function handleCalculate() {
+        const input = validateInputs();
+        if (!input) {
+          lastResult = null;
+          btnSave.disabled = true;
+          btnDownload.disabled = true;
+          return;
+        }
+
+        // 기본 산식: 예정가격 × (하한율 / 100)
+        const bidPrice = Math.round(input.expected * (input.rate / 100));
+
+        const result = {
+          org: input.org,
+          bidNo: input.bidNo,
+          expected: input.expected,
+          rate: input.rate,
+          bidPrice,
+          closingDate: input.closingDate,
+          memo: input.memo
+        };
+
+        lastResult = result;
+        renderResult(result);
+        setStatus("계산 완료", "success");
+        btnSave.disabled = false;
+        btnDownload.disabled = false;
+      }
+
+      function handleClear() {
+        orgSelect.value = "나라장터";
+        bidNoInput.value = "";
+        expectedPriceInput.value = "";
+        rateInput.value = "";
+        closingDateInput.value = "";
+        memoInput.value = "";
+        inputError.textContent = "";
+        resultBox.innerHTML = '<p class="text-small">입찰 정보를 입력하고 <strong>“입찰 계산 실행”</strong> 버튼을 누르면 결과가 여기 표시됩니다.</p>';
+        setStatus("대기 중", "");
+        lastResult = null;
+        btnSave.disabled = true;
+        btnDownload.disabled = true;
+      }
+
+      function handleSave() {
+        if (!lastResult) return;
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString("ko-KR", { hour12: false });
+        logs.unshift({
+          time: timeStr,
+          org: lastResult.org,
+          bidNo: lastResult.bidNo,
+          expected: lastResult.expected,
+          rate: lastResult.rate,
+          bidPrice: lastResult.bidPrice
+        });
+        if (logs.length > 20) {
+          logs = logs.slice(0, 20);
+        }
+        renderLogs();
+      }
+
+      function handleDownload() {
+        if (!lastResult) return;
+        const text = buildTextReport(lastResult);
+        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+
+        const safeBidNo = (lastResult.bidNo || "bid").replace(/[^\w\-]+/g, "_");
+        const fileName = `입찰_산출내역_${safeBidNo}.txt`;
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      btnCalc.addEventListener("click", handleCalculate);
+      btnClear.addEventListener("click", handleClear);
+      btnSave.addEventListener("click", handleSave);
+      btnDownload.addEventListener("click", handleDownload);
+
+      renderLogs();
+    })();
+  </script>
+</body>
+</html>
