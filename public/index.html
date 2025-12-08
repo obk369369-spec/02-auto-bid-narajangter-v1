@@ -2,1405 +2,2004 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>1번 도구 · 고객 자동화 안내서 · WIC 자동화 시스템</title>
+  <title>2번 도구 · 입찰 프로그램 · WIC 자동화 시스템</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+    :root {
+      --bg: #0f172a;
+      --bg-alt: #020617;
+      --card: #020617;
+      --card-soft: #0b1220;
+      --border: #1e293b;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.1);
+      --accent-strong: #0ea5e9;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #f97373;
+      --success: #4ade80;
+      --warning: #facc15;
+      --radius-xl: 18px;
+      --shadow-soft: 0 18px 50px rgba(15, 23, 42, 0.8);
+      --transition-fast: 0.18s ease-out;
+    }
+
     * {
       box-sizing: border-box;
     }
 
-    body {
+    html, body {
       margin: 0;
       padding: 0;
+      height: 100%;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background-color: #f5f7fb;
-      color: #222;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 50%, #000 100%);
+      color: var(--text-main);
     }
 
-    .app-root {
-      max-width: 1320px;
-      margin: 0 auto;
-      padding: 16px 16px 32px 16px;
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      padding: 16px;
     }
 
-    h1, h2, h3, h4 {
+    .app-shell {
+      width: 100%;
+      max-width: 1240px;
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.98));
+      border-radius: 24px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header.app-header {
+      padding: 16px 20px 10px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background:
+        radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.16), transparent 55%),
+        radial-gradient(circle at 100% 0, rgba(52, 211, 153, 0.12), transparent 55%);
+    }
+
+    .app-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tool-pill {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(12px);
+    }
+
+    .tool-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.35);
+    }
+
+    h1 {
       margin: 0;
-      font-weight: 600;
-    }
-
-    .app-header {
-      margin-bottom: 12px;
-    }
-
-    .app-header-title {
       font-size: 20px;
-      margin-bottom: 4px;
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
     }
 
-    .app-header-sub {
+    h1 span.sub {
       font-size: 13px;
-      color: #555;
+      font-weight: 400;
+      color: var(--text-muted);
     }
 
     .app-meta {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #666;
+      font-size: 11px;
+      color: var(--text-muted);
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
       align-items: center;
+      opacity: 0.9;
     }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 8px;
+    .app-meta strong {
+      color: var(--accent-strong);
+      font-weight: 500;
+    }
+
+    .badge-outline {
+      padding: 2px 8px;
       border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
       font-size: 11px;
-      background-color: #e5edff;
-      color: #1f3bb3;
-      border: 1px solid #c4d3ff;
     }
 
-    .badge-muted {
-      background-color: #eceff4;
-      color: #555;
-      border-color: #dde2f0;
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 16px 16px 16px;
+      gap: 10px;
     }
 
-    .app-note {
-      font-size: 11px;
-      color: #777;
-      margin-top: 4px;
-    }
-
-    .grid {
+    .grid-3 {
       display: grid;
-      grid-template-columns: minmax(0, 3.2fr) minmax(0, 3.3fr) minmax(0, 3.5fr);
-      gap: 12px;
-      margin-top: 16px;
+      grid-template-columns: 1.1fr 1.1fr 1.2fr;
+      gap: 10px;
+      height: 100%;
+      min-height: 540px;
     }
 
-    @media (max-width: 1080px) {
-      .grid {
+    @media (max-width: 1040px) {
+      .grid-3 {
         grid-template-columns: 1fr;
+        grid-auto-rows: minmax(0, auto);
+        height: auto;
       }
     }
 
     .card {
-      background-color: #ffffff;
-      border-radius: 10px;
-      border: 1px solid #dde3f0;
-      padding: 12px 12px 14px 12px;
-      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.06);
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.98));
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(30, 64, 175, 0.7);
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      min-height: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.08), transparent 55%);
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    .card-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
     }
 
     .card-header {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
-      gap: 8px;
+      align-items: center;
+      gap: 6px;
     }
 
     .card-title {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .card-sub {
+    .card-title span.icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       font-size: 11px;
-      color: #666;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
     }
 
-    .muted {
-      color: #777;
+    .card-subtitle {
       font-size: 11px;
+      color: var(--text-muted);
     }
 
-    .muted-strong {
-      color: #555;
+    .pill-count {
       font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--text-muted);
+    }
+
+    .card-section {
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      padding: 6px 7px 5px 7px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .card-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .card-section-header strong {
+      color: var(--text-main);
       font-weight: 500;
+    }
+
+    .card-section-body {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+
+    .input-pair {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 4px;
+    }
+
+    .input-3 {
+      display: grid;
+      grid-template-columns: 2fr 1.4fr 1.4fr;
+      gap: 4px;
+    }
+
+    @media (max-width: 1040px) {
+      .input-3 {
+        grid-template-columns: 1fr;
+      }
     }
 
     label {
-      display: block;
-      font-size: 11px;
-      margin-bottom: 2px;
-      color: #444;
-    }
-
-    .label-required::after {
-      content: " *";
-      color: #d12b2b;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    textarea,
-    select {
-      width: 100%;
-      padding: 6px 8px;
-      font-size: 12px;
-      border-radius: 6px;
-      border: 1px solid #ccd3e3;
-      outline: none;
-      background-color: #fdfefe;
-      transition: border-color 0.12s ease, box-shadow 0.12s ease;
-    }
-
-    input[type="text"]:focus,
-    input[type="email"]:focus,
-    textarea:focus,
-    select:focus {
-      border-color: #4c6fff;
-      box-shadow: 0 0 0 1px rgba(76, 111, 255, 0.26);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 56px;
-      max-height: 180px;
-      line-height: 1.4;
-    }
-
-    .field-hint {
-      font-size: 10px;
-      color: #888;
-      margin-top: 2px;
-    }
-
-    .field-group {
-      margin-bottom: 6px;
-    }
-
-    .inline {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .inline > * {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .inline-compact > * {
-      flex: 0 0 auto;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid transparent;
-      font-size: 12px;
-      cursor: pointer;
-      user-select: none;
-      background-color: #3b82f6;
-      color: #fff;
-      transition: background-color 0.12s ease, box-shadow 0.12s ease, transform 0.05s ease;
-    }
-
-    .btn:hover {
-      background-color: #2563eb;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.3);
-    }
-
-    .btn:active {
-      transform: translateY(1px);
-      box-shadow: none;
-    }
-
-    .btn-secondary {
-      background-color: #e5e7eb;
-      color: #111827;
-      border-color: #d1d5db;
-    }
-
-    .btn-secondary:hover {
-      background-color: #d4d4d8;
-    }
-
-    .btn-ghost {
-      background-color: transparent;
-      color: #374151;
-      border-color: #d1d5db;
-    }
-
-    .btn-ghost:hover {
-      background-color: #e5e7eb;
-    }
-
-    .btn-sm {
-      padding: 3px 8px;
-      font-size: 11px;
-      border-radius: 999px;
-    }
-
-    .btn-icon {
-      font-size: 12px;
-    }
-
-    .btn-block {
-      width: 100%;
-      justify-content: center;
-    }
-
-    .btn-disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      border-radius: 999px;
-      padding: 3px 8px;
-      background-color: #eff3ff;
-      color: #1e3a8a;
-      font-size: 11px;
-      margin-right: 4px;
-      margin-bottom: 4px;
-    }
-
-    .pill-muted {
-      background-color: #e5e7eb;
-      color: #374151;
-    }
-
-    .status-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-      font-size: 10px;
-      color: #666;
-      margin-top: 2px;
-    }
-
-    .status-left, .status-right {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .customer-list-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      font-size: 11px;
-      color: #555;
-      margin-bottom: 4px;
-    }
-
-    .customer-list-count {
-      font-size: 11px;
-      color: #444;
-    }
-
-    .customer-list {
-      border-radius: 8px;
-      border: 1px solid #e0e4f0;
-      background-color: #f9fafb;
-      padding: 4px;
-      max-height: 270px;
-      overflow-y: auto;
-      font-size: 12px;
-    }
-
-    .customer-item {
-      padding: 6px 7px;
-      border-radius: 7px;
-      cursor: pointer;
-      border: 1px solid transparent;
       display: flex;
       flex-direction: column;
       gap: 2px;
+      font-size: 11px;
+      color: var(--text-muted);
     }
 
-    .customer-item:hover {
-      background-color: #eef2ff;
-      border-color: #c7d2fe;
+    label span.req {
+      color: var(--accent-strong);
+      margin-left: 2px;
     }
 
-    .customer-item.selected {
-      background-color: #eef2ff;
-      border-color: #4f46e5;
-      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.3);
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    textarea,
+    select {
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: 9px;
+      border: 1px solid rgba(51, 65, 85, 0.95);
+      padding: 6px 8px;
+      font-size: 12px;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+      width: 100%;
+      resize: vertical;
+      min-height: 0;
+      max-height: 140px;
     }
 
-    .customer-name-row {
+    input[type="text"]::placeholder,
+    input[type="number"]::placeholder,
+    textarea::placeholder {
+      color: rgba(148, 163, 184, 0.8);
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="date"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: rgba(56, 189, 248, 0.9);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.7);
+      background: rgba(15, 23, 42, 0.98);
+      transform: translateY(-0.5px);
+    }
+
+    textarea {
+      min-height: 46px;
+    }
+
+    .hint {
+      font-size: 10px;
+      color: rgba(148, 163, 184, 0.8);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 3px;
+    }
+
+    button {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.9);
+      padding: 6px 12px;
+      background: rgba(15, 23, 42, 0.96);
+      color: var(--text-main);
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    button span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+      border-color: rgba(56, 189, 248, 0.1);
+      color: #0f172a;
+      box-shadow: 0 10px 25px rgba(8, 47, 73, 0.65);
+      font-weight: 500;
+    }
+
+    button.primary:hover {
+      background: linear-gradient(135deg, #38bdf8, #22d3ee);
+      transform: translateY(-1px);
+      box-shadow: 0 14px 32px rgba(8, 47, 73, 0.85);
+    }
+
+    button.secondary {
+      background: rgba(15, 23, 42, 0.98);
+    }
+
+    button.secondary:hover {
+      background: rgba(15, 23, 42, 1);
+      border-color: rgba(148, 163, 184, 1);
+      transform: translateY(-1px);
+    }
+
+    button.ghost {
+      background: transparent;
+      border-style: dashed;
+      border-color: rgba(148, 163, 184, 0.7);
+      color: var(--text-muted);
+    }
+
+    button.ghost:hover {
+      border-color: rgba(148, 163, 184, 1);
+      color: var(--text-main);
+    }
+
+    button.danger {
+      border-color: rgba(248, 113, 113, 0.9);
+      color: #fecaca;
+    }
+
+    button.danger:hover {
+      background: rgba(248, 113, 113, 0.1);
+    }
+
+    button:disabled {
+      opacity: 0.35;
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .table-shell {
+      border-radius: 11px;
+      border: 1px solid rgba(30, 64, 175, 0.8);
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .table-header-row {
+      display: grid;
+      grid-template-columns: 2.4fr 1.2fr 1.1fr 0.9fr 0.9fr 0.8fr;
+      font-size: 11px;
+      padding: 5px 7px;
+      background: linear-gradient(to right, rgba(15, 23, 42, 1), rgba(15, 23, 42, 0.95));
+      border-bottom: 1px solid rgba(30, 64, 175, 0.9);
+      color: rgba(148, 163, 184, 0.95);
+    }
+
+    @media (max-width: 1040px) {
+      .table-header-row {
+        grid-template-columns: 2.2fr 1.2fr 1.1fr 0.9fr 0.9fr 0.8fr;
+      }
+    }
+
+    .table-body {
+      max-height: 260px;
+      overflow: auto;
+      background: rgba(15, 23, 42, 0.97);
+    }
+
+    .table-row {
+      display: grid;
+      grid-template-columns: 2.4fr 1.2fr 1.1fr 0.9fr 0.9fr 0.8fr;
+      font-size: 11px;
+      padding: 5px 7px;
+      border-bottom: 1px solid rgba(30, 64, 175, 0.4);
+      align-items: center;
+      cursor: pointer;
+      transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .table-row:nth-child(even) {
+      background: rgba(15, 23, 42, 0.98);
+    }
+
+    .table-row:nth-child(odd) {
+      background: rgba(15, 23, 42, 0.94);
+    }
+
+    .table-row:hover {
+      background: rgba(15, 23, 42, 1);
+      transform: translateY(-0.5px);
+    }
+
+    .table-row.selected {
+      background: rgba(56, 189, 248, 0.12);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.7);
+    }
+
+    .cell-main {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .cell-main-title {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .cell-main-sub {
+      color: var(--text-muted);
+      font-size: 10px;
+    }
+
+    .status-pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      text-align: center;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      background: rgba(15, 23, 42, 0.98);
+      color: var(--text-muted);
+    }
+
+    .status-준비 {
+      border-color: rgba(129, 140, 248, 0.9);
+      color: #a5b4fc;
+      background: rgba(79, 70, 229, 0.16);
+    }
+
+    .status-검토중 {
+      border-color: rgba(250, 204, 21, 0.9);
+      color: #facc15;
+      background: rgba(234, 179, 8, 0.16);
+    }
+
+    .status-투찰완료 {
+      border-color: rgba(74, 222, 128, 0.9);
+      color: #bbf7d0;
+      background: rgba(22, 163, 74, 0.2);
+    }
+
+    .status-유찰 {
+      border-color: rgba(248, 113, 113, 0.9);
+      color: #fecaca;
+      background: rgba(185, 28, 28, 0.24);
+    }
+
+    .badge {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: rgba(148, 163, 184, 0.95);
+    }
+
+    .badge-soft {
+      background: rgba(15, 23, 42, 0.7);
+      border-style: dashed;
+    }
+
+    .summary-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .summary-row strong {
+      color: var(--accent-strong);
+      font-weight: 500;
+    }
+
+    .flex-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .sim-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1.1fr;
+      gap: 6px;
+    }
+
+    @media (max-width: 1040px) {
+      .sim-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .sim-output {
+      padding: 6px 7px;
+      border-radius: 11px;
+      border: 1px solid rgba(30, 64, 175, 0.9);
+      background: rgba(15, 23, 42, 0.98);
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-height: 70px;
+    }
+
+    .sim-line {
       display: flex;
       justify-content: space-between;
       gap: 6px;
-      font-size: 12px;
+    }
+
+    .sim-label {
+      color: var(--text-muted);
+    }
+
+    .sim-value {
+      color: var(--text-main);
       font-weight: 500;
-      color: #111827;
     }
 
-    .customer-org {
-      font-size: 11px;
-      color: #4b5563;
+    .sim-highlight {
+      color: var(--accent-strong);
     }
 
-    .customer-tags {
-      font-size: 10px;
-      color: #6b7280;
+    .sim-warning {
+      color: var(--warning);
+    }
+
+    .sim-danger {
+      color: var(--danger);
+    }
+
+    .sim-ok {
+      color: var(--success);
+    }
+
+    .footer-bar {
+      padding: 7px 14px 10px 14px;
+      border-top: 1px solid var(--border);
       display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-    }
-
-    .customer-empty {
-      padding: 12px;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
       font-size: 11px;
-      color: #6b7280;
-      text-align: left;
-      border-radius: 8px;
-      border: 1px dashed #d1d5db;
-      background-color: #f9fafb;
+      color: var(--text-muted);
+      background: radial-gradient(circle at bottom, rgba(30, 64, 175, 0.6), rgba(15, 23, 42, 0.94));
     }
 
-    .search-input {
-      margin-bottom: 6px;
-    }
-
-    .preview-box {
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-      background-color: #f9fafb;
-      padding: 8px;
-      min-height: 140px;
-      font-size: 12px;
-      white-space: pre-wrap;
-      line-height: 1.45;
-      overflow-y: auto;
-      max-height: 320px;
-    }
-
-    .preview-placeholder {
-      color: #777;
-      font-size: 11px;
-    }
-
-    .title-preview {
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-      background-color: #fefefe;
-      padding: 6px 8px;
-      font-size: 12px;
-      min-height: 28px;
+    .footer-left {
       display: flex;
       align-items: center;
-    }
-
-    .title-placeholder {
-      color: #888;
-      font-size: 11px;
-    }
-
-    .chips-row {
-      display: flex;
+      gap: 8px;
       flex-wrap: wrap;
+    }
+
+    .dot-live {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.4);
+    }
+
+    .storage-state {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .footer-right {
+      display: flex;
+      align-items: center;
       gap: 4px;
-      margin-top: 4px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
-    .section-divider {
-      border-top: 1px solid #e4e4ee;
-      margin: 4px 0 6px 0;
-    }
-
-    .text-xs {
+    .kbd {
+      padding: 2px 5px;
+      border-radius: 5px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
       font-size: 10px;
+      font-family: inherit;
+      color: var(--text-muted);
     }
 
-    .text-right {
-      text-align: right;
+    .no-data {
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 6px;
+      text-align: center;
     }
 
-    .danger {
-      color: #b91c1c;
-    }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
+    .hard-divider {
       height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
+      background: linear-gradient(to right, transparent, rgba(51, 65, 85, 1), transparent);
+      margin: 2px 0;
+    }
+
+    .scroll-y {
+      overflow-y: auto;
+    }
+
+    .mt-2 {
+      margin-top: 2px;
+    }
+
+    .mt-4 {
+      margin-top: 4px;
     }
   </style>
 </head>
 <body>
-  <div class="app-root">
-    <header class="app-header" aria-label="도구 정보">
-      <div class="app-header-title">1번 도구 · 고객 자동화 안내서</div>
-      <div class="app-header-sub">WIC 고객별 맞춤 안내문을 빠르게 생성하고 재사용하는 전용 모듈</div>
-      <div class="app-meta">
-        <span class="badge">WIC 자동화 시스템 · public/index.html</span>
-        <span class="badge badge-muted">v1.0 · Local-only · Safe DOM</span>
+  <div class="app-shell" aria-label="2번 도구 입찰 프로그램">
+    <header class="app-header">
+      <div class="app-title-row">
+        <div class="tool-pill">
+          <span class="tool-dot"></span>
+          <span>2번 도구 · 입찰 프로그램</span>
+        </div>
+        <h1>
+          WIC 입찰 관리 모듈
+          <span class="sub">공고 정리 · 마감 D-Day · 투찰률 확인</span>
+        </h1>
       </div>
-      <div class="app-note">※ 이 화면에 보이는 것만 동작합니다. (저장: 브라우저 localStorage)</div>
+      <div class="app-meta">
+        <span><strong>WIC 자동화 시스템 · public/index.html</strong></span>
+        <span class="badge-outline">v1.0 · Local-only · Safe DOM</span>
+        <span>※ 이 화면에 보이는 것만 동작합니다. (저장: 브라우저 localStorage)</span>
+      </div>
     </header>
 
-    <main class="grid" aria-label="고객 자동화 안내서 메인 영역">
-      <!-- LEFT: 고객 관리 -->
-      <section class="card" aria-label="고객 관리 카드">
-        <div class="card-header">
-          <div>
-            <div class="card-title">고객 관리</div>
-            <div class="card-sub">고객 카드 선택 → 안내서 자동 생성</div>
-          </div>
-          <div class="customer-list-count">
-            고객 <span id="customerCount">0</span>명
-          </div>
-        </div>
+    <main>
+      <div class="grid-3">
+        <!-- 좌측: 공고 목록 -->
+        <section class="card" aria-label="입찰 공고 목록">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <div class="card-title">
+                  <span class="icon">①</span>
+                  <span>입찰 공고 목록</span>
+                </div>
+                <div class="card-subtitle">
+                  전체 공고를 한눈에 보고, 하나 클릭하면 오른쪽에 상세가 뜹니다.
+                </div>
+              </div>
+              <span class="pill-count" id="bidCountBadge">공고 0건</span>
+            </div>
 
-        <div class="customer-list-header">
-          <span>고객 목록</span>
-          <span id="customerListCountLabel">0명</span>
-        </div>
+            <div class="card-section">
+              <div class="card-section-header">
+                <strong>검색 · 필터</strong>
+                <span class="badge-soft">공고명 / 발주기관 / 공고번호 / 상태</span>
+              </div>
+              <div class="card-section-body">
+                <div class="input-row">
+                  <label>
+                    검색어
+                    <input
+                      type="text"
+                      id="searchInput"
+                      placeholder="예: KIST / 나라장터 / 2025-0001 / 준비"
+                      autocomplete="off"
+                    />
+                  </label>
+                </div>
+                <div class="btn-row">
+                  <button class="secondary" id="clearSearchBtn" type="button">
+                    <span class="dot"></span> 검색 초기화
+                  </button>
+                  <button class="ghost" id="filterDeadlineBtn" type="button">
+                    7일 이내 마감만 보기
+                  </button>
+                </div>
+              </div>
+            </div>
 
-        <div id="customerListContainer" class="customer-list" aria-label="고객 목록 영역">
-          <div id="customerEmpty" class="customer-empty">
-            <div><strong>고객 카드 없음</strong></div>
-            <div>등록된 고객이 없습니다.</div>
-            <div class="field-hint">
-              아래 입력 칸에 정보를 입력하고 <strong>"고객 저장/업데이트"</strong>를 눌러 첫 고객을 등록하세요.
+            <div class="table-shell mt-4" aria-label="공고 리스트 테이블">
+              <div class="table-header-row">
+                <div>공고명 · 발주기관</div>
+                <div>공고번호</div>
+                <div>마감일 · D-Day</div>
+                <div>추정금액</div>
+                <div>투찰가</div>
+                <div>상태</div>
+              </div>
+              <div class="table-body" id="bidTableBody">
+                <div class="no-data">
+                  등록된 공고가 없습니다.<br />
+                  아래 &lt;공고 입력·수정&gt;에서 첫 공고를 등록해주세요.
+                </div>
+              </div>
+            </div>
+
+            <div class="summary-row mt-4" id="listSummary">
+              <span>총 <strong>0</strong>건 · 준비 <strong>0</strong> · 검토중 <strong>0</strong> · 투찰완료 <strong>0</strong> · 유찰 <strong>0</strong></span>
             </div>
           </div>
-          <div id="customerList" style="display: none;"></div>
-        </div>
+        </section>
 
-        <div class="field-group search-input">
-          <label for="searchInput">고객 검색 (이름/기관/관심)</label>
-          <input
-            id="searchInput"
-            type="text"
-            placeholder="예: KIST / 접착제 / 홍길동"
-            autocomplete="off"
-          />
-          <div class="field-hint">
-            검색어를 비우면 전체 고객이 다시 보입니다.
-          </div>
-        </div>
+        <!-- 가운데: 공고 입력/수정 -->
+        <section class="card" aria-label="입찰 공고 입력 및 수정">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <div class="card-title">
+                  <span class="icon">②</span>
+                  <span>공고 입력 · 수정</span>
+                </div>
+                <div class="card-subtitle">
+                  공고 정보를 저장하면 왼쪽 목록에 카드가 추가됩니다. (localStorage 저장)
+                </div>
+              </div>
+              <span class="pill-count" id="selectedBidLabel">선택: 없음</span>
+            </div>
 
-        <div class="section-divider"></div>
+            <div class="card-section scroll-y" style="flex:1;">
+              <div class="card-section-header">
+                <strong>기본 정보</strong>
+                <span class="badge-soft">* 표시는 필수 항목</span>
+              </div>
+              <div class="card-section-body">
+                <div class="input-row">
+                  <label>
+                    공고명 <span class="req">*</span>
+                    <input
+                      type="text"
+                      id="titleInput"
+                      placeholder="예: 2025년 해외시장조사 용역 입찰"
+                      autocomplete="off"
+                    />
+                  </label>
+                </div>
+                <div class="input-pair mt-2">
+                  <label>
+                    발주기관 <span class="req">*</span>
+                    <input
+                      type="text"
+                      id="agencyInput"
+                      placeholder="예: 한국과학기술정보연구원(KISTI)"
+                      autocomplete="off"
+                    />
+                  </label>
+                  <label>
+                    공고번호
+                    <input
+                      type="text"
+                      id="numberInput"
+                      placeholder="예: 2025-0001-00"
+                      autocomplete="off"
+                    />
+                  </label>
+                </div>
+                <div class="input-pair mt-2">
+                  <label>
+                    마감일 <span class="req">*</span>
+                    <input
+                      type="date"
+                      id="deadlineInput"
+                    />
+                    <div class="hint">마감일을 기준으로 D-Day를 계산합니다.</div>
+                  </label>
+                  <label>
+                    상태 <span class="req">*</span>
+                    <select id="statusInput">
+                      <option value="준비">준비</option>
+                      <option value="검토중">검토중</option>
+                      <option value="투찰완료">투찰완료</option>
+                      <option value="유찰">유찰</option>
+                    </select>
+                    <div class="hint">현재 진행 상태를 선택합니다.</div>
+                  </label>
+                </div>
 
-        <div class="card-header">
-          <div class="card-title">고객 카드 입력</div>
-        </div>
+                <div class="hard-divider"></div>
 
-        <div class="field-group">
-          <label for="nameInput" class="label-required">이름</label>
-          <input id="nameInput" type="text" placeholder="예: 홍길동" autocomplete="off" />
-        </div>
+                <div class="card-section-header">
+                  <strong>금액 정보 (선택)</strong>
+                  <span class="badge-soft">숫자만 입력 (단위: 원)</span>
+                </div>
+                <div class="card-section-body">
+                  <div class="input-3">
+                    <label>
+                      추정금액
+                      <input
+                        type="number"
+                        id="budgetInput"
+                        min="0"
+                        step="1000"
+                        placeholder="예: 80000000"
+                      />
+                      <div class="hint">발주기관 기준 추정금액.</div>
+                    </label>
+                    <label>
+                      투찰 예정가
+                      <input
+                        type="number"
+                        id="bidPriceInput"
+                        min="0"
+                        step="1000"
+                        placeholder="예: 71200000"
+                      />
+                      <div class="hint">우리 쪽에서 넣을 금액.</div>
+                    </label>
+                    <label>
+                      내부 목표 투찰률 (%)
+                      <input
+                        type="number"
+                        id="targetRateInput"
+                        min="0"
+                        max="120"
+                        step="0.01"
+                        placeholder="예: 89.00"
+                      />
+                      <div class="hint">예: 87.5 / 89.0 등.</div>
+                    </label>
+                  </div>
+                </div>
 
-        <div class="field-group">
-          <label for="titleInput">직함</label>
-          <input id="titleInput" type="text" placeholder="예: 책임연구원" autocomplete="off" />
-        </div>
+                <div class="hard-divider"></div>
 
-        <div class="field-group">
-          <label for="orgInput" class="label-required">기관/회사</label>
-          <input id="orgInput" type="text" placeholder="예: 한국과학기술연구원(KIST)" autocomplete="off" />
-        </div>
+                <div class="card-section-header">
+                  <strong>비고 · 메모</strong>
+                  <span class="badge-soft">입찰 전략, 필요 서류, 담당자 등</span>
+                </div>
+                <div class="card-section-body">
+                  <div class="input-row">
+                    <label>
+                      메모
+                      <textarea
+                        id="noteInput"
+                        placeholder="예: 시장조사 보고서 3권 포함 / 기술제안서 A양식 / 가격점수 비중 90% / 나라장터 투찰 예정 등"
+                      ></textarea>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        <div class="field-group">
-          <label for="deptInput">부서</label>
-          <input id="deptInput" type="text" placeholder="예: 재료연구본부" autocomplete="off" />
-        </div>
-
-        <div class="field-group">
-          <label for="emailInput">이메일</label>
-          <input id="emailInput" type="email" placeholder="예: name@kist.re.kr" autocomplete="off" />
-        </div>
-
-        <div class="field-group">
-          <label for="interestInput">관심 분야 / 키워드</label>
-          <textarea
-            id="interestInput"
-            placeholder="예: 반도체 패키징용 글래스 섭스트레이트, 고내열 접착제"
-          ></textarea>
-          <div class="field-hint">
-            고객이 최근 문의하거나 관심을 보인 주제를 간단히 적어둡니다.
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label for="memoInput">메모 (예산, 특이사항 등)</label>
-          <textarea
-            id="memoInput"
-            placeholder="예: 2025년 예산 1,200만원 / 해외 시장조사 보고서 집중 / 후지경제 + SK 스페셜티 관련 관심"
-          ></textarea>
-        </div>
-
-        <div class="inline">
-          <button id="saveCustomerBtn" class="btn btn-block" type="button">
-            고객 저장/업데이트
-          </button>
-        </div>
-
-        <div class="status-row" aria-label="고객 데이터 상태">
-          <div class="status-left">
-            <span class="text-xs">localStorage · <span id="storageStatus">로드 완료</span></span>
-          </div>
-          <div class="status-right">
-            <span class="text-xs">선택: <span id="selectedCustomerLabel">없음</span></span>
-          </div>
-        </div>
-      </section>
-
-      <!-- MIDDLE: 안내서 옵션 -->
-      <section class="card" aria-label="안내서 옵션 카드">
-        <div class="card-header">
-          <div>
-            <div class="card-title">안내서 옵션</div>
-            <div class="card-sub">톤·언어·형식을 미리 고정해 두고 재사용</div>
-          </div>
-          <div class="pill-muted pill">
-            언어: <span style="margin-left:4px;">한국어</span>
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label for="typeSelect">안내서 유형</label>
-          <select id="typeSelect">
-            <option value="first-contact">① 첫 문의용 안내 (처음 인사)</option>
-            <option value="follow-up">② 후속 문의/자료 추가 안내</option>
-            <option value="renewal">③ 정기 예산/갱신 제안</option>
-          </select>
-        </div>
-
-        <div class="field-group inline">
-          <div>
-            <label for="toneSelect">톤 &amp; 길이</label>
-            <select id="toneSelect">
-              <option value="standard">표준 · 보통 길이</option>
-              <option value="short">간단 버전 · 짧게</option>
-              <option value="detailed">자세한 버전 · 길게</option>
-            </select>
-          </div>
-          <div>
-            <label>언어</label>
-            <input type="text" value="한국어" disabled />
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label for="keywordInput">보고서/자료 키워드 (쉼표 구분)</label>
-          <textarea
-            id="keywordInput"
-            placeholder="예: 후지경제 보고서, SK 스페셜티, Sulfur Hexafluoride 시장, Perovskite Solar"
-          ></textarea>
-          <div class="field-hint">
-            실제 제안할 보고서 이름이나 핵심 키워드를 쉼표(,)로 나눠 적습니다.
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label for="closingInput">맺음말 기본 문장</label>
-          <textarea
-            id="closingInput"
-            placeholder="검토 후 궁금하신 점이나 추가로 필요하신 주제가 있으시면 언제든지 편하게 말씀 부탁드립니다."
-          ></textarea>
-          <div class="field-hint">
-            자주 쓰는 맺음말을 저장해 두면 안내서 생성 시 자동으로 붙습니다.
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label for="tagsInput">자동 요약 태그</label>
-          <input
-            id="tagsInput"
-            type="text"
-            placeholder="#첫문의 #표준버전 #국문"
-            autocomplete="off"
-          />
-          <div class="chips-row" id="tagsPreview">
-            <span class="pill">#첫문의</span>
-            <span class="pill">#표준버전</span>
-            <span class="pill">#국문</span>
-          </div>
-        </div>
-
-        <div class="section-divider"></div>
-
-        <div class="status-row">
-          <div class="status-left">
-            <span class="text-xs">옵션 변경: <span id="optionDirtyStatus">미반영</span></span>
-          </div>
-          <div class="status-right">
-            <span class="text-xs">최근 생성: <span id="lastGeneratedAt">없음</span></span>
-          </div>
-        </div>
-      </section>
-
-      <!-- RIGHT: 안내서 미리보기 -->
-      <section class="card" aria-label="안내서 미리보기 카드">
-        <div class="card-header">
-          <div>
-            <div class="card-title">안내서 미리보기</div>
-            <div class="card-sub">고객에게 바로 보낼 수 있는 수준으로 확인</div>
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label>본문</label>
-          <div id="bodyPreview" class="preview-box">
-            <div class="preview-placeholder">
-              ① 왼쪽에서 고객을 선택하거나 새로 저장합니다.<br />
-              ② 가운데에서 안내서 옵션과 키워드를 설정합니다.<br />
-              ③ 아래 버튼 <strong>"안내서 자동 생성"</strong>을 누르면 이곳에 본문이 만들어집니다.
+            <div class="btn-row mt-4">
+              <button class="primary" id="saveBidBtn" type="button">
+                <span class="dot"></span> 공고 저장 / 업데이트
+              </button>
+              <button class="secondary" id="newBidBtn" type="button">
+                새 공고로 입력 초기화
+              </button>
+              <button class="danger" id="deleteBidBtn" type="button" disabled>
+                선택 공고 삭제
+              </button>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="field-group">
-          <div class="inline inline-compact">
-            <button id="generateBtn" type="button" class="btn btn-block">
-              안내서 자동 생성
-            </button>
-          </div>
-        </div>
+        <!-- 오른쪽: 상세 & 시뮬레이션 -->
+        <section class="card" aria-label="상세 · 투찰 시뮬레이션">
+          <div class="card-inner">
+            <div class="card-header">
+              <div>
+                <div class="card-title">
+                  <span class="icon">③</span>
+                  <span>상세 보기 · 투찰 시뮬레이션</span>
+                </div>
+                <div class="card-subtitle" id="detailSubtitle">
+                  왼쪽에서 공고를 선택하면 여기에서 D-Day, 투찰률 등을 자동 계산합니다.
+                </div>
+              </div>
+              <span class="pill-count" id="detailStatusPill">선택: 없음</span>
+            </div>
 
-        <div class="field-group">
-          <label>이메일 제목 추천</label>
-          <div id="titlePreview" class="title-preview">
-            <span class="title-placeholder">
-              고객과 옵션을 선택하면 자동으로 제목이 표시됩니다.
-            </span>
-          </div>
-        </div>
+            <div class="card-section">
+              <div class="card-section-header">
+                <strong>선택한 공고</strong>
+                <span class="badge-soft mono" id="detailIdBadge">ID: -</span>
+              </div>
+              <div class="card-section-body" id="detailMain">
+                <div class="no-data">
+                  아직 선택된 공고가 없습니다.<br />
+                  목록에서 하나를 클릭하면 상세가 보입니다.
+                </div>
+              </div>
+            </div>
 
-        <div class="field-group inline inline-compact">
-          <button id="copyBodyBtn" type="button" class="btn btn-secondary btn-sm">
-            본문 복사
-          </button>
-          <button id="copyTitleBtn" type="button" class="btn btn-ghost btn-sm">
-            제목 복사
-          </button>
-        </div>
+            <div class="card-section mt-4">
+              <div class="card-section-header">
+                <strong>투찰 시뮬레이션</strong>
+                <span class="badge-soft">추정금액 / 투찰가 / 목표 투찰률 기준</span>
+              </div>
+              <div class="card-section-body">
+                <div class="sim-grid">
+                  <div>
+                    <div class="sim-output" id="simOutput">
+                      <div class="no-data">
+                        추정금액과 투찰가를 입력하면, 여기에서 투찰률과 차액을 보여줍니다.
+                      </div>
+                    </div>
+                    <div class="hint mt-2">
+                      * 추정금액이 0이거나 비어 있으면 투찰률 계산이 되지 않습니다.
+                    </div>
+                  </div>
+                  <div>
+                    <label>
+                      투찰률 직접 입력 (테스트용, 선택)
+                      <input
+                        type="number"
+                        id="manualRateInput"
+                        min="0"
+                        max="120"
+                        step="0.01"
+                        placeholder="예: 88.75"
+                      />
+                    </label>
+                    <div class="hint mt-2">
+                      이 칸은 별도 계산 없이, 단순히 감각 테스트용으로만 사용합니다.
+                    </div>
+                    <div class="sim-output mt-2" id="manualRateOutput">
+                      <div class="no-data">
+                        직접 입력한 투찰률을 간단히 표시합니다.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        <div class="status-row">
-          <div class="status-left">
-            <span class="text-xs">클립보드 상태: <span id="clipboardStatus">대기</span></span>
+            <div class="card-section mt-4">
+              <div class="card-section-header">
+                <strong>클립보드용 요약</strong>
+                <span class="badge-soft">메모장 / 메일 / 메신저에 바로 붙여넣기</span>
+              </div>
+              <div class="card-section-body">
+                <div class="flex-row">
+                  <button class="secondary" id="copySummaryBtn" type="button" disabled>
+                    공고 요약 복사 (텍스트)
+                  </button>
+                  <span class="hint" id="copyStateLabel">클립보드 상태: 대기</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="status-right">
-            <span class="text-xs">
-              글자 수: <span id="charCount">0</span>자 /
-              줄 수: <span id="lineCount">0</span>줄
-            </span>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
+
+    <footer class="footer-bar">
+      <div class="footer-left">
+        <span class="dot-live"></span>
+        <span>localStorage · <span id="storageStateText">로드 시도 중…</span></span>
+        <span class="badge-soft">자동 저장: 공고 목록이 바뀔 때마다</span>
+      </div>
+      <div class="footer-right">
+        <span class="kbd">클릭</span>
+        <span>목록에서 공고 선택 → 가운데에서 수정 → 오른쪽에서 시뮬레이션</span>
+      </div>
+    </footer>
   </div>
 
   <script>
     (function () {
       "use strict";
 
-      // Safe DOM helpers
-      function qs(selector) {
-        return document.querySelector(selector);
-      }
-
-      function createElement(tag, className) {
-        var el = document.createElement(tag);
-        if (className) el.className = className;
-        return el;
-      }
-
-      function safeText(text) {
-        return (text || "").toString();
-      }
-
-      // Storage keys
-      var STORAGE_CUSTOMERS_KEY = "wicGuide_customers_v1";
-      var STORAGE_OPTIONS_KEY = "wicGuide_options_v1";
-
-      // State
-      var state = {
-        customers: [],
-        selectedCustomerId: null,
-        optionsDirty: false,
-        lastGeneratedAt: null,
-        lastBody: "",
-        lastTitle: ""
-      };
-
-      // DOM refs
-      var customerCountEl = qs("#customerCount");
-      var customerListCountLabelEl = qs("#customerListCountLabel");
-      var customerListContainerEl = qs("#customerListContainer");
-      var customerEmptyEl = qs("#customerEmpty");
-      var customerListEl = qs("#customerList");
-      var selectedCustomerLabelEl = qs("#selectedCustomerLabel");
-      var storageStatusEl = qs("#storageStatus");
-
-      var searchInputEl = qs("#searchInput");
-      var nameInputEl = qs("#nameInput");
-      var titleInputEl = qs("#titleInput");
-      var orgInputEl = qs("#orgInput");
-      var deptInputEl = qs("#deptInput");
-      var emailInputEl = qs("#emailInput");
-      var interestInputEl = qs("#interestInput");
-      var memoInputEl = qs("#memoInput");
-      var saveCustomerBtnEl = qs("#saveCustomerBtn");
-
-      var typeSelectEl = qs("#typeSelect");
-      var toneSelectEl = qs("#toneSelect");
-      var keywordInputEl = qs("#keywordInput");
-      var closingInputEl = qs("#closingInput");
-      var tagsInputEl = qs("#tagsInput");
-      var tagsPreviewEl = qs("#tagsPreview");
-      var optionDirtyStatusEl = qs("#optionDirtyStatus");
-      var lastGeneratedAtEl = qs("#lastGeneratedAt");
-
-      var bodyPreviewEl = qs("#bodyPreview");
-      var titlePreviewEl = qs("#titlePreview");
-      var generateBtnEl = qs("#generateBtn");
-      var copyBodyBtnEl = qs("#copyBodyBtn");
-      var copyTitleBtnEl = qs("#copyTitleBtn");
-      var clipboardStatusEl = qs("#clipboardStatus");
-      var charCountEl = qs("#charCount");
-      var lineCountEl = qs("#lineCount");
-
-      // Utilities
-      function generateId() {
-        return "C" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-      }
-
-      function nowString() {
-        var d = new Date();
-        var y = d.getFullYear();
-        var m = (d.getMonth() + 1).toString().padStart(2, "0");
-        var day = d.getDate().toString().padStart(2, "0");
-        var hh = d.getHours().toString().padStart(2, "0");
-        var mm = d.getMinutes().toString().padStart(2, "0");
-        return y + "-" + m + "-" + day + " " + hh + ":" + mm;
-      }
-
-      function parseTags(text) {
-        var raw = safeText(text)
-          .trim()
-          .replace(/,/g, " ")
-          .split(/\s+/)
-          .filter(Boolean);
-
-        var clean = raw.map(function (t) {
-          if (t[0] !== "#") return "#" + t;
-          return t;
-        });
-
-        // deduplicate
-        var seen = {};
-        var res = [];
-        clean.forEach(function (t) {
-          if (!seen[t]) {
-            seen[t] = true;
-            res.push(t);
-          }
-        });
-        return res;
-      }
-
-      function sanitizeEmail(text) {
-        var trimmed = safeText(text).trim();
-        if (!trimmed) return "";
-        // very relaxed check
-        if (!trimmed.includes("@") || !trimmed.includes(".")) {
-          return trimmed; // do not block; just return as is
-        }
-        return trimmed;
-      }
-
-      function computeCounts(text) {
-        var body = safeText(text);
-        var chars = body.length;
-        var lines = body ? body.split(/\r\n|\r|\n/).length : 0;
-        charCountEl.textContent = chars.toString();
-        lineCountEl.textContent = lines.toString();
-      }
-
-      function setOptionDirty(dirty) {
-        state.optionsDirty = !!dirty;
-        optionDirtyStatusEl.textContent = dirty ? "변경됨" : "미반영";
-      }
-
-      function showClipboardStatus(msg) {
-        clipboardStatusEl.textContent = msg;
-        if (!msg) clipboardStatusEl.textContent = "대기";
-      }
-
-      function safeLocalStorageGet(key) {
+      /**
+       * 안전한 JSON 파싱
+       * @param {string | null} str
+       * @param {any} fallback
+       * @returns {any}
+       */
+      function safeJsonParse(str, fallback) {
+        if (typeof str !== "string") return fallback;
         try {
-          var raw = window.localStorage.getItem(key);
-          if (!raw) return null;
-          return JSON.parse(raw);
-        } catch (e) {
-          return null;
+          return JSON.parse(str);
+        } catch (_) {
+          return fallback;
         }
       }
 
-      function safeLocalStorageSet(key, value) {
+      /**
+       * 숫자 포맷 (원 단위)
+       * @param {number | null | undefined} value
+       * @returns {string}
+       */
+      function formatWon(value) {
+        if (value === null || value === undefined || isNaN(value)) return "-";
         try {
-          window.localStorage.setItem(key, JSON.stringify(value));
-        } catch (e) {
-          // ignore quota errors
+          return value.toLocaleString("ko-KR") + "원";
+        } catch (_) {
+          return value + "원";
         }
       }
 
-      // Load & Save
+      /**
+       * 날짜 포맷 YYYY-MM-DD
+       * @param {string} value
+       * @returns {string}
+       */
+      function normalizeDate(value) {
+        if (!value) return "";
+        const date = new Date(value);
+        if (isNaN(date.getTime())) return "";
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return year + "-" + month + "-" + day;
+      }
+
+      /**
+       * D-Day 계산
+       * @param {string} dateStr (YYYY-MM-DD)
+       * @returns {{label: string, diff: number}}
+       */
+      function computeDDay(dateStr) {
+        if (!dateStr) return { label: "-", diff: NaN };
+        const target = new Date(dateStr + "T00:00:00");
+        if (isNaN(target.getTime())) return { label: "-", diff: NaN };
+        const today = new Date();
+        const todayMid = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate()
+        );
+        const diffMs = target.getTime() - todayMid.getTime();
+        const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+        let label = "";
+        if (diffDays > 0) {
+          label = "D-" + diffDays;
+        } else if (diffDays === 0) {
+          label = "D-Day";
+        } else {
+          label = "D+" + Math.abs(diffDays);
+        }
+        return { label: label, diff: diffDays };
+      }
+
+      /**
+       * 투찰률 계산
+       * @param {number} budget
+       * @param {number} bidPrice
+       * @returns {number | null}
+       */
+      function computeRate(budget, bidPrice) {
+        if (!budget || isNaN(budget) || budget <= 0) return null;
+        if (!bidPrice || isNaN(bidPrice) || bidPrice <= 0) return null;
+        return (bidPrice / budget) * 100;
+      }
+
+      /**
+       * 상태 색상 클래스
+       * @param {string} status
+       * @returns {string}
+       */
+      function getStatusClass(status) {
+        switch (status) {
+          case "준비":
+            return "status-준비";
+          case "검토중":
+            return "status-검토중";
+          case "투찰완료":
+            return "status-투찰완료";
+          case "유찰":
+            return "status-유찰";
+          default:
+            return "";
+        }
+      }
+
+      /**
+       * 요약 문자열 생성 (클립보드용)
+       * @param {any} bid
+       * @returns {string}
+       */
+      function buildSummaryText(bid) {
+        var lines = [];
+        lines.push("[입찰 공고 요약]");
+        lines.push("공고명: " + (bid.title || "-"));
+        lines.push("발주기관: " + (bid.agency || "-"));
+        lines.push("공고번호: " + (bid.number || "-"));
+        lines.push("");
+        var deadline = bid.deadline || "";
+        var dInfo = computeDDay(deadline);
+        lines.push("마감일: " + (deadline || "-") + " (" + (dInfo.label || "-") + ")");
+        lines.push("상태: " + (bid.status || "-"));
+        lines.push("");
+        lines.push("추정금액: " + formatWon(bid.budget || null));
+        lines.push("투찰 예정가: " + formatWon(bid.bidPrice || null));
+        var rate = computeRate(bid.budget || 0, bid.bidPrice || 0);
+        if (rate !== null) {
+          lines.push("투찰률: " + rate.toFixed(2) + "%");
+        } else {
+          lines.push("투찰률: 계산 불가 (금액 정보 부족)");
+        }
+        if (typeof bid.targetRate === "number" && !isNaN(bid.targetRate)) {
+          lines.push("내부 목표 투찰률: " + bid.targetRate.toFixed(2) + "%");
+        }
+        lines.push("");
+        lines.push("메모: " + (bid.note || "-"));
+        return lines.join("\n");
+      }
+
+      // DOM 요소 캐시
+      var bidTableBody = document.getElementById("bidTableBody");
+      var bidCountBadge = document.getElementById("bidCountBadge");
+      var listSummary = document.getElementById("listSummary");
+      var selectedBidLabel = document.getElementById("selectedBidLabel");
+      var detailSubtitle = document.getElementById("detailSubtitle");
+      var detailStatusPill = document.getElementById("detailStatusPill");
+      var detailMain = document.getElementById("detailMain");
+      var detailIdBadge = document.getElementById("detailIdBadge");
+      var simOutput = document.getElementById("simOutput");
+      var manualRateInput = document.getElementById("manualRateInput");
+      var manualRateOutput = document.getElementById("manualRateOutput");
+      var copySummaryBtn = document.getElementById("copySummaryBtn");
+      var copyStateLabel = document.getElementById("copyStateLabel");
+      var storageStateText = document.getElementById("storageStateText");
+
+      var searchInput = document.getElementById("searchInput");
+      var clearSearchBtn = document.getElementById("clearSearchBtn");
+      var filterDeadlineBtn = document.getElementById("filterDeadlineBtn");
+
+      var titleInput = document.getElementById("titleInput");
+      var agencyInput = document.getElementById("agencyInput");
+      var numberInput = document.getElementById("numberInput");
+      var deadlineInput = document.getElementById("deadlineInput");
+      var statusInput = document.getElementById("statusInput");
+      var budgetInput = document.getElementById("budgetInput");
+      var bidPriceInput = document.getElementById("bidPriceInput");
+      var targetRateInput = document.getElementById("targetRateInput");
+      var noteInput = document.getElementById("noteInput");
+
+      var saveBidBtn = document.getElementById("saveBidBtn");
+      var newBidBtn = document.getElementById("newBidBtn");
+      var deleteBidBtn = document.getElementById("deleteBidBtn");
+
+      // 상태
+      var STATE_KEY = "wic_bid_tool_v1_bids";
+      var bids = [];
+      var selectedBidId = null;
+      var deadlineFilterActive = false;
+
+      /**
+       * localStorage에서 데이터 로드
+       */
       function loadFromStorage() {
-        var customers = safeLocalStorageGet(STORAGE_CUSTOMERS_KEY);
-        if (Array.isArray(customers)) {
-          state.customers = customers;
-        } else {
-          state.customers = [];
+        var raw = null;
+        try {
+          raw = window.localStorage.getItem(STATE_KEY);
+        } catch (e) {
+          raw = null;
         }
-
-        var options = safeLocalStorageGet(STORAGE_OPTIONS_KEY);
-        if (options && typeof options === "object") {
-          if (options.type) typeSelectEl.value = options.type;
-          if (options.tone) toneSelectEl.value = options.tone;
-          if (typeof options.keywords === "string") {
-            keywordInputEl.value = options.keywords;
-          }
-          if (typeof options.closing === "string") {
-            closingInputEl.value = options.closing;
-          } else {
-            // default closing
-            closingInputEl.value =
-              "검토 후 궁금하신 점이나 추가로 필요하신 주제가 있으시면 언제든지 편하게 말씀 부탁드립니다.";
-          }
-          if (typeof options.tags === "string") {
-            tagsInputEl.value = options.tags;
-          } else {
-            tagsInputEl.value = "#첫문의 #표준버전 #국문";
-          }
+        var list = safeJsonParse(raw, []);
+        if (!Array.isArray(list)) {
+          bids = [];
         } else {
-          // 초기값 설정
-          keywordInputEl.value =
-            "후지경제 보고서, SK 스페셜티, Sulfur Hexafluoride 시장, Perovskite Solar";
-          closingInputEl.value =
-            "검토 후 궁금하신 점이나 추가로 필요하신 주제가 있으시면 언제든지 편하게 말씀 부탁드립니다.";
-          tagsInputEl.value = "#첫문의 #표준버전 #국문";
+          bids = list.map(function (item) {
+            return {
+              id: item.id || generateId(),
+              title: item.title || "",
+              agency: item.agency || "",
+              number: item.number || "",
+              deadline: item.deadline || "",
+              status: item.status || "준비",
+              budget: typeof item.budget === "number" ? item.budget : null,
+              bidPrice: typeof item.bidPrice === "number" ? item.bidPrice : null,
+              targetRate:
+                typeof item.targetRate === "number" ? item.targetRate : null,
+              note: item.note || ""
+            };
+          });
         }
-
-        updateTagsPreview();
-        refreshCustomerList();
-        storageStatusEl.textContent = "로드 완료";
-        setOptionDirty(false);
+        storageStateText.textContent = "로드 완료";
       }
 
-      function saveOptionsToStorage() {
-        var options = {
-          type: typeSelectEl.value,
-          tone: toneSelectEl.value,
-          keywords: keywordInputEl.value,
-          closing: closingInputEl.value,
-          tags: tagsInputEl.value
+      /**
+       * localStorage에 저장
+       */
+      function saveToStorage() {
+        try {
+          var serialized = JSON.stringify(bids);
+          window.localStorage.setItem(STATE_KEY, serialized);
+          storageStateText.textContent = "저장 완료";
+        } catch (e) {
+          storageStateText.textContent = "저장 실패 (용량 또는 브라우저 제한)";
+        }
+      }
+
+      /**
+       * ID 생성
+       * @returns {string}
+       */
+      function generateId() {
+        return (
+          "bid_" +
+          Date.now().toString(36) +
+          "_" +
+          Math.random().toString(36).substring(2, 8)
+        );
+      }
+
+      /**
+       * 선택 해제
+       */
+      function clearSelection() {
+        selectedBidId = null;
+        selectedBidLabel.textContent = "선택: 없음";
+        detailStatusPill.textContent = "선택: 없음";
+        detailStatusPill.className = "pill-count";
+        detailIdBadge.textContent = "ID: -";
+        detailMain.innerHTML =
+          '<div class="no-data">아직 선택된 공고가 없습니다.<br />목록에서 하나를 클릭하면 상세가 보입니다.</div>';
+        simOutput.innerHTML =
+          '<div class="no-data">추정금액과 투찰가를 입력하면, 여기에서 투찰률과 차액을 보여줍니다.</div>';
+        manualRateInput.value = "";
+        manualRateOutput.innerHTML =
+          '<div class="no-data">직접 입력한 투찰률을 간단히 표시합니다.</div>';
+        copySummaryBtn.disabled = true;
+        deleteBidBtn.disabled = true;
+      }
+
+      /**
+       * 입력 폼 초기화
+       */
+      function resetFormForNewBid() {
+        titleInput.value = "";
+        agencyInput.value = "";
+        numberInput.value = "";
+        deadlineInput.value = "";
+        statusInput.value = "준비";
+        budgetInput.value = "";
+        bidPriceInput.value = "";
+        targetRateInput.value = "";
+        noteInput.value = "";
+        clearSelection();
+      }
+
+      /**
+       * 입력값 가져오기
+       * @returns {{ok: boolean, error?: string, data?: any}}
+       */
+      function collectFormData() {
+        var title = (titleInput.value || "").trim();
+        var agency = (agencyInput.value || "").trim();
+        var number = (numberInput.value || "").trim();
+        var deadlineRaw = (deadlineInput.value || "").trim();
+        var status = statusInput.value || "준비";
+        var deadline = normalizeDate(deadlineRaw);
+
+        if (!title) {
+          return { ok: false, error: "공고명을 입력해주세요." };
+        }
+        if (!agency) {
+          return { ok: false, error: "발주기관을 입력해주세요." };
+        }
+        if (!deadline) {
+          return { ok: false, error: "마감일을 올바르게 선택해주세요." };
+        }
+
+        var budget = null;
+        var bidPrice = null;
+        var targetRate = null;
+
+        var budgetStr = (budgetInput.value || "").trim();
+        var bidPriceStr = (bidPriceInput.value || "").trim();
+        var targetRateStr = (targetRateInput.value || "").trim();
+
+        if (budgetStr) {
+          var b = Number(budgetStr);
+          if (!isNaN(b) && b >= 0) {
+            budget = b;
+          }
+        }
+
+        if (bidPriceStr) {
+          var bp = Number(bidPriceStr);
+          if (!isNaN(bp) && bp >= 0) {
+            bidPrice = bp;
+          }
+        }
+
+        if (targetRateStr) {
+          var tr = Number(targetRateStr);
+          if (!isNaN(tr) && tr >= 0 && tr <= 120) {
+            targetRate = tr;
+          }
+        }
+
+        var note = (noteInput.value || "").trim();
+
+        return {
+          ok: true,
+          data: {
+            title: title,
+            agency: agency,
+            number: number,
+            deadline: deadline,
+            status: status,
+            budget: budget,
+            bidPrice: bidPrice,
+            targetRate: targetRate,
+            note: note
+          }
         };
-        safeLocalStorageSet(STORAGE_OPTIONS_KEY, options);
-        setOptionDirty(false);
       }
 
-      function saveCustomersToStorage() {
-        safeLocalStorageSet(STORAGE_CUSTOMERS_KEY, state.customers);
-        storageStatusEl.textContent = "저장 완료";
+      /**
+       * 공고 저장 또는 업데이트
+       */
+      function handleSaveBid() {
+        var result = collectFormData();
+        if (!result.ok) {
+          window.alert(result.error || "입력값을 확인해주세요.");
+          return;
+        }
+        var data = result.data;
+
+        if (selectedBidId) {
+          // 업데이트
+          var updated = false;
+          bids = bids.map(function (item) {
+            if (item.id === selectedBidId) {
+              updated = true;
+              return Object.assign({}, item, data);
+            }
+            return item;
+          });
+          if (!updated) {
+            // 선택된 ID가 리스트에 없는 경우, 새로 추가
+            var newId = generateId();
+            bids.push(Object.assign({ id: newId }, data));
+            selectedBidId = newId;
+          }
+        } else {
+          // 새로 추가
+          var id = generateId();
+          bids.push(Object.assign({ id: id }, data));
+          selectedBidId = id;
+        }
+
+        saveToStorage();
+        renderAll();
+        focusSelectedRow();
       }
 
-      // Customer list rendering
-      function refreshCustomerList() {
-        var term = safeText(searchInputEl.value).trim().toLowerCase();
-        var customers = state.customers || [];
-
-        var filtered = customers.filter(function (c) {
-          if (!term) return true;
-          var fields = [
-            safeText(c.name),
-            safeText(c.org),
-            safeText(c.interest),
-            safeText(c.memo)
-          ]
-            .join(" ")
-            .toLowerCase();
-          return fields.indexOf(term) !== -1;
+      /**
+       * 선택된 공고 삭제
+       */
+      function handleDeleteBid() {
+        if (!selectedBidId) return;
+        var ok = window.confirm("선택한 공고를 삭제하시겠습니까?");
+        if (!ok) return;
+        bids = bids.filter(function (item) {
+          return item.id !== selectedBidId;
         });
+        saveToStorage();
+        selectedBidId = null;
+        renderAll();
+        clearSelection();
+      }
 
-        customerCountEl.textContent = customers.length.toString();
-        customerListCountLabelEl.textContent = filtered.length + "명";
+      /**
+       * 목록 렌더
+       */
+      function renderList() {
+        var searchText = (searchInput.value || "").trim().toLowerCase();
+        var hasSearch = searchText.length > 0;
 
-        // toggle empty/list
+        var filtered = bids.slice();
+
+        // 검색 필터
+        if (hasSearch) {
+          filtered = filtered.filter(function (bid) {
+            var combined =
+              (bid.title || "") +
+              " " +
+              (bid.agency || "") +
+              " " +
+              (bid.number || "") +
+              " " +
+              (bid.status || "");
+            return combined.toLowerCase().indexOf(searchText) !== -1;
+          });
+        }
+
+        // 마감일 필터 (7일 이내)
+        if (deadlineFilterActive) {
+          filtered = filtered.filter(function (bid) {
+            var d = computeDDay(bid.deadline || "");
+            if (isNaN(d.diff)) return false;
+            return d.diff <= 7;
+          });
+        }
+
+        bidTableBody.innerHTML = "";
+
         if (filtered.length === 0) {
-          customerEmptyEl.style.display = "block";
-          customerListEl.style.display = "none";
-          customerListEl.innerHTML = "";
-          return;
-        }
-
-        customerEmptyEl.style.display = "none";
-        customerListEl.style.display = "block";
-        customerListEl.innerHTML = "";
-
-        filtered.forEach(function (c) {
-          var item = createElement("div", "customer-item");
-          item.setAttribute("data-id", c.id);
-
-          if (c.id === state.selectedCustomerId) {
-            item.classList.add("selected");
-          }
-
-          var nameRow = createElement("div", "customer-name-row");
-          var nameSpan = createElement("span");
-          nameSpan.textContent = safeText(c.name) || "(이름 없음)";
-
-          var titleSpan = createElement("span", "muted");
-          titleSpan.textContent = safeText(c.title || "").slice(0, 18);
-          nameRow.appendChild(nameSpan);
-          if (titleSpan.textContent) {
-            nameRow.appendChild(titleSpan);
-          }
-
-          var orgEl = createElement("div", "customer-org");
-          var orgText = safeText(c.org);
-          var deptText = safeText(c.dept);
-          var combined = orgText;
-          if (deptText) {
-            combined += " · " + deptText;
-          }
-          orgEl.textContent = combined || "(기관 미입력)";
-
-          var tagsRow = createElement("div", "customer-tags");
-          var interestsShort = safeText(c.interest)
-            .split(/[,\n]/)
-            .map(function (s) {
-              return s.trim();
-            })
-            .filter(Boolean)
-            .slice(0, 2)
-            .join(" / ");
-          if (interestsShort) {
-            var interestSpan = createElement("span");
-            interestSpan.textContent = "관심: " + interestsShort;
-            tagsRow.appendChild(interestSpan);
-          }
-
-          if (c.memo) {
-            var memoSpan = createElement("span");
-            memoSpan.textContent = "메모 있음";
-            memoSpan.style.color = "#4b5563";
-            tagsRow.appendChild(memoSpan);
-          }
-
-          if (!interestsShort && !c.memo) {
-            var noneSpan = createElement("span");
-            noneSpan.textContent = "추가 정보 없음";
-            noneSpan.style.color = "#9ca3af";
-            tagsRow.appendChild(noneSpan);
-          }
-
-          item.appendChild(nameRow);
-          item.appendChild(orgEl);
-          item.appendChild(tagsRow);
-
-          item.addEventListener("click", function () {
-            onSelectCustomer(c.id);
-          });
-
-          customerListEl.appendChild(item);
-        });
-      }
-
-      function onSelectCustomer(id) {
-        state.selectedCustomerId = id;
-        var customers = state.customers || [];
-        var selected = customers.find(function (c) {
-          return c.id === id;
-        });
-
-        // highlight
-        var allItems = customerListEl.querySelectorAll(".customer-item");
-        allItems.forEach(function (item) {
-          var itemId = item.getAttribute("data-id");
-          if (itemId === id) {
-            item.classList.add("selected");
+          var noDiv = document.createElement("div");
+          noDiv.className = "no-data";
+          if (bids.length === 0) {
+            noDiv.innerHTML =
+              "등록된 공고가 없습니다.<br />아래 &lt;공고 입력·수정&gt;에서 첫 공고를 등록해주세요.";
           } else {
-            item.classList.remove("selected");
+            noDiv.innerHTML =
+              "조건에 맞는 공고가 없습니다.<br />검색어와 필터를 다시 확인해주세요.";
           }
-        });
-
-        if (selected) {
-          nameInputEl.value = safeText(selected.name);
-          titleInputEl.value = safeText(selected.title);
-          orgInputEl.value = safeText(selected.org);
-          deptInputEl.value = safeText(selected.dept);
-          emailInputEl.value = safeText(selected.email);
-          interestInputEl.value = safeText(selected.interest);
-          memoInputEl.value = safeText(selected.memo);
-          selectedCustomerLabelEl.textContent = safeText(selected.name) || "이름 없음";
+          bidTableBody.appendChild(noDiv);
         } else {
-          selectedCustomerLabelEl.textContent = "없음";
-        }
-      }
+          filtered.forEach(function (bid) {
+            var row = document.createElement("div");
+            row.className = "table-row";
+            row.dataset.id = bid.id;
 
-      // Save or update customer
-      function onSaveCustomer() {
-        var name = safeText(nameInputEl.value).trim();
-        var org = safeText(orgInputEl.value).trim();
+            if (bid.id === selectedBidId) {
+              row.classList.add("selected");
+            }
 
-        if (!name || !org) {
-          alert("이름과 기관/회사를 입력해 주세요.");
-          return;
-        }
+            var deadlineInfo = computeDDay(bid.deadline || "");
+            var budget = bid.budget || null;
+            var bidPrice = bid.bidPrice || null;
+            var rate = computeRate(budget, bidPrice);
 
-        var customer = {
-          id: state.selectedCustomerId || generateId(),
-          name: name,
-          title: safeText(titleInputEl.value).trim(),
-          org: org,
-          dept: safeText(deptInputEl.value).trim(),
-          email: sanitizeEmail(emailInputEl.value),
-          interest: safeText(interestInputEl.value).trim(),
-          memo: safeText(memoInputEl.value).trim()
-        };
+            var cell1 = document.createElement("div");
+            cell1.className = "cell-main";
+            var titleDiv = document.createElement("div");
+            titleDiv.className = "cell-main-title";
+            titleDiv.textContent = bid.title || "-";
+            var subDiv = document.createElement("div");
+            subDiv.className = "cell-main-sub";
+            subDiv.textContent = bid.agency || "-";
+            cell1.appendChild(titleDiv);
+            cell1.appendChild(subDiv);
 
-        var idx = state.customers.findIndex(function (c) {
-          return c.id === customer.id;
-        });
+            var cell2 = document.createElement("div");
+            cell2.className = "mono";
+            cell2.textContent = bid.number || "-";
 
-        if (idx === -1) {
-          state.customers.push(customer);
-        } else {
-          state.customers[idx] = customer;
-        }
+            var cell3 = document.createElement("div");
+            cell3.className = "cell-main";
+            var d1 = document.createElement("div");
+            d1.className = "cell-main-title";
+            d1.textContent = bid.deadline || "-";
+            var d2 = document.createElement("div");
+            d2.className = "cell-main-sub";
+            d2.textContent = deadlineInfo.label || "-";
+            cell3.appendChild(d1);
+            cell3.appendChild(d2);
 
-        state.selectedCustomerId = customer.id;
-        selectedCustomerLabelEl.textContent = customer.name || "이름 없음";
-        saveCustomersToStorage();
-        refreshCustomerList();
-      }
+            var cell4 = document.createElement("div");
+            cell4.textContent = formatWon(budget);
 
-      // Tags preview
-      function updateTagsPreview() {
-        var tags = parseTags(tagsInputEl.value);
-        tagsPreviewEl.innerHTML = "";
-        if (tags.length === 0) {
-          var defaultTags = ["#첫문의", "#표준버전", "#국문"];
-          defaultTags.forEach(function (t) {
-            var span = createElement("span", "pill");
-            span.textContent = t;
-            tagsPreviewEl.appendChild(span);
+            var cell5 = document.createElement("div");
+            if (rate !== null) {
+              cell5.innerHTML =
+                '<div class="cell-main-title">' +
+                formatWon(bidPrice) +
+                '</div><div class="cell-main-sub">' +
+                rate.toFixed(2) +
+                "%</div>";
+            } else {
+              cell5.textContent = formatWon(bidPrice);
+            }
+
+            var cell6 = document.createElement("div");
+            var statusSpan = document.createElement("div");
+            statusSpan.className = "status-pill " + getStatusClass(bid.status);
+            statusSpan.textContent = bid.status || "-";
+            cell6.appendChild(statusSpan);
+
+            row.appendChild(cell1);
+            row.appendChild(cell2);
+            row.appendChild(cell3);
+            row.appendChild(cell4);
+            row.appendChild(cell5);
+            row.appendChild(cell6);
+
+            row.addEventListener("click", function () {
+              selectBid(bid.id);
+            });
+
+            bidTableBody.appendChild(row);
           });
-          return;
         }
 
-        tags.forEach(function (t) {
-          var span = createElement("span", "pill");
-          span.textContent = t;
-          tagsPreviewEl.appendChild(span);
+        bidCountBadge.textContent = "공고 " + bids.length + "건";
+
+        var counts = {
+          준비: 0,
+          검토중: 0,
+          투찰완료: 0,
+          유찰: 0
+        };
+        bids.forEach(function (bid) {
+          if (counts.hasOwnProperty(bid.status)) {
+            counts[bid.status] += 1;
+          }
         });
+
+        listSummary.innerHTML =
+          '<span>총 <strong>' +
+          bids.length +
+          "</strong>건 · 준비 <strong>" +
+          counts["준비"] +
+          "</strong> · 검토중 <strong>" +
+          counts["검토중"] +
+          "</strong> · 투찰완료 <strong>" +
+          counts["투찰완료"] +
+          "</strong> · 유찰 <strong>" +
+          counts["유찰"] +
+          "</strong></span>";
       }
 
-      // Generate body
-      function buildBody(customer, options) {
-        var name = safeText(customer.name) || "연구자님";
-        var title = safeText(customer.title);
-        var org = safeText(customer.org);
-        var dept = safeText(customer.dept);
-        var interest = safeText(customer.interest);
-        var memo = safeText(customer.memo);
-
-        var type = options.type;
-        var tone = options.tone;
-        var keywords = options.keywords;
-        var closing = options.closing;
-        var tags = parseTags(options.tags);
-
-        var salutationLine = "";
-        if (title && dept) {
-          salutationLine = org + " " + dept + " " + name + " " + title + "께";
-        } else if (title) {
-          salutationLine = org + " " + name + " " + title + "께";
-        } else if (dept) {
-          salutationLine = org + " " + dept + " " + name + "께";
-        } else if (org) {
-          salutationLine = org + " " + name + "께";
-        } else {
-          salutationLine = name + "께";
+      /**
+       * 시뮬레이션 영역 렌더
+       * @param {any | null} bid
+       */
+      function renderSimulation(bid) {
+        if (!bid) {
+          simOutput.innerHTML =
+            '<div class="no-data">추정금액과 투찰가를 입력하면, 여기에서 투찰률과 차액을 보여줍니다.</div>';
+          return;
+        }
+        var budget = bid.budget || null;
+        var bidPrice = bid.bidPrice || null;
+        var targetRate = bid.targetRate || null;
+        var rate = computeRate(budget || 0, bidPrice || 0);
+        var diff = null;
+        if (
+          budget !== null &&
+          budget !== undefined &&
+          bidPrice !== null &&
+          bidPrice !== undefined
+        ) {
+          diff = (budget || 0) - (bidPrice || 0);
         }
 
-        var intro1 = "";
-        if (type === "first-contact") {
-          intro1 =
-            "월드산업정보센터에서 해외 시장조사 및 기술자료를 안내드리고 있는 월드산업정보센터입니다.";
-        } else if (type === "follow-up") {
-          intro1 =
-            "이전에 보내드렸던 자료 관련하여, 추가로 참고하실 수 있는 보고서와 정보를 정리하여 다시 안내드립니다.";
+        var html = "";
+
+        html += '<div class="sim-line">';
+        html += '<div class="sim-label">추정금액</div>';
+        html +=
+          '<div class="sim-value mono">' + formatWon(budget) + "</div>";
+        html += "</div>";
+
+        html += '<div class="sim-line">';
+        html += '<div class="sim-label">투찰 예정가</div>';
+        html +=
+          '<div class="sim-value mono">' + formatWon(bidPrice) + "</div>";
+        html += "</div>";
+
+        html += '<div class="sim-line">';
+        html += '<div class="sim-label">투찰률</div>';
+        if (rate !== null) {
+          html +=
+            '<div class="sim-value sim-highlight mono">' +
+            rate.toFixed(2) +
+            "%</div>";
         } else {
-          intro1 =
-            "다가오는 예산 및 연구 계획 수립에 참고하실 수 있도록 관련 시장조사 및 기술자료를 다시 한 번 정리하여 안내드립니다.";
+          html +=
+            '<div class="sim-value sim-warning">계산 불가 (금액 정보 부족)</div>';
+        }
+        html += "</div>";
+
+        if (diff !== null) {
+          html += '<div class="sim-line">';
+          html += '<div class="sim-label">추정금액 - 투찰가 (차액)</div>';
+          var diffClass =
+            diff > 0 ? "sim-ok" : diff < 0 ? "sim-danger" : "sim-highlight";
+          html +=
+            '<div class="sim-value mono ' +
+            diffClass +
+            '">' +
+            formatWon(diff) +
+            "</div>";
+          html += "</div>";
         }
 
-        var interestLine = "";
-        if (interest) {
-          if (tone === "short") {
-            interestLine =
-              "최근에 관심을 보이신 \"" + interest + "\" 관련 내용에 초점을 맞추어,";
-          } else if (tone === "detailed") {
-            interestLine =
-              "최근 문의 주셨던 \"" +
-              interest +
-              "\" 관련 연구 및 개발 방향을 위주로," +
-              "\n해외 시장 규모, 주요 플레이어, 기술 동향 등을 함께 확인하실 수 있는 자료를 중심으로 선별하였습니다.";
-          } else {
-            interestLine =
-              "최근 문의 및 관심 분야로 알려주신 \"" +
-              interest +
-              "\" 관련 주제를 중심으로,";
+        if (targetRate !== null && !isNaN(targetRate)) {
+          html += '<div class="sim-line">';
+          html += '<div class="sim-label">내부 목표 투찰률</div>';
+          html +=
+            '<div class="sim-value mono">' +
+            targetRate.toFixed(2) +
+            "%</div>";
+          html += "</div>";
+
+          if (rate !== null) {
+            var gap = rate - targetRate;
+            html += '<div class="sim-line">';
+            html += '<div class="sim-label">실제 - 목표 (투찰률 차이)</div>';
+            var gapClass =
+              Math.abs(gap) <= 0.3
+                ? "sim-ok"
+                : Math.abs(gap) <= 1.0
+                ? "sim-highlight"
+                : "sim-warning";
+            html +=
+              '<div class="sim-value mono ' +
+              gapClass +
+              '">' +
+              gap.toFixed(2) +
+              "%</div>";
+            html += "</div>";
           }
         }
 
-        var keywordLine = "";
-        if (keywords) {
-          keywordLine =
-            "아래와 같은 보고서/자료를 통해 주요 시장 규모, 성장 전망, 공급망 및 경쟁사 자료 등을 확인하실 수 있습니다.\n" +
-            "- " +
-            keywords
-              .split(",")
-              .map(function (s) {
-                return s.trim();
-              })
-              .filter(Boolean)
-              .join("\n- ");
-        }
-
-        var memoLine = "";
-        if (memo) {
-          memoLine =
-            "\n\n※ 내부 메모 기준으로 파악된 사항:\n" + memo;
-        }
-
-        var toneLine = "";
-        if (tone === "short") {
-          toneLine =
-            "\n\n자세한 내용은 필요 시 추가로 간단한 정리본을 함께 전달드리겠습니다.";
-        } else if (tone === "detailed") {
-          toneLine =
-            "\n\n요청 주시면, 상기 자료를 기반으로 연구 방향에 맞춘 요약본(국문)도 별도 정리하여 전달드릴 수 있습니다.";
-        }
-
-        var tagsLine = "";
-        if (tags.length > 0) {
-          tagsLine = "\n\n태그: " + tags.join(" ");
-        }
-
-        var body =
-          salutationLine +
-          "\n\n안녕하세요.\n" +
-          intro1 +
-          "\n\n" +
-          (interestLine ? interestLine + "\n" : "") +
-          (keywordLine ? "\n" + keywordLine : "") +
-          memoLine +
-          toneLine +
-          "\n\n" +
-          (closing ? closing : "") +
-          "\n\n감사합니다.\n월드산업정보센터 드림" +
-          tagsLine;
-
-        return body;
+        simOutput.innerHTML = html;
       }
 
-      function buildTitle(customer, options) {
-        var org = safeText(customer.org);
-        var name = safeText(customer.name);
-        var interest = safeText(customer.interest);
-        var keywords = options.keywords || "";
-
-        var firstKeyword = "";
-        var kwList = keywords
-          .split(",")
-          .map(function (s) {
-            return s.trim();
-          })
-          .filter(Boolean);
-        if (kwList.length > 0) {
-          firstKeyword = kwList[0];
-        } else if (interest) {
-          firstKeyword = interest.split(/[,\n]/)[0].trim();
+      /**
+       * 수동 투찰률 출력
+       */
+      function renderManualRateOutput() {
+        var valStr = (manualRateInput.value || "").trim();
+        if (!valStr) {
+          manualRateOutput.innerHTML =
+            '<div class="no-data">직접 입력한 투찰률을 간단히 표시합니다.</div>';
+          return;
         }
-
-        var focus = firstKeyword || "시장조사·기술자료";
-
-        var title =
-          (org ? "[" + org + "] " : "") +
-          focus +
-          " 관련 해외 시장조사·기술자료 안내드립니다";
-
-        if (name) {
-          title = "[월드산업정보센터] " + focus + " 자료 안내 (" + name + " 연구자님)";
+        var val = Number(valStr);
+        if (isNaN(val)) {
+          manualRateOutput.innerHTML =
+            '<div class="sim-danger">숫자만 입력해주세요.</div>';
+          return;
         }
-
-        return title;
+        var msgClass =
+          val >= 80 && val <= 95
+            ? "sim-ok"
+            : val < 80
+            ? "sim-warning"
+            : "sim-danger";
+        manualRateOutput.innerHTML =
+          '<div class="' +
+          msgClass +
+          '">직접 입력한 투찰률: ' +
+          val.toFixed(2) +
+          "%</div>";
       }
 
-      function updatePreview(body, title) {
-        var safeBody = safeText(body);
-        var safeTitle = safeText(title);
+      /**
+       * 상세 영역 렌더
+       * @param {any | null} bid
+       */
+      function renderDetail(bid) {
+        if (!bid) {
+          detailMain.innerHTML =
+            '<div class="no-data">아직 선택된 공고가 없습니다.<br />목록에서 하나를 클릭하면 상세가 보입니다.</div>';
+          detailSubtitle.textContent =
+            "왼쪽에서 공고를 선택하면 여기에서 D-Day, 투찰률 등을 자동 계산합니다.";
+          detailIdBadge.textContent = "ID: -";
+          detailStatusPill.textContent = "선택: 없음";
+          detailStatusPill.className = "pill-count";
+          copySummaryBtn.disabled = true;
+          deleteBidBtn.disabled = true;
+          renderSimulation(null);
+          return;
+        }
 
-        bodyPreviewEl.innerHTML = "";
-        if (!safeBody) {
-          var placeholder = createElement("div", "preview-placeholder");
-          placeholder.innerHTML =
-            "① 왼쪽에서 고객을 선택하거나 새로 저장합니다.<br />" +
-            "② 가운데에서 안내서 옵션과 키워드를 설정합니다.<br />" +
-            "③ 아래 버튼 <strong>\"안내서 자동 생성\"</strong>을 누르면 이곳에 본문이 만들어집니다.";
-          bodyPreviewEl.appendChild(placeholder);
+        detailIdBadge.textContent = "ID: " + (bid.id || "-");
+        selectedBidLabel.textContent =
+          "선택: " + (bid.title || "").substring(0, 24) + (bid.title.length > 24 ? "…" : "");
+        detailStatusPill.textContent = bid.status || "-";
+        detailStatusPill.className =
+          "pill-count " + (getStatusClass(bid.status) || "");
+
+        var dInfo = computeDDay(bid.deadline || "");
+        var rate = computeRate(bid.budget || 0, bid.bidPrice || 0);
+
+        var html = "";
+        html += '<div class="summary-row">';
+        html +=
+          '<span class="badge">공고명</span> <span>' +
+          (bid.title || "-") +
+          "</span>";
+        html += "</div>";
+
+        html += '<div class="summary-row mt-2">';
+        html +=
+          '<span class="badge-soft">발주기관</span> <span>' +
+          (bid.agency || "-") +
+          "</span>";
+        html +=
+          '<span class="badge-soft">공고번호</span> <span class="mono">' +
+          (bid.number || "-") +
+          "</span>";
+        html += "</div>";
+
+        html += '<div class="summary-row mt-2">';
+        html +=
+          '<span class="badge-soft">마감일</span> <span>' +
+          (bid.deadline || "-") +
+          "</span>";
+        html +=
+          '<span class="badge-soft">D-Day</span> <span>' +
+          (dInfo.label || "-") +
+          "</span>";
+        html += "</div>";
+
+        html += '<div class="summary-row mt-2">';
+        html +=
+          '<span class="badge-soft">추정금액</span> <span class="mono">' +
+          formatWon(bid.budget || null) +
+          "</span>";
+        html +=
+          '<span class="badge-soft">투찰 예정가</span> <span class="mono">' +
+          formatWon(bid.bidPrice || null) +
+          "</span>";
+        if (rate !== null) {
+          html +=
+            '<span class="badge-soft">투찰률</span> <span class="mono">' +
+            rate.toFixed(2) +
+            "%</span>";
+        }
+        html += "</div>";
+
+        html += '<div class="summary-row mt-2">';
+        html +=
+          '<span class="badge-soft">내부 목표 투찰률</span> <span class="mono">' +
+          (typeof bid.targetRate === "number" && !isNaN(bid.targetRate)
+            ? bid.targetRate.toFixed(2) + "%"
+            : "-") +
+          "</span>";
+        html += "</div>";
+
+        html += '<div class="summary-row mt-2">';
+        html += '<span class="badge-soft">메모</span>';
+        html +=
+          '<span style="white-space:pre-wrap;word-break:keep-all;">' +
+          (bid.note || "-") +
+          "</span>";
+        html += "</div>";
+
+        detailMain.innerHTML = html;
+        detailSubtitle.textContent =
+          "선택한 공고의 기본 정보와 금액 정보를 한 번에 확인할 수 있습니다.";
+
+        copySummaryBtn.disabled = false;
+        deleteBidBtn.disabled = false;
+
+        renderSimulation(bid);
+      }
+
+      /**
+       * 전체 렌더
+       */
+      function renderAll() {
+        renderList();
+        if (selectedBidId) {
+          var current = bids.find(function (item) {
+            return item.id === selectedBidId;
+          });
+          renderDetail(current || null);
         } else {
-          bodyPreviewEl.textContent = safeBody;
+          renderDetail(null);
         }
-
-        if (!safeTitle) {
-          titlePreviewEl.innerHTML =
-            '<span class="title-placeholder">고객과 옵션을 선택하면 자동으로 제목이 표시됩니다.</span>';
-        } else {
-          titlePreviewEl.textContent = safeTitle;
-        }
-
-        computeCounts(safeBody);
       }
 
-      function onGenerate() {
-        var customers = state.customers || [];
-        var selected = customers.find(function (c) {
-          return c.id === state.selectedCustomerId;
+      /**
+       * 공고 선택
+       * @param {string} id
+       */
+      function selectBid(id) {
+        selectedBidId = id;
+        var bid = bids.find(function (item) {
+          return item.id === id;
         });
-
-        if (!selected) {
-          alert("왼쪽에서 고객을 선택하거나 새로 저장한 후 다시 시도해 주세요.");
+        if (!bid) {
+          clearSelection();
           return;
         }
 
-        var options = {
-          type: typeSelectEl.value,
-          tone: toneSelectEl.value,
-          keywords: safeText(keywordInputEl.value).trim(),
-          closing: safeText(closingInputEl.value).trim(),
-          tags: safeText(tagsInputEl.value).trim()
-        };
+        // 폼에 넣기
+        titleInput.value = bid.title || "";
+        agencyInput.value = bid.agency || "";
+        numberInput.value = bid.number || "";
+        deadlineInput.value = bid.deadline || "";
+        statusInput.value = bid.status || "준비";
+        budgetInput.value =
+          typeof bid.budget === "number" && !isNaN(bid.budget)
+            ? String(bid.budget)
+            : "";
+        bidPriceInput.value =
+          typeof bid.bidPrice === "number" && !isNaN(bid.bidPrice)
+            ? String(bid.bidPrice)
+            : "";
+        targetRateInput.value =
+          typeof bid.targetRate === "number" && !isNaN(bid.targetRate)
+            ? String(bid.targetRate)
+            : "";
+        noteInput.value = bid.note || "";
 
-        saveOptionsToStorage();
-
-        var body = buildBody(selected, options);
-        var title = buildTitle(selected, options);
-        state.lastBody = body;
-        state.lastTitle = title;
-        state.lastGeneratedAt = nowString();
-        lastGeneratedAtEl.textContent = state.lastGeneratedAt;
-
-        updatePreview(body, title);
-        showClipboardStatus("대기");
+        renderAll();
       }
 
-      function copyToClipboard(text, onSuccessMessage) {
-        var body = safeText(text);
-        if (!body) {
-          showClipboardStatus("복사할 내용이 없습니다.");
-          return;
+      /**
+       * 선택된 행으로 스크롤 포커스
+       */
+      function focusSelectedRow() {
+        if (!selectedBidId) return;
+        var rows = bidTableBody.querySelectorAll(".table-row");
+        var targetRow = null;
+        rows.forEach(function (row) {
+          if (row.dataset.id === selectedBidId) {
+            targetRow = row;
+          }
+        });
+        if (targetRow && typeof targetRow.scrollIntoView === "function") {
+          targetRow.scrollIntoView({ block: "nearest", behavior: "smooth" });
         }
+      }
+
+      /**
+       * 클립보드 복사
+       */
+      function handleCopySummary() {
+        if (!selectedBidId) return;
+        var bid = bids.find(function (item) {
+          return item.id === selectedBidId;
+        });
+        if (!bid) return;
+        var text = buildSummaryText(bid);
 
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard
-            .writeText(body)
+            .writeText(text)
             .then(function () {
-              showClipboardStatus(onSuccessMessage);
+              copyStateLabel.textContent = "클립보드 상태: 복사 완료";
+              window.setTimeout(function () {
+                copyStateLabel.textContent = "클립보드 상태: 대기";
+              }, 2000);
             })
             .catch(function () {
-              fallbackCopy(body, onSuccessMessage);
+              copyStateLabel.textContent = "클립보드 상태: 실패 (브라우저 제한)";
             });
         } else {
-          fallbackCopy(body, onSuccessMessage);
+          // 구형 브라우저용
+          var textarea = document.createElement("textarea");
+          textarea.style.position = "fixed";
+          textarea.style.opacity = "0";
+          textarea.value = text;
+          document.body.appendChild(textarea);
+          textarea.select();
+          try {
+            var ok = document.execCommand("copy");
+            copyStateLabel.textContent = ok
+              ? "클립보드 상태: 복사 완료"
+              : "클립보드 상태: 실패 (브라우저 제한)";
+          } catch (e) {
+            copyStateLabel.textContent = "클립보드 상태: 실패 (브라우저 제한)";
+          }
+          document.body.removeChild(textarea);
+          window.setTimeout(function () {
+            copyStateLabel.textContent = "클립보드 상태: 대기";
+          }, 2000);
         }
       }
 
-      function fallbackCopy(text, onSuccessMessage) {
-        try {
-          var temp = document.createElement("textarea");
-          temp.value = text;
-          temp.style.position = "fixed";
-          temp.style.left = "-9999px";
-          temp.style.top = "0";
-          document.body.appendChild(temp);
-          temp.focus();
-          temp.select();
-          var ok = document.execCommand("copy");
-          document.body.removeChild(temp);
-          if (ok) {
-            showClipboardStatus(onSuccessMessage);
-          } else {
-            showClipboardStatus("복사가 지원되지 않는 환경입니다.");
-          }
-        } catch (e) {
-          showClipboardStatus("복사 중 문제가 발생했습니다.");
+      /**
+       * 필터 버튼 토글 표현
+       */
+      function updateFilterButtonState() {
+        if (deadlineFilterActive) {
+          filterDeadlineBtn.style.borderColor = "rgba(56, 189, 248, 0.9)";
+          filterDeadlineBtn.style.boxShadow =
+            "0 0 0 1px rgba(56, 189, 248, 0.6)";
+          filterDeadlineBtn.textContent = "전체 다시 보기";
+        } else {
+          filterDeadlineBtn.style.borderColor =
+            "rgba(148, 163, 184, 0.7)";
+          filterDeadlineBtn.style.boxShadow = "none";
+          filterDeadlineBtn.textContent = "7일 이내 마감만 보기";
         }
       }
 
-      // Event bindings
-      function bindEvents() {
-        saveCustomerBtnEl.addEventListener("click", onSaveCustomer);
-
-        searchInputEl.addEventListener("input", function () {
-          refreshCustomerList();
-        });
-
-        // 옵션 변경 감지
-        [typeSelectEl, toneSelectEl, keywordInputEl, closingInputEl, tagsInputEl].forEach(
-          function (el) {
-            el.addEventListener("input", function () {
-              setOptionDirty(true);
-              if (el === tagsInputEl) {
-                updateTagsPreview();
-              }
-            });
-          }
-        );
-
-        generateBtnEl.addEventListener("click", onGenerate);
-
-        copyBodyBtnEl.addEventListener("click", function () {
-          copyToClipboard(state.lastBody, "본문 복사 완료");
-        });
-
-        copyTitleBtnEl.addEventListener("click", function () {
-          copyToClipboard(state.lastTitle, "제목 복사 완료");
-        });
-      }
-
-      // Init
-      document.addEventListener("DOMContentLoaded", function () {
+      /**
+       * 초기화
+       */
+      function init() {
         loadFromStorage();
-        bindEvents();
-        updatePreview("", "");
-      });
+        clearSelection();
+        renderAll();
+        updateFilterButtonState();
+
+        // 이벤트 바인딩
+        saveBidBtn.addEventListener("click", handleSaveBid);
+        newBidBtn.addEventListener("click", function () {
+          resetFormForNewBid();
+        });
+        deleteBidBtn.addEventListener("click", handleDeleteBid);
+
+        searchInput.addEventListener("input", function () {
+          renderList();
+        });
+        clearSearchBtn.addEventListener("click", function () {
+          searchInput.value = "";
+          renderList();
+        });
+
+        filterDeadlineBtn.addEventListener("click", function () {
+          deadlineFilterActive = !deadlineFilterActive;
+          updateFilterButtonState();
+          renderList();
+        });
+
+        manualRateInput.addEventListener("input", renderManualRateOutput);
+
+        copySummaryBtn.addEventListener("click", handleCopySummary);
+      }
+
+      // DOMContentLoaded 후 실행
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+      } else {
+        init();
+      }
     })();
   </script>
 </body>
