@@ -2,748 +2,1406 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>2번 입찰·전자조달 자동화 도구 v1 (정적 모듈 버전)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>1번 도구 · 고객 자동화 안내서 · WIC 자동화 시스템</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      padding: 16px;
+      padding: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f5f5f7;
+      background-color: #f5f7fb;
       color: #222;
     }
-    h1, h2, h3 {
-      margin: 0 0 8px;
+
+    .app-root {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 16px 16px 32px 16px;
     }
-    h1 {
+
+    h1, h2, h3, h4 {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .app-header {
+      margin-bottom: 12px;
+    }
+
+    .app-header-title {
       font-size: 20px;
+      margin-bottom: 4px;
     }
-    h2 {
-      font-size: 16px;
-      margin-top: 24px;
-    }
-    p {
-      margin: 4px 0 8px;
+
+    .app-header-sub {
       font-size: 13px;
-      line-height: 1.5;
+      color: #555;
     }
-    .layout {
+
+    .app-meta {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #666;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      background-color: #e5edff;
+      color: #1f3bb3;
+      border: 1px solid #c4d3ff;
+    }
+
+    .badge-muted {
+      background-color: #eceff4;
+      color: #555;
+      border-color: #dde2f0;
+    }
+
+    .app-note {
+      font-size: 11px;
+      color: #777;
+      margin-top: 4px;
+    }
+
+    .grid {
       display: grid;
-      grid-template-columns: 1.2fr 2fr 1.3fr;
+      grid-template-columns: minmax(0, 3.2fr) minmax(0, 3.3fr) minmax(0, 3.5fr);
       gap: 12px;
-      margin-top: 12px;
+      margin-top: 16px;
     }
-    @media (max-width: 1100px) {
-      .layout {
+
+    @media (max-width: 1080px) {
+      .grid {
         grid-template-columns: 1fr;
       }
     }
+
     .card {
-      background: #fff;
+      background-color: #ffffff;
       border-radius: 10px;
-      padding: 12px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-      margin-bottom: 8px;
+      border: 1px solid #dde3f0;
+      padding: 12px 12px 14px 12px;
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .card-sub {
       font-size: 11px;
-      background: #eef2ff;
-      color: #3730a3;
-      margin-left: 4px;
+      color: #666;
     }
+
+    .muted {
+      color: #777;
+      font-size: 11px;
+    }
+
+    .muted-strong {
+      color: #555;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
     label {
       display: block;
-      font-size: 12px;
-      margin: 4px 0 2px;
+      font-size: 11px;
+      margin-bottom: 2px;
+      color: #444;
     }
+
+    .label-required::after {
+      content: " *";
+      color: #d12b2b;
+    }
+
     input[type="text"],
-    input[type="number"],
-    input[type="date"],
-    select,
-    textarea {
+    input[type="email"],
+    textarea,
+    select {
       width: 100%;
       padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid #d4d4d8;
-      font-size: 13px;
-    }
-    textarea {
-      min-height: 60px;
-      resize: vertical;
-    }
-    button {
-      padding: 6px 10px;
-      border-radius: 6px;
-      border: none;
-      font-size: 13px;
-      cursor: pointer;
-      background: #2563eb;
-      color: white;
-      margin-right: 4px;
-      margin-top: 4px;
-    }
-    button.secondary {
-      background: #e5e7eb;
-      color: #111827;
-    }
-    button.danger {
-      background: #dc2626;
-    }
-    button.small {
-      font-size: 11px;
-      padding: 4px 8px;
-    }
-    button:disabled {
-      opacity: 0.5;
-      cursor: default;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
       font-size: 12px;
-      margin-top: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccd3e3;
+      outline: none;
+      background-color: #fdfefe;
+      transition: border-color 0.12s ease, box-shadow 0.12s ease;
     }
-    th, td {
-      border: 1px solid #e5e7eb;
-      padding: 4px 6px;
-      text-align: left;
-      vertical-align: top;
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #4c6fff;
+      box-shadow: 0 0 0 1px rgba(76, 111, 255, 0.26);
     }
-    th {
-      background: #f3f4f6;
+
+    textarea {
+      resize: vertical;
+      min-height: 56px;
+      max-height: 180px;
+      line-height: 1.4;
     }
-    tr.highlight {
-      background: #eff6ff;
+
+    .field-hint {
+      font-size: 10px;
+      color: #888;
+      margin-top: 2px;
     }
-    .status-pill {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 999px;
-      font-size: 11px;
-      color: white;
+
+    .field-group {
+      margin-bottom: 6px;
     }
-    .status-open { background: #16a34a; }
-    .status-soon { background: #f97316; }
-    .status-closed { background: #6b7280; }
-    .flex {
+
+    .inline {
       display: flex;
       gap: 8px;
       align-items: center;
       flex-wrap: wrap;
     }
-    .flex-between {
+
+    .inline > * {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .inline-compact > * {
+      flex: 0 0 auto;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 12px;
+      cursor: pointer;
+      user-select: none;
+      background-color: #3b82f6;
+      color: #fff;
+      transition: background-color 0.12s ease, box-shadow 0.12s ease, transform 0.05s ease;
+    }
+
+    .btn:hover {
+      background-color: #2563eb;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.3);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background-color: #e5e7eb;
+      color: #111827;
+      border-color: #d1d5db;
+    }
+
+    .btn-secondary:hover {
+      background-color: #d4d4d8;
+    }
+
+    .btn-ghost {
+      background-color: transparent;
+      color: #374151;
+      border-color: #d1d5db;
+    }
+
+    .btn-ghost:hover {
+      background-color: #e5e7eb;
+    }
+
+    .btn-sm {
+      padding: 3px 8px;
+      font-size: 11px;
+      border-radius: 999px;
+    }
+
+    .btn-icon {
+      font-size: 12px;
+    }
+
+    .btn-block {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .btn-disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 3px 8px;
+      background-color: #eff3ff;
+      color: #1e3a8a;
+      font-size: 11px;
+      margin-right: 4px;
+      margin-bottom: 4px;
+    }
+
+    .pill-muted {
+      background-color: #e5e7eb;
+      color: #374151;
+    }
+
+    .status-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .muted {
-      font-size: 11px;
-      color: #6b7280;
-    }
-    .chip {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: #e5e7eb;
-      font-size: 11px;
-      margin-right: 4px;
+      gap: 6px;
+      font-size: 10px;
+      color: #666;
       margin-top: 2px;
     }
-    .section-title {
-      font-weight: 600;
-      font-size: 13px;
+
+    .status-left, .status-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .customer-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 11px;
+      color: #555;
       margin-bottom: 4px;
     }
-    .debug-log {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+    .customer-list-count {
       font-size: 11px;
-      background: #111827;
-      color: #e5e7eb;
-      padding: 8px;
-      border-radius: 8px;
-      max-height: 160px;
-      overflow-y: auto;
-      white-space: pre-wrap;
+      color: #444;
     }
-    .tag {
+
+    .customer-list {
+      border-radius: 8px;
+      border: 1px solid #e0e4f0;
+      background-color: #f9fafb;
+      padding: 4px;
+      max-height: 270px;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+
+    .customer-item {
+      padding: 6px 7px;
+      border-radius: 7px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .customer-item:hover {
+      background-color: #eef2ff;
+      border-color: #c7d2fe;
+    }
+
+    .customer-item.selected {
+      background-color: #eef2ff;
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.3);
+    }
+
+    .customer-name-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #111827;
+    }
+
+    .customer-org {
+      font-size: 11px;
+      color: #4b5563;
+    }
+
+    .customer-tags {
       font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background: #fee2e2;
+      color: #6b7280;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .customer-empty {
+      padding: 12px;
+      font-size: 11px;
+      color: #6b7280;
+      text-align: left;
+      border-radius: 8px;
+      border: 1px dashed #d1d5db;
+      background-color: #f9fafb;
+    }
+
+    .search-input {
+      margin-bottom: 6px;
+    }
+
+    .preview-box {
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background-color: #f9fafb;
+      padding: 8px;
+      min-height: 140px;
+      font-size: 12px;
+      white-space: pre-wrap;
+      line-height: 1.45;
+      overflow-y: auto;
+      max-height: 320px;
+    }
+
+    .preview-placeholder {
+      color: #777;
+      font-size: 11px;
+    }
+
+    .title-preview {
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background-color: #fefefe;
+      padding: 6px 8px;
+      font-size: 12px;
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+    }
+
+    .title-placeholder {
+      color: #888;
+      font-size: 11px;
+    }
+
+    .chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .section-divider {
+      border-top: 1px solid #e4e4ee;
+      margin: 4px 0 6px 0;
+    }
+
+    .text-xs {
+      font-size: 10px;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .danger {
       color: #b91c1c;
-      margin-left: 4px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="flex-between">
-      <div>
-        <h1>2번 입찰·전자조달 자동화 도구 v1</h1>
-        <p class="muted">
-          입찰·전자조달 사이트에서 공고 정보를 모아 보고, 조건에 맞게 필터링하고, 메모까지 남기는
-          <strong>정적 1차 모듈</strong>입니다. (지금은 브라우저 안에서만 동작)
-        </p>
+  <div class="app-root">
+    <header class="app-header" aria-label="도구 정보">
+      <div class="app-header-title">1번 도구 · 고객 자동화 안내서</div>
+      <div class="app-header-sub">WIC 고객별 맞춤 안내문을 빠르게 생성하고 재사용하는 전용 모듈</div>
+      <div class="app-meta">
+        <span class="badge">WIC 자동화 시스템 · public/index.html</span>
+        <span class="badge badge-muted">v1.0 · Local-only · Safe DOM</span>
       </div>
-      <div>
-        <span class="badge">정적 index.html 단일 파일</span>
-        <span class="badge">모듈: 소스 + 검색 + 목록 + 상세 + 메모 + 디버그</span>
-      </div>
-    </div>
-  </div>
+      <div class="app-note">※ 이 화면에 보이는 것만 동작합니다. (저장: 브라우저 localStorage)</div>
+    </header>
 
-  <div class="layout">
-    <!-- 왼쪽 : 입찰 소스 + 검색 조건 -->
-    <div>
-      <div class="card">
-        <h2>① 입찰 소스 설정</h2>
-        <p class="muted">
-          자주 보는 입찰·전자조달 사이트 주소를 적어 두는 모듈입니다.
-          지금은 화면에만 저장되고, 나중에 7번 세팅 도구·API와 연결할 수 있습니다.
-        </p>
-        <label for="sourceName">소스 이름</label>
-        <input id="sourceName" type="text" placeholder="예: 나라장터, KIST 전자조달" />
-
-        <label for="sourceUrl">소스 URL</label>
-        <input id="sourceUrl" type="text" placeholder="예: https://www.g2b.go.kr/..." />
-
-        <button id="addSourceBtn" class="small">소스 추가</button>
-        <button id="clearSourcesBtn" class="small secondary">소스 모두 삭제</button>
-
-        <p class="section-title" style="margin-top:8px;">등록된 소스</p>
-        <div id="sourceList" class="muted">아직 등록된 소스가 없습니다.</div>
-      </div>
-
-      <div class="card">
-        <h2>② 검색 조건 설정</h2>
-        <p class="muted">
-          실제 크롤링·API는 나중 단계에서 붙이고, 지금은 <strong>조건 + 예시 데이터 필터링</strong>만 동작합니다.
-        </p>
-        <label for="keyword">검색어(공고명·품목 등)</label>
-        <input id="keyword" type="text" placeholder="예: 접착제, 글래스 서브스트레이트 등" />
-
-        <div class="flex">
-          <div style="flex:1;">
-            <label for="agency">기관 / 발주처</label>
-            <input id="agency" type="text" placeholder="예: KIST, KITECH..." />
+    <main class="grid" aria-label="고객 자동화 안내서 메인 영역">
+      <!-- LEFT: 고객 관리 -->
+      <section class="card" aria-label="고객 관리 카드">
+        <div class="card-header">
+          <div>
+            <div class="card-title">고객 관리</div>
+            <div class="card-sub">고객 카드 선택 → 안내서 자동 생성</div>
           </div>
-          <div style="flex:1;">
-            <label for="region">지역</label>
-            <input id="region" type="text" placeholder="예: 서울, 대전 등" />
+          <div class="customer-list-count">
+            고객 <span id="customerCount">0</span>명
           </div>
         </div>
 
-        <div class="flex">
-          <div style="flex:1;">
-            <label for="minBudget">최소 추정금액(만원)</label>
-            <input id="minBudget" type="number" min="0" placeholder="예: 100" />
+        <div class="customer-list-header">
+          <span>고객 목록</span>
+          <span id="customerListCountLabel">0명</span>
+        </div>
+
+        <div id="customerListContainer" class="customer-list" aria-label="고객 목록 영역">
+          <div id="customerEmpty" class="customer-empty">
+            <div><strong>고객 카드 없음</strong></div>
+            <div>등록된 고객이 없습니다.</div>
+            <div class="field-hint">
+              아래 입력 칸에 정보를 입력하고 <strong>"고객 저장/업데이트"</strong>를 눌러 첫 고객을 등록하세요.
+            </div>
           </div>
-          <div style="flex:1;">
-            <label for="maxBudget">최대 추정금액(만원)</label>
-            <input id="maxBudget" type="number" min="0" placeholder="예: 5000" />
+          <div id="customerList" style="display: none;"></div>
+        </div>
+
+        <div class="field-group search-input">
+          <label for="searchInput">고객 검색 (이름/기관/관심)</label>
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="예: KIST / 접착제 / 홍길동"
+            autocomplete="off"
+          />
+          <div class="field-hint">
+            검색어를 비우면 전체 고객이 다시 보입니다.
           </div>
         </div>
 
-        <label for="deadlineFrom">마감일(시작)</label>
-        <input id="deadlineFrom" type="date" />
+        <div class="section-divider"></div>
 
-        <label for="deadlineTo">마감일(끝)</label>
-        <input id="deadlineTo" type="date" />
-
-        <div style="margin-top:4px;">
-          <span class="muted">공고 상태</span><br />
-          <label style="font-size:11px;">
-            <input type="checkbox" id="statusOpen" checked /> 진행중
-          </label>
-          <label style="font-size:11px; margin-left:4px;">
-            <input type="checkbox" id="statusSoon" checked /> 마감 임박
-          </label>
-          <label style="font-size:11px; margin-left:4px;">
-            <input type="checkbox" id="statusClosed" /> 마감됨
-          </label>
+        <div class="card-header">
+          <div class="card-title">고객 카드 입력</div>
         </div>
 
-        <button id="applyFilterBtn">검색 조건 적용</button>
-        <button id="resetFilterBtn" class="secondary">조건 초기화</button>
-      </div>
-    </div>
+        <div class="field-group">
+          <label for="nameInput" class="label-required">이름</label>
+          <input id="nameInput" type="text" placeholder="예: 홍길동" autocomplete="off" />
+        </div>
 
-    <!-- 가운데 : 공고 목록 -->
-    <div>
-      <div class="card">
-        <h2>③ 공고 목록 (예시 데이터 + 필터 모듈)</h2>
-        <div class="flex-between">
-          <div class="muted">
-            현재 표시 공고 수: <span id="bidCount">0</span>건  
-            <span class="chip" id="chipOpen">진행중 0</span>
-            <span class="chip" id="chipSoon">임박 0</span>
-            <span class="chip" id="chipClosed">마감 0</span>
+        <div class="field-group">
+          <label for="titleInput">직함</label>
+          <input id="titleInput" type="text" placeholder="예: 책임연구원" autocomplete="off" />
+        </div>
+
+        <div class="field-group">
+          <label for="orgInput" class="label-required">기관/회사</label>
+          <input id="orgInput" type="text" placeholder="예: 한국과학기술연구원(KIST)" autocomplete="off" />
+        </div>
+
+        <div class="field-group">
+          <label for="deptInput">부서</label>
+          <input id="deptInput" type="text" placeholder="예: 재료연구본부" autocomplete="off" />
+        </div>
+
+        <div class="field-group">
+          <label for="emailInput">이메일</label>
+          <input id="emailInput" type="email" placeholder="예: name@kist.re.kr" autocomplete="off" />
+        </div>
+
+        <div class="field-group">
+          <label for="interestInput">관심 분야 / 키워드</label>
+          <textarea
+            id="interestInput"
+            placeholder="예: 반도체 패키징용 글래스 섭스트레이트, 고내열 접착제"
+          ></textarea>
+          <div class="field-hint">
+            고객이 최근 문의하거나 관심을 보인 주제를 간단히 적어둡니다.
           </div>
-          <button id="resetToSampleBtn" class="small secondary">
-            예시 데이터 다시 불러오기
+        </div>
+
+        <div class="field-group">
+          <label for="memoInput">메모 (예산, 특이사항 등)</label>
+          <textarea
+            id="memoInput"
+            placeholder="예: 2025년 예산 1,200만원 / 해외 시장조사 보고서 집중 / 후지경제 + SK 스페셜티 관련 관심"
+          ></textarea>
+        </div>
+
+        <div class="inline">
+          <button id="saveCustomerBtn" class="btn btn-block" type="button">
+            고객 저장/업데이트
           </button>
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th style="width:28px;">선택</th>
-              <th>공고명 / 발주처</th>
-              <th style="width:60px;">상태</th>
-              <th style="width:100px;">마감일</th>
-              <th style="width:80px;">추정금액(만원)</th>
-            </tr>
-          </thead>
-          <tbody id="bidTableBody">
-            <!-- JS로 행 추가 -->
-          </tbody>
-        </table>
-      </div>
-    </div>
+        <div class="status-row" aria-label="고객 데이터 상태">
+          <div class="status-left">
+            <span class="text-xs">localStorage · <span id="storageStatus">로드 완료</span></span>
+          </div>
+          <div class="status-right">
+            <span class="text-xs">선택: <span id="selectedCustomerLabel">없음</span></span>
+          </div>
+        </div>
+      </section>
 
-    <!-- 오른쪽 : 상세 + 메모 + 디버그 -->
-    <div>
-      <div class="card">
-        <h2>④ 공고 상세 · 메모</h2>
-        <p class="muted">
-          목록에서 행을 클릭하면 상세 정보와 메모를 이 칸에 저장할 수 있습니다.
-        </p>
-        <div id="selectedBidInfo" class="muted">
-          아직 선택된 공고가 없습니다.
+      <!-- MIDDLE: 안내서 옵션 -->
+      <section class="card" aria-label="안내서 옵션 카드">
+        <div class="card-header">
+          <div>
+            <div class="card-title">안내서 옵션</div>
+            <div class="card-sub">톤·언어·형식을 미리 고정해 두고 재사용</div>
+          </div>
+          <div class="pill-muted pill">
+            언어: <span style="margin-left:4px;">한국어</span>
+          </div>
         </div>
 
-        <label for="noteField">내 메모 / 전략</label>
-        <textarea id="noteField" placeholder="예: 이 기관은 글래스 서브스트레이트 관련 연구비 있음, 후속 자료 필요 등"></textarea>
+        <div class="field-group">
+          <label for="typeSelect">안내서 유형</label>
+          <select id="typeSelect">
+            <option value="first-contact">① 첫 문의용 안내 (처음 인사)</option>
+            <option value="follow-up">② 후속 문의/자료 추가 안내</option>
+            <option value="renewal">③ 정기 예산/갱신 제안</option>
+          </select>
+        </div>
 
-        <label for="nextActionDate">다음 조치 예정일</label>
-        <input id="nextActionDate" type="date" />
+        <div class="field-group inline">
+          <div>
+            <label for="toneSelect">톤 &amp; 길이</label>
+            <select id="toneSelect">
+              <option value="standard">표준 · 보통 길이</option>
+              <option value="short">간단 버전 · 짧게</option>
+              <option value="detailed">자세한 버전 · 길게</option>
+            </select>
+          </div>
+          <div>
+            <label>언어</label>
+            <input type="text" value="한국어" disabled />
+          </div>
+        </div>
 
-        <button id="saveNoteBtn" class="small">메모 저장</button>
-        <button id="clearNoteBtn" class="small secondary">메모 삭제</button>
+        <div class="field-group">
+          <label for="keywordInput">보고서/자료 키워드 (쉼표 구분)</label>
+          <textarea
+            id="keywordInput"
+            placeholder="예: 후지경제 보고서, SK 스페셜티, Sulfur Hexafluoride 시장, Perovskite Solar"
+          ></textarea>
+          <div class="field-hint">
+            실제 제안할 보고서 이름이나 핵심 키워드를 쉼표(,)로 나눠 적습니다.
+          </div>
+        </div>
 
-        <p class="muted" id="noteStatus" style="margin-top:4px;">
-          아직 저장된 메모가 없습니다.
-        </p>
-      </div>
+        <div class="field-group">
+          <label for="closingInput">맺음말 기본 문장</label>
+          <textarea
+            id="closingInput"
+            placeholder="검토 후 궁금하신 점이나 추가로 필요하신 주제가 있으시면 언제든지 편하게 말씀 부탁드립니다."
+          ></textarea>
+          <div class="field-hint">
+            자주 쓰는 맺음말을 저장해 두면 안내서 생성 시 자동으로 붙습니다.
+          </div>
+        </div>
 
-      <div class="card">
-        <h2>⑤ 디버그 · 모듈 상태</h2>
-        <p class="muted">
-          나중에 7번 세팅 도구에서 자동 테스트·자동 수정 모듈과 연결할 수 있도록,  
-          현재 모듈 상태를 간단히 기록합니다.
-          <span class="tag">공통 규칙 후보</span>
-        </p>
-        <div class="debug-log" id="debugLog"></div>
-        <button id="clearLogBtn" class="small danger">로그 삭제</button>
-      </div>
-    </div>
+        <div class="field-group">
+          <label for="tagsInput">자동 요약 태그</label>
+          <input
+            id="tagsInput"
+            type="text"
+            placeholder="#첫문의 #표준버전 #국문"
+            autocomplete="off"
+          />
+          <div class="chips-row" id="tagsPreview">
+            <span class="pill">#첫문의</span>
+            <span class="pill">#표준버전</span>
+            <span class="pill">#국문</span>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div class="status-row">
+          <div class="status-left">
+            <span class="text-xs">옵션 변경: <span id="optionDirtyStatus">미반영</span></span>
+          </div>
+          <div class="status-right">
+            <span class="text-xs">최근 생성: <span id="lastGeneratedAt">없음</span></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: 안내서 미리보기 -->
+      <section class="card" aria-label="안내서 미리보기 카드">
+        <div class="card-header">
+          <div>
+            <div class="card-title">안내서 미리보기</div>
+            <div class="card-sub">고객에게 바로 보낼 수 있는 수준으로 확인</div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label>본문</label>
+          <div id="bodyPreview" class="preview-box">
+            <div class="preview-placeholder">
+              ① 왼쪽에서 고객을 선택하거나 새로 저장합니다.<br />
+              ② 가운데에서 안내서 옵션과 키워드를 설정합니다.<br />
+              ③ 아래 버튼 <strong>"안내서 자동 생성"</strong>을 누르면 이곳에 본문이 만들어집니다.
+            </div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="inline inline-compact">
+            <button id="generateBtn" type="button" class="btn btn-block">
+              안내서 자동 생성
+            </button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label>이메일 제목 추천</label>
+          <div id="titlePreview" class="title-preview">
+            <span class="title-placeholder">
+              고객과 옵션을 선택하면 자동으로 제목이 표시됩니다.
+            </span>
+          </div>
+        </div>
+
+        <div class="field-group inline inline-compact">
+          <button id="copyBodyBtn" type="button" class="btn btn-secondary btn-sm">
+            본문 복사
+          </button>
+          <button id="copyTitleBtn" type="button" class="btn btn-ghost btn-sm">
+            제목 복사
+          </button>
+        </div>
+
+        <div class="status-row">
+          <div class="status-left">
+            <span class="text-xs">클립보드 상태: <span id="clipboardStatus">대기</span></span>
+          </div>
+          <div class="status-right">
+            <span class="text-xs">
+              글자 수: <span id="charCount">0</span>자 /
+              줄 수: <span id="lineCount">0</span>줄
+            </span>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
   <script>
-    // ===== 공통 상수 / 상태 =====
-    const STORAGE_KEY_SOURCES = "tool2_sources_v1";
-    const STORAGE_KEY_BIDS = "tool2_bids_v1";
-    const STORAGE_KEY_NOTES = "tool2_notes_v1";
-    const STORAGE_KEY_DEBUG = "tool2_debug_v1";
+    (function () {
+      "use strict";
 
-    let bidData = [];        // 현재 화면에 쓰는 공고 데이터
-    let allBidData = [];     // 예시 + 로컬 저장 전체
-    let selectedBidId = null;
-
-    // ===== 유틸 함수 =====
-    function logDebug(message) {
-      const logEl = document.getElementById("debugLog");
-      const now = new Date();
-      const time = now.toTimeString().split(" ")[0];
-      const line = "[" + time + "] " + message;
-      logEl.textContent = line + "\n" + logEl.textContent;
-      try {
-        let saved = JSON.parse(localStorage.getItem(STORAGE_KEY_DEBUG) || "[]");
-        saved.unshift(line);
-        if (saved.length > 200) saved = saved.slice(0, 200);
-        localStorage.setItem(STORAGE_KEY_DEBUG, JSON.stringify(saved));
-      } catch (e) {
-        console.warn("debug save error", e);
+      // Safe DOM helpers
+      function qs(selector) {
+        return document.querySelector(selector);
       }
-    }
 
-    function loadDebugFromStorage() {
-      try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY_DEBUG) || "[]");
-        const logEl = document.getElementById("debugLog");
-        logEl.textContent = saved.join("\n");
-      } catch (e) {
-        console.warn("debug load error", e);
+      function createElement(tag, className) {
+        var el = document.createElement(tag);
+        if (className) el.className = className;
+        return el;
       }
-    }
 
-    function saveToStorage(key, data) {
-      try {
-        localStorage.setItem(key, JSON.stringify(data));
-      } catch (e) {
-        logDebug("저장 오류: " + key);
+      function safeText(text) {
+        return (text || "").toString();
       }
-    }
 
-    function loadFromStorage(key, fallback) {
-      try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return fallback;
-        return JSON.parse(raw);
-      } catch (e) {
-        logDebug("불러오기 오류: " + key);
-        return fallback;
+      // Storage keys
+      var STORAGE_CUSTOMERS_KEY = "wicGuide_customers_v1";
+      var STORAGE_OPTIONS_KEY = "wicGuide_options_v1";
+
+      // State
+      var state = {
+        customers: [],
+        selectedCustomerId: null,
+        optionsDirty: false,
+        lastGeneratedAt: null,
+        lastBody: "",
+        lastTitle: ""
+      };
+
+      // DOM refs
+      var customerCountEl = qs("#customerCount");
+      var customerListCountLabelEl = qs("#customerListCountLabel");
+      var customerListContainerEl = qs("#customerListContainer");
+      var customerEmptyEl = qs("#customerEmpty");
+      var customerListEl = qs("#customerList");
+      var selectedCustomerLabelEl = qs("#selectedCustomerLabel");
+      var storageStatusEl = qs("#storageStatus");
+
+      var searchInputEl = qs("#searchInput");
+      var nameInputEl = qs("#nameInput");
+      var titleInputEl = qs("#titleInput");
+      var orgInputEl = qs("#orgInput");
+      var deptInputEl = qs("#deptInput");
+      var emailInputEl = qs("#emailInput");
+      var interestInputEl = qs("#interestInput");
+      var memoInputEl = qs("#memoInput");
+      var saveCustomerBtnEl = qs("#saveCustomerBtn");
+
+      var typeSelectEl = qs("#typeSelect");
+      var toneSelectEl = qs("#toneSelect");
+      var keywordInputEl = qs("#keywordInput");
+      var closingInputEl = qs("#closingInput");
+      var tagsInputEl = qs("#tagsInput");
+      var tagsPreviewEl = qs("#tagsPreview");
+      var optionDirtyStatusEl = qs("#optionDirtyStatus");
+      var lastGeneratedAtEl = qs("#lastGeneratedAt");
+
+      var bodyPreviewEl = qs("#bodyPreview");
+      var titlePreviewEl = qs("#titlePreview");
+      var generateBtnEl = qs("#generateBtn");
+      var copyBodyBtnEl = qs("#copyBodyBtn");
+      var copyTitleBtnEl = qs("#copyTitleBtn");
+      var clipboardStatusEl = qs("#clipboardStatus");
+      var charCountEl = qs("#charCount");
+      var lineCountEl = qs("#lineCount");
+
+      // Utilities
+      function generateId() {
+        return "C" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
       }
-    }
 
-    function formatDate(dateStr) {
-      if (!dateStr) return "-";
-      return dateStr;
-    }
-
-    function renderStatusPill(status) {
-      const span = document.createElement("span");
-      span.classList.add("status-pill");
-      if (status === "진행중") span.classList.add("status-open");
-      else if (status === "임박") span.classList.add("status-soon");
-      else span.classList.add("status-closed");
-      span.textContent = status;
-      return span;
-    }
-
-    // ===== ① 입찰 소스 모듈 =====
-    function renderSources() {
-      const box = document.getElementById("sourceList");
-      const sources = loadFromStorage(STORAGE_KEY_SOURCES, []);
-      if (!sources.length) {
-        box.textContent = "아직 등록된 소스가 없습니다.";
-        return;
+      function nowString() {
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = (d.getMonth() + 1).toString().padStart(2, "0");
+        var day = d.getDate().toString().padStart(2, "0");
+        var hh = d.getHours().toString().padStart(2, "0");
+        var mm = d.getMinutes().toString().padStart(2, "0");
+        return y + "-" + m + "-" + day + " " + hh + ":" + mm;
       }
-      box.innerHTML = "";
-      sources.forEach((s, idx) => {
-        const div = document.createElement("div");
-        div.innerHTML = `<span class="chip">${idx + 1}. ${s.name}</span>
-          <a href="${s.url}" target="_blank" style="font-size:11px;">열기</a>`;
-        box.appendChild(div);
-      });
-    }
 
-    function addSource() {
-      const nameEl = document.getElementById("sourceName");
-      const urlEl = document.getElementById("sourceUrl");
-      const name = nameEl.value.trim();
-      const url = urlEl.value.trim();
-      if (!name || !url) {
-        logDebug("소스 추가 실패: 이름/URL 필요");
-        return;
-      }
-      const sources = loadFromStorage(STORAGE_KEY_SOURCES, []);
-      sources.push({ name, url });
-      saveToStorage(STORAGE_KEY_SOURCES, sources);
-      nameEl.value = "";
-      urlEl.value = "";
-      renderSources();
-      logDebug("소스 추가: " + name);
-    }
+      function parseTags(text) {
+        var raw = safeText(text)
+          .trim()
+          .replace(/,/g, " ")
+          .split(/\s+/)
+          .filter(Boolean);
 
-    function clearSources() {
-      saveToStorage(STORAGE_KEY_SOURCES, []);
-      renderSources();
-      logDebug("소스 모두 삭제");
-    }
-
-    // ===== 예시 입찰 데이터 =====
-    function createSampleBids() {
-      const today = new Date();
-      const y = today.getFullYear();
-      const m = String(today.getMonth() + 1).padStart(2, "0");
-      const d = String(today.getDate()).padStart(2, "0");
-      const baseDate = y + "-" + m + "-" + d;
-
-      return [
-        {
-          id: "BID-001",
-          title: "글래스 서브스트레이트용 고기능성 접착제 연구용역",
-          agency: "KITECH",
-          region: "경기도",
-          budget: 3200,
-          deadline: baseDate,
-          status: "진행중",
-          tags: ["접착제", "glass substrate", "연구용역"]
-        },
-        {
-          id: "BID-002",
-          title: "페로브스카이트 태양전지 공정 최적화 장비 구매",
-          agency: "KIST",
-          region: "서울",
-          budget: 8500,
-          deadline: baseDate,
-          status: "임박",
-          tags: ["perovskite", "태양전지", "장비"]
-        },
-        {
-          id: "BID-003",
-          title: "화학 소재 분석·평가 용역",
-          agency: "KRICT",
-          region: "대전",
-          budget: 1800,
-          deadline: baseDate,
-          status: "진행중",
-          tags: ["analysis", "화학", "용역"]
-        },
-        {
-          id: "BID-004",
-          title: "R&D 보고서 번역 및 편집 서비스",
-          agency: "민간연구소",
-          region: "서울",
-          budget: 600,
-          deadline: baseDate,
-          status: "마감됨",
-          tags: ["번역", "편집", "보고서"]
-        }
-      ];
-    }
-
-    function initBidData() {
-      const saved = loadFromStorage(STORAGE_KEY_BIDS, null);
-      if (saved && saved.length) {
-        allBidData = saved;
-        logDebug("저장된 입찰 데이터 불러옴: " + saved.length + "건");
-      } else {
-        allBidData = createSampleBids();
-        saveToStorage(STORAGE_KEY_BIDS, allBidData);
-        logDebug("예시 입찰 데이터 생성: " + allBidData.length + "건");
-      }
-      bidData = allBidData.slice();
-      renderBidTable();
-    }
-
-    // ===== ③ 공고 목록 + 필터 =====
-    function applyFilter() {
-      const keyword = document.getElementById("keyword").value.trim().toLowerCase();
-      const agency = document.getElementById("agency").value.trim().toLowerCase();
-      const region = document.getElementById("region").value.trim().toLowerCase();
-      const minBudget = parseInt(document.getElementById("minBudget").value, 10);
-      const maxBudget = parseInt(document.getElementById("maxBudget").value, 10);
-      const deadlineFrom = document.getElementById("deadlineFrom").value;
-      const deadlineTo = document.getElementById("deadlineTo").value;
-      const allowOpen = document.getElementById("statusOpen").checked;
-      const allowSoon = document.getElementById("statusSoon").checked;
-      const allowClosed = document.getElementById("statusClosed").checked;
-
-      bidData = allBidData.filter(bid => {
-        if (keyword && !(
-          bid.title.toLowerCase().includes(keyword) ||
-          bid.tags.join(" ").toLowerCase().includes(keyword)
-        )) return false;
-
-        if (agency && !bid.agency.toLowerCase().includes(agency)) return false;
-        if (region && !bid.region.toLowerCase().includes(region)) return false;
-
-        if (!isNaN(minBudget) && bid.budget < minBudget) return false;
-        if (!isNaN(maxBudget) && bid.budget > maxBudget) return false;
-
-        if (deadlineFrom && bid.deadline < deadlineFrom) return false;
-        if (deadlineTo && bid.deadline > deadlineTo) return false;
-
-        if (bid.status === "진행중" && !allowOpen) return false;
-        if (bid.status === "임박" && !allowSoon) return false;
-        if (bid.status === "마감됨" && !allowClosed) return false;
-
-        return true;
-      });
-
-      renderBidTable();
-      logDebug("검색 조건 적용: 결과 " + bidData.length + "건");
-    }
-
-    function resetFilter() {
-      document.getElementById("keyword").value = "";
-      document.getElementById("agency").value = "";
-      document.getElementById("region").value = "";
-      document.getElementById("minBudget").value = "";
-      document.getElementById("maxBudget").value = "";
-      document.getElementById("deadlineFrom").value = "";
-      document.getElementById("deadlineTo").value = "";
-      document.getElementById("statusOpen").checked = true;
-      document.getElementById("statusSoon").checked = true;
-      document.getElementById("statusClosed").checked = false;
-
-      bidData = allBidData.slice();
-      renderBidTable();
-      logDebug("검색 조건 초기화");
-    }
-
-    function resetToSample() {
-      allBidData = createSampleBids();
-      bidData = allBidData.slice();
-      saveToStorage(STORAGE_KEY_BIDS, allBidData);
-      selectedBidId = null;
-      renderBidTable();
-      renderSelectedBid(null);
-      logDebug("예시 데이터로 되돌림");
-    }
-
-    function renderBidTable() {
-      const tbody = document.getElementById("bidTableBody");
-      tbody.innerHTML = "";
-
-      let countOpen = 0, countSoon = 0, countClosed = 0;
-      bidData.forEach(bid => {
-        if (bid.status === "진행중") countOpen++;
-        else if (bid.status === "임박") countSoon++;
-        else countClosed++;
-
-        const tr = document.createElement("tr");
-        if (bid.id === selectedBidId) {
-          tr.classList.add("highlight");
-        }
-
-        const tdSelect = document.createElement("td");
-        const btn = document.createElement("button");
-        btn.textContent = "선택";
-        btn.classList.add("small");
-        btn.addEventListener("click", () => {
-          selectedBidId = bid.id;
-          renderBidTable();
-          renderSelectedBid(bid);
+        var clean = raw.map(function (t) {
+          if (t[0] !== "#") return "#" + t;
+          return t;
         });
-        tdSelect.appendChild(btn);
 
-        const tdTitle = document.createElement("td");
-        tdTitle.innerHTML = `
-          <div class="section-title" style="margin-bottom:2px;">${bid.title}</div>
-          <div class="muted">${bid.agency} · ${bid.region}</div>
-          <div class="muted">
-            ${bid.tags.map(t => `<span class="chip">${t}</span>`).join("")}
-          </div>
-        `;
+        // deduplicate
+        var seen = {};
+        var res = [];
+        clean.forEach(function (t) {
+          if (!seen[t]) {
+            seen[t] = true;
+            res.push(t);
+          }
+        });
+        return res;
+      }
 
-        const tdStatus = document.createElement("td");
-        tdStatus.appendChild(renderStatusPill(bid.status));
+      function sanitizeEmail(text) {
+        var trimmed = safeText(text).trim();
+        if (!trimmed) return "";
+        // very relaxed check
+        if (!trimmed.includes("@") || !trimmed.includes(".")) {
+          return trimmed; // do not block; just return as is
+        }
+        return trimmed;
+      }
 
-        const tdDeadline = document.createElement("td");
-        tdDeadline.textContent = formatDate(bid.deadline);
+      function computeCounts(text) {
+        var body = safeText(text);
+        var chars = body.length;
+        var lines = body ? body.split(/\r\n|\r|\n/).length : 0;
+        charCountEl.textContent = chars.toString();
+        lineCountEl.textContent = lines.toString();
+      }
 
-        const tdBudget = document.createElement("td");
-        tdBudget.textContent = bid.budget.toLocaleString("ko-KR");
+      function setOptionDirty(dirty) {
+        state.optionsDirty = !!dirty;
+        optionDirtyStatusEl.textContent = dirty ? "변경됨" : "미반영";
+      }
 
-        tr.appendChild(tdSelect);
-        tr.appendChild(tdTitle);
-        tr.appendChild(tdStatus);
-        tr.appendChild(tdDeadline);
-        tr.appendChild(tdBudget);
+      function showClipboardStatus(msg) {
+        clipboardStatusEl.textContent = msg;
+        if (!msg) clipboardStatusEl.textContent = "대기";
+      }
 
-        tbody.appendChild(tr);
+      function safeLocalStorageGet(key) {
+        try {
+          var raw = window.localStorage.getItem(key);
+          if (!raw) return null;
+          return JSON.parse(raw);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function safeLocalStorageSet(key, value) {
+        try {
+          window.localStorage.setItem(key, JSON.stringify(value));
+        } catch (e) {
+          // ignore quota errors
+        }
+      }
+
+      // Load & Save
+      function loadFromStorage() {
+        var customers = safeLocalStorageGet(STORAGE_CUSTOMERS_KEY);
+        if (Array.isArray(customers)) {
+          state.customers = customers;
+        } else {
+          state.customers = [];
+        }
+
+        var options = safeLocalStorageGet(STORAGE_OPTIONS_KEY);
+        if (options && typeof options === "object") {
+          if (options.type) typeSelectEl.value = options.type;
+          if (options.tone) toneSelectEl.value = options.tone;
+          if (typeof options.keywords === "string") {
+            keywordInputEl.value = options.keywords;
+          }
+          if (typeof options.closing === "string") {
+            closingInputEl.value = options.closing;
+          } else {
+            // default closing
+            closingInputEl.value =
+              "검토 후 궁금하신 점이나 추가로 필요하신 주제가 있으시면 언제든지 편하게 말씀 부탁드립니다.";
+          }
+          if (typeof options.tags === "string") {
+            tagsInputEl.value = options.tags;
+          } else {
+            tagsInputEl.value = "#첫문의 #표준버전 #국문";
+          }
+        } else {
+          // 초기값 설정
+          keywordInputEl.value =
+            "후지경제 보고서, SK 스페셜티, Sulfur Hexafluoride 시장, Perovskite Solar";
+          closingInputEl.value =
+            "검토 후 궁금하신 점이나 추가로 필요하신 주제가 있으시면 언제든지 편하게 말씀 부탁드립니다.";
+          tagsInputEl.value = "#첫문의 #표준버전 #국문";
+        }
+
+        updateTagsPreview();
+        refreshCustomerList();
+        storageStatusEl.textContent = "로드 완료";
+        setOptionDirty(false);
+      }
+
+      function saveOptionsToStorage() {
+        var options = {
+          type: typeSelectEl.value,
+          tone: toneSelectEl.value,
+          keywords: keywordInputEl.value,
+          closing: closingInputEl.value,
+          tags: tagsInputEl.value
+        };
+        safeLocalStorageSet(STORAGE_OPTIONS_KEY, options);
+        setOptionDirty(false);
+      }
+
+      function saveCustomersToStorage() {
+        safeLocalStorageSet(STORAGE_CUSTOMERS_KEY, state.customers);
+        storageStatusEl.textContent = "저장 완료";
+      }
+
+      // Customer list rendering
+      function refreshCustomerList() {
+        var term = safeText(searchInputEl.value).trim().toLowerCase();
+        var customers = state.customers || [];
+
+        var filtered = customers.filter(function (c) {
+          if (!term) return true;
+          var fields = [
+            safeText(c.name),
+            safeText(c.org),
+            safeText(c.interest),
+            safeText(c.memo)
+          ]
+            .join(" ")
+            .toLowerCase();
+          return fields.indexOf(term) !== -1;
+        });
+
+        customerCountEl.textContent = customers.length.toString();
+        customerListCountLabelEl.textContent = filtered.length + "명";
+
+        // toggle empty/list
+        if (filtered.length === 0) {
+          customerEmptyEl.style.display = "block";
+          customerListEl.style.display = "none";
+          customerListEl.innerHTML = "";
+          return;
+        }
+
+        customerEmptyEl.style.display = "none";
+        customerListEl.style.display = "block";
+        customerListEl.innerHTML = "";
+
+        filtered.forEach(function (c) {
+          var item = createElement("div", "customer-item");
+          item.setAttribute("data-id", c.id);
+
+          if (c.id === state.selectedCustomerId) {
+            item.classList.add("selected");
+          }
+
+          var nameRow = createElement("div", "customer-name-row");
+          var nameSpan = createElement("span");
+          nameSpan.textContent = safeText(c.name) || "(이름 없음)";
+
+          var titleSpan = createElement("span", "muted");
+          titleSpan.textContent = safeText(c.title || "").slice(0, 18);
+          nameRow.appendChild(nameSpan);
+          if (titleSpan.textContent) {
+            nameRow.appendChild(titleSpan);
+          }
+
+          var orgEl = createElement("div", "customer-org");
+          var orgText = safeText(c.org);
+          var deptText = safeText(c.dept);
+          var combined = orgText;
+          if (deptText) {
+            combined += " · " + deptText;
+          }
+          orgEl.textContent = combined || "(기관 미입력)";
+
+          var tagsRow = createElement("div", "customer-tags");
+          var interestsShort = safeText(c.interest)
+            .split(/[,\n]/)
+            .map(function (s) {
+              return s.trim();
+            })
+            .filter(Boolean)
+            .slice(0, 2)
+            .join(" / ");
+          if (interestsShort) {
+            var interestSpan = createElement("span");
+            interestSpan.textContent = "관심: " + interestsShort;
+            tagsRow.appendChild(interestSpan);
+          }
+
+          if (c.memo) {
+            var memoSpan = createElement("span");
+            memoSpan.textContent = "메모 있음";
+            memoSpan.style.color = "#4b5563";
+            tagsRow.appendChild(memoSpan);
+          }
+
+          if (!interestsShort && !c.memo) {
+            var noneSpan = createElement("span");
+            noneSpan.textContent = "추가 정보 없음";
+            noneSpan.style.color = "#9ca3af";
+            tagsRow.appendChild(noneSpan);
+          }
+
+          item.appendChild(nameRow);
+          item.appendChild(orgEl);
+          item.appendChild(tagsRow);
+
+          item.addEventListener("click", function () {
+            onSelectCustomer(c.id);
+          });
+
+          customerListEl.appendChild(item);
+        });
+      }
+
+      function onSelectCustomer(id) {
+        state.selectedCustomerId = id;
+        var customers = state.customers || [];
+        var selected = customers.find(function (c) {
+          return c.id === id;
+        });
+
+        // highlight
+        var allItems = customerListEl.querySelectorAll(".customer-item");
+        allItems.forEach(function (item) {
+          var itemId = item.getAttribute("data-id");
+          if (itemId === id) {
+            item.classList.add("selected");
+          } else {
+            item.classList.remove("selected");
+          }
+        });
+
+        if (selected) {
+          nameInputEl.value = safeText(selected.name);
+          titleInputEl.value = safeText(selected.title);
+          orgInputEl.value = safeText(selected.org);
+          deptInputEl.value = safeText(selected.dept);
+          emailInputEl.value = safeText(selected.email);
+          interestInputEl.value = safeText(selected.interest);
+          memoInputEl.value = safeText(selected.memo);
+          selectedCustomerLabelEl.textContent = safeText(selected.name) || "이름 없음";
+        } else {
+          selectedCustomerLabelEl.textContent = "없음";
+        }
+      }
+
+      // Save or update customer
+      function onSaveCustomer() {
+        var name = safeText(nameInputEl.value).trim();
+        var org = safeText(orgInputEl.value).trim();
+
+        if (!name || !org) {
+          alert("이름과 기관/회사를 입력해 주세요.");
+          return;
+        }
+
+        var customer = {
+          id: state.selectedCustomerId || generateId(),
+          name: name,
+          title: safeText(titleInputEl.value).trim(),
+          org: org,
+          dept: safeText(deptInputEl.value).trim(),
+          email: sanitizeEmail(emailInputEl.value),
+          interest: safeText(interestInputEl.value).trim(),
+          memo: safeText(memoInputEl.value).trim()
+        };
+
+        var idx = state.customers.findIndex(function (c) {
+          return c.id === customer.id;
+        });
+
+        if (idx === -1) {
+          state.customers.push(customer);
+        } else {
+          state.customers[idx] = customer;
+        }
+
+        state.selectedCustomerId = customer.id;
+        selectedCustomerLabelEl.textContent = customer.name || "이름 없음";
+        saveCustomersToStorage();
+        refreshCustomerList();
+      }
+
+      // Tags preview
+      function updateTagsPreview() {
+        var tags = parseTags(tagsInputEl.value);
+        tagsPreviewEl.innerHTML = "";
+        if (tags.length === 0) {
+          var defaultTags = ["#첫문의", "#표준버전", "#국문"];
+          defaultTags.forEach(function (t) {
+            var span = createElement("span", "pill");
+            span.textContent = t;
+            tagsPreviewEl.appendChild(span);
+          });
+          return;
+        }
+
+        tags.forEach(function (t) {
+          var span = createElement("span", "pill");
+          span.textContent = t;
+          tagsPreviewEl.appendChild(span);
+        });
+      }
+
+      // Generate body
+      function buildBody(customer, options) {
+        var name = safeText(customer.name) || "연구자님";
+        var title = safeText(customer.title);
+        var org = safeText(customer.org);
+        var dept = safeText(customer.dept);
+        var interest = safeText(customer.interest);
+        var memo = safeText(customer.memo);
+
+        var type = options.type;
+        var tone = options.tone;
+        var keywords = options.keywords;
+        var closing = options.closing;
+        var tags = parseTags(options.tags);
+
+        var salutationLine = "";
+        if (title && dept) {
+          salutationLine = org + " " + dept + " " + name + " " + title + "께";
+        } else if (title) {
+          salutationLine = org + " " + name + " " + title + "께";
+        } else if (dept) {
+          salutationLine = org + " " + dept + " " + name + "께";
+        } else if (org) {
+          salutationLine = org + " " + name + "께";
+        } else {
+          salutationLine = name + "께";
+        }
+
+        var intro1 = "";
+        if (type === "first-contact") {
+          intro1 =
+            "월드산업정보센터에서 해외 시장조사 및 기술자료를 안내드리고 있는 월드산업정보센터입니다.";
+        } else if (type === "follow-up") {
+          intro1 =
+            "이전에 보내드렸던 자료 관련하여, 추가로 참고하실 수 있는 보고서와 정보를 정리하여 다시 안내드립니다.";
+        } else {
+          intro1 =
+            "다가오는 예산 및 연구 계획 수립에 참고하실 수 있도록 관련 시장조사 및 기술자료를 다시 한 번 정리하여 안내드립니다.";
+        }
+
+        var interestLine = "";
+        if (interest) {
+          if (tone === "short") {
+            interestLine =
+              "최근에 관심을 보이신 \"" + interest + "\" 관련 내용에 초점을 맞추어,";
+          } else if (tone === "detailed") {
+            interestLine =
+              "최근 문의 주셨던 \"" +
+              interest +
+              "\" 관련 연구 및 개발 방향을 위주로," +
+              "\n해외 시장 규모, 주요 플레이어, 기술 동향 등을 함께 확인하실 수 있는 자료를 중심으로 선별하였습니다.";
+          } else {
+            interestLine =
+              "최근 문의 및 관심 분야로 알려주신 \"" +
+              interest +
+              "\" 관련 주제를 중심으로,";
+          }
+        }
+
+        var keywordLine = "";
+        if (keywords) {
+          keywordLine =
+            "아래와 같은 보고서/자료를 통해 주요 시장 규모, 성장 전망, 공급망 및 경쟁사 자료 등을 확인하실 수 있습니다.\n" +
+            "- " +
+            keywords
+              .split(",")
+              .map(function (s) {
+                return s.trim();
+              })
+              .filter(Boolean)
+              .join("\n- ");
+        }
+
+        var memoLine = "";
+        if (memo) {
+          memoLine =
+            "\n\n※ 내부 메모 기준으로 파악된 사항:\n" + memo;
+        }
+
+        var toneLine = "";
+        if (tone === "short") {
+          toneLine =
+            "\n\n자세한 내용은 필요 시 추가로 간단한 정리본을 함께 전달드리겠습니다.";
+        } else if (tone === "detailed") {
+          toneLine =
+            "\n\n요청 주시면, 상기 자료를 기반으로 연구 방향에 맞춘 요약본(국문)도 별도 정리하여 전달드릴 수 있습니다.";
+        }
+
+        var tagsLine = "";
+        if (tags.length > 0) {
+          tagsLine = "\n\n태그: " + tags.join(" ");
+        }
+
+        var body =
+          salutationLine +
+          "\n\n안녕하세요.\n" +
+          intro1 +
+          "\n\n" +
+          (interestLine ? interestLine + "\n" : "") +
+          (keywordLine ? "\n" + keywordLine : "") +
+          memoLine +
+          toneLine +
+          "\n\n" +
+          (closing ? closing : "") +
+          "\n\n감사합니다.\n월드산업정보센터 드림" +
+          tagsLine;
+
+        return body;
+      }
+
+      function buildTitle(customer, options) {
+        var org = safeText(customer.org);
+        var name = safeText(customer.name);
+        var interest = safeText(customer.interest);
+        var keywords = options.keywords || "";
+
+        var firstKeyword = "";
+        var kwList = keywords
+          .split(",")
+          .map(function (s) {
+            return s.trim();
+          })
+          .filter(Boolean);
+        if (kwList.length > 0) {
+          firstKeyword = kwList[0];
+        } else if (interest) {
+          firstKeyword = interest.split(/[,\n]/)[0].trim();
+        }
+
+        var focus = firstKeyword || "시장조사·기술자료";
+
+        var title =
+          (org ? "[" + org + "] " : "") +
+          focus +
+          " 관련 해외 시장조사·기술자료 안내드립니다";
+
+        if (name) {
+          title = "[월드산업정보센터] " + focus + " 자료 안내 (" + name + " 연구자님)";
+        }
+
+        return title;
+      }
+
+      function updatePreview(body, title) {
+        var safeBody = safeText(body);
+        var safeTitle = safeText(title);
+
+        bodyPreviewEl.innerHTML = "";
+        if (!safeBody) {
+          var placeholder = createElement("div", "preview-placeholder");
+          placeholder.innerHTML =
+            "① 왼쪽에서 고객을 선택하거나 새로 저장합니다.<br />" +
+            "② 가운데에서 안내서 옵션과 키워드를 설정합니다.<br />" +
+            "③ 아래 버튼 <strong>\"안내서 자동 생성\"</strong>을 누르면 이곳에 본문이 만들어집니다.";
+          bodyPreviewEl.appendChild(placeholder);
+        } else {
+          bodyPreviewEl.textContent = safeBody;
+        }
+
+        if (!safeTitle) {
+          titlePreviewEl.innerHTML =
+            '<span class="title-placeholder">고객과 옵션을 선택하면 자동으로 제목이 표시됩니다.</span>';
+        } else {
+          titlePreviewEl.textContent = safeTitle;
+        }
+
+        computeCounts(safeBody);
+      }
+
+      function onGenerate() {
+        var customers = state.customers || [];
+        var selected = customers.find(function (c) {
+          return c.id === state.selectedCustomerId;
+        });
+
+        if (!selected) {
+          alert("왼쪽에서 고객을 선택하거나 새로 저장한 후 다시 시도해 주세요.");
+          return;
+        }
+
+        var options = {
+          type: typeSelectEl.value,
+          tone: toneSelectEl.value,
+          keywords: safeText(keywordInputEl.value).trim(),
+          closing: safeText(closingInputEl.value).trim(),
+          tags: safeText(tagsInputEl.value).trim()
+        };
+
+        saveOptionsToStorage();
+
+        var body = buildBody(selected, options);
+        var title = buildTitle(selected, options);
+        state.lastBody = body;
+        state.lastTitle = title;
+        state.lastGeneratedAt = nowString();
+        lastGeneratedAtEl.textContent = state.lastGeneratedAt;
+
+        updatePreview(body, title);
+        showClipboardStatus("대기");
+      }
+
+      function copyToClipboard(text, onSuccessMessage) {
+        var body = safeText(text);
+        if (!body) {
+          showClipboardStatus("복사할 내용이 없습니다.");
+          return;
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard
+            .writeText(body)
+            .then(function () {
+              showClipboardStatus(onSuccessMessage);
+            })
+            .catch(function () {
+              fallbackCopy(body, onSuccessMessage);
+            });
+        } else {
+          fallbackCopy(body, onSuccessMessage);
+        }
+      }
+
+      function fallbackCopy(text, onSuccessMessage) {
+        try {
+          var temp = document.createElement("textarea");
+          temp.value = text;
+          temp.style.position = "fixed";
+          temp.style.left = "-9999px";
+          temp.style.top = "0";
+          document.body.appendChild(temp);
+          temp.focus();
+          temp.select();
+          var ok = document.execCommand("copy");
+          document.body.removeChild(temp);
+          if (ok) {
+            showClipboardStatus(onSuccessMessage);
+          } else {
+            showClipboardStatus("복사가 지원되지 않는 환경입니다.");
+          }
+        } catch (e) {
+          showClipboardStatus("복사 중 문제가 발생했습니다.");
+        }
+      }
+
+      // Event bindings
+      function bindEvents() {
+        saveCustomerBtnEl.addEventListener("click", onSaveCustomer);
+
+        searchInputEl.addEventListener("input", function () {
+          refreshCustomerList();
+        });
+
+        // 옵션 변경 감지
+        [typeSelectEl, toneSelectEl, keywordInputEl, closingInputEl, tagsInputEl].forEach(
+          function (el) {
+            el.addEventListener("input", function () {
+              setOptionDirty(true);
+              if (el === tagsInputEl) {
+                updateTagsPreview();
+              }
+            });
+          }
+        );
+
+        generateBtnEl.addEventListener("click", onGenerate);
+
+        copyBodyBtnEl.addEventListener("click", function () {
+          copyToClipboard(state.lastBody, "본문 복사 완료");
+        });
+
+        copyTitleBtnEl.addEventListener("click", function () {
+          copyToClipboard(state.lastTitle, "제목 복사 완료");
+        });
+      }
+
+      // Init
+      document.addEventListener("DOMContentLoaded", function () {
+        loadFromStorage();
+        bindEvents();
+        updatePreview("", "");
       });
-
-      document.getElementById("bidCount").textContent = bidData.length;
-      document.getElementById("chipOpen").textContent = "진행중 " + countOpen;
-      document.getElementById("chipSoon").textContent = "임박 " + countSoon;
-      document.getElementById("chipClosed").textContent = "마감 " + countClosed;
-    }
-
-    // ===== ④ 상세 + 메모 모듈 =====
-    function renderSelectedBid(bid) {
-      const box = document.getElementById("selectedBidInfo");
-      const noteStatus = document.getElementById("noteStatus");
-      const noteField = document.getElementById("noteField");
-      const nextDate = document.getElementById("nextActionDate");
-
-      if (!bid) {
-        box.textContent = "아직 선택된 공고가 없습니다.";
-        noteField.value = "";
-        nextDate.value = "";
-        noteStatus.textContent = "아직 저장된 메모가 없습니다.";
-        return;
-      }
-
-      const notes = loadFromStorage(STORAGE_KEY_NOTES, {});
-      const note = notes[bid.id] || { memo: "", nextDate: "" };
-
-      box.innerHTML = `
-        <div class="section-title">${bid.title}</div>
-        <p class="muted">
-          발주처: ${bid.agency} · 지역: ${bid.region}<br />
-          마감일: ${formatDate(bid.deadline)} · 추정금액: ${bid.budget.toLocaleString("ko-KR")} 만원
-        </p>
-      `;
-      noteField.value = note.memo || "";
-      nextDate.value = note.nextDate || "";
-      if (note.memo || note.nextDate) {
-        noteStatus.textContent = "저장된 메모가 있습니다.";
-      } else {
-        noteStatus.textContent = "아직 저장된 메모가 없습니다.";
-      }
-    }
-
-    function saveNote() {
-      if (!selectedBidId) {
-        logDebug("메모 저장 실패: 선택된 공고 없음");
-        return;
-      }
-      const memo = document.getElementById("noteField").value.trim();
-      const nextDate = document.getElementById("nextActionDate").value;
-
-      const notes = loadFromStorage(STORAGE_KEY_NOTES, {});
-      notes[selectedBidId] = { memo, nextDate };
-      saveToStorage(STORAGE_KEY_NOTES, notes);
-      document.getElementById("noteStatus").textContent = "저장된 메모가 있습니다.";
-      logDebug("메모 저장: " + selectedBidId);
-    }
-
-    function clearNote() {
-      if (!selectedBidId) return;
-      const notes = loadFromStorage(STORAGE_KEY_NOTES, {});
-      delete notes[selectedBidId];
-      saveToStorage(STORAGE_KEY_NOTES, notes);
-      document.getElementById("noteField").value = "";
-      document.getElementById("nextActionDate").value = "";
-      document.getElementById("noteStatus").textContent = "아직 저장된 메모가 없습니다.";
-      logDebug("메모 삭제: " + selectedBidId);
-    }
-
-    // ===== ⑤ 초기화 =====
-    function initDebug() {
-      loadDebugFromStorage();
-      logDebug("도구 시작: 2번 입찰·전자조달 모듈 로딩");
-    }
-
-    function init() {
-      // 소스
-      renderSources();
-      document.getElementById("addSourceBtn").addEventListener("click", addSource);
-      document.getElementById("clearSourcesBtn").addEventListener("click", clearSources);
-
-      // 공고 데이터
-      initBidData();
-
-      // 필터
-      document.getElementById("applyFilterBtn").addEventListener("click", applyFilter);
-      document.getElementById("resetFilterBtn").addEventListener("click", resetFilter);
-      document.getElementById("resetToSampleBtn").addEventListener("click", resetToSample);
-
-      // 메모
-      document.getElementById("saveNoteBtn").addEventListener("click", saveNote);
-      document.getElementById("clearNoteBtn").addEventListener("click", clearNote);
-
-      // 디버그
-      document.getElementById("clearLogBtn").addEventListener("click", () => {
-        saveToStorage(STORAGE_KEY_DEBUG, []);
-        document.getElementById("debugLog").textContent = "";
-        logDebug("디버그 로그 삭제");
-      });
-
-      initDebug();
-    }
-
-    document.addEventListener("DOMContentLoaded", init);
+    })();
   </script>
 </body>
 </html>
