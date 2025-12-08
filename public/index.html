@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>2번 입찰·전자조달 자동화 도구 v1 (정적 모듈 버전)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f5f7;
+      color: #222;
+    }
+    h1, h2, h3 {
+      margin: 0 0 8px;
+    }
+    h1 {
+      font-size: 20px;
+    }
+    h2 {
+      font-size: 16px;
+      margin-top: 24px;
+    }
+    p {
+      margin: 4px 0 8px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 1.2fr 2fr 1.3fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      margin-bottom: 8px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: #eef2ff;
+      color: #3730a3;
+      margin-left: 4px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      margin: 4px 0 2px;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #d4d4d8;
+      font-size: 13px;
+    }
+    textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+    button {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 13px;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+      margin-right: 4px;
+      margin-top: 4px;
+    }
+    button.secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+    button.danger {
+      background: #dc2626;
+    }
+    button.small {
+      font-size: 11px;
+      padding: 4px 8px;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 4px 6px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #f3f4f6;
+    }
+    tr.highlight {
+      background: #eff6ff;
+    }
+    .status-pill {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 11px;
+      color: white;
+    }
+    .status-open { background: #16a34a; }
+    .status-soon { background: #f97316; }
+    .status-closed { background: #6b7280; }
+    .flex {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .muted {
+      font-size: 11px;
+      color: #6b7280;
+    }
+    .chip {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      font-size: 11px;
+      margin-right: 4px;
+      margin-top: 2px;
+    }
+    .section-title {
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .debug-log {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+      background: #111827;
+      color: #e5e7eb;
+      padding: 8px;
+      border-radius: 8px;
+      max-height: 160px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #fee2e2;
+      color: #b91c1c;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="flex-between">
+      <div>
+        <h1>2번 입찰·전자조달 자동화 도구 v1</h1>
+        <p class="muted">
+          입찰·전자조달 사이트에서 공고 정보를 모아 보고, 조건에 맞게 필터링하고, 메모까지 남기는
+          <strong>정적 1차 모듈</strong>입니다. (지금은 브라우저 안에서만 동작)
+        </p>
+      </div>
+      <div>
+        <span class="badge">정적 index.html 단일 파일</span>
+        <span class="badge">모듈: 소스 + 검색 + 목록 + 상세 + 메모 + 디버그</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- 왼쪽 : 입찰 소스 + 검색 조건 -->
+    <div>
+      <div class="card">
+        <h2>① 입찰 소스 설정</h2>
+        <p class="muted">
+          자주 보는 입찰·전자조달 사이트 주소를 적어 두는 모듈입니다.
+          지금은 화면에만 저장되고, 나중에 7번 세팅 도구·API와 연결할 수 있습니다.
+        </p>
+        <label for="sourceName">소스 이름</label>
+        <input id="sourceName" type="text" placeholder="예: 나라장터, KIST 전자조달" />
+
+        <label for="sourceUrl">소스 URL</label>
+        <input id="sourceUrl" type="text" placeholder="예: https://www.g2b.go.kr/..." />
+
+        <button id="addSourceBtn" class="small">소스 추가</button>
+        <button id="clearSourcesBtn" class="small secondary">소스 모두 삭제</button>
+
+        <p class="section-title" style="margin-top:8px;">등록된 소스</p>
+        <div id="sourceList" class="muted">아직 등록된 소스가 없습니다.</div>
+      </div>
+
+      <div class="card">
+        <h2>② 검색 조건 설정</h2>
+        <p class="muted">
+          실제 크롤링·API는 나중 단계에서 붙이고, 지금은 <strong>조건 + 예시 데이터 필터링</strong>만 동작합니다.
+        </p>
+        <label for="keyword">검색어(공고명·품목 등)</label>
+        <input id="keyword" type="text" placeholder="예: 접착제, 글래스 서브스트레이트 등" />
+
+        <div class="flex">
+          <div style="flex:1;">
+            <label for="agency">기관 / 발주처</label>
+            <input id="agency" type="text" placeholder="예: KIST, KITECH..." />
+          </div>
+          <div style="flex:1;">
+            <label for="region">지역</label>
+            <input id="region" type="text" placeholder="예: 서울, 대전 등" />
+          </div>
+        </div>
+
+        <div class="flex">
+          <div style="flex:1;">
+            <label for="minBudget">최소 추정금액(만원)</label>
+            <input id="minBudget" type="number" min="0" placeholder="예: 100" />
+          </div>
+          <div style="flex:1;">
+            <label for="maxBudget">최대 추정금액(만원)</label>
+            <input id="maxBudget" type="number" min="0" placeholder="예: 5000" />
+          </div>
+        </div>
+
+        <label for="deadlineFrom">마감일(시작)</label>
+        <input id="deadlineFrom" type="date" />
+
+        <label for="deadlineTo">마감일(끝)</label>
+        <input id="deadlineTo" type="date" />
+
+        <div style="margin-top:4px;">
+          <span class="muted">공고 상태</span><br />
+          <label style="font-size:11px;">
+            <input type="checkbox" id="statusOpen" checked /> 진행중
+          </label>
+          <label style="font-size:11px; margin-left:4px;">
+            <input type="checkbox" id="statusSoon" checked /> 마감 임박
+          </label>
+          <label style="font-size:11px; margin-left:4px;">
+            <input type="checkbox" id="statusClosed" /> 마감됨
+          </label>
+        </div>
+
+        <button id="applyFilterBtn">검색 조건 적용</button>
+        <button id="resetFilterBtn" class="secondary">조건 초기화</button>
+      </div>
+    </div>
+
+    <!-- 가운데 : 공고 목록 -->
+    <div>
+      <div class="card">
+        <h2>③ 공고 목록 (예시 데이터 + 필터 모듈)</h2>
+        <div class="flex-between">
+          <div class="muted">
+            현재 표시 공고 수: <span id="bidCount">0</span>건  
+            <span class="chip" id="chipOpen">진행중 0</span>
+            <span class="chip" id="chipSoon">임박 0</span>
+            <span class="chip" id="chipClosed">마감 0</span>
+          </div>
+          <button id="resetToSampleBtn" class="small secondary">
+            예시 데이터 다시 불러오기
+          </button>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width:28px;">선택</th>
+              <th>공고명 / 발주처</th>
+              <th style="width:60px;">상태</th>
+              <th style="width:100px;">마감일</th>
+              <th style="width:80px;">추정금액(만원)</th>
+            </tr>
+          </thead>
+          <tbody id="bidTableBody">
+            <!-- JS로 행 추가 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 오른쪽 : 상세 + 메모 + 디버그 -->
+    <div>
+      <div class="card">
+        <h2>④ 공고 상세 · 메모</h2>
+        <p class="muted">
+          목록에서 행을 클릭하면 상세 정보와 메모를 이 칸에 저장할 수 있습니다.
+        </p>
+        <div id="selectedBidInfo" class="muted">
+          아직 선택된 공고가 없습니다.
+        </div>
+
+        <label for="noteField">내 메모 / 전략</label>
+        <textarea id="noteField" placeholder="예: 이 기관은 글래스 서브스트레이트 관련 연구비 있음, 후속 자료 필요 등"></textarea>
+
+        <label for="nextActionDate">다음 조치 예정일</label>
+        <input id="nextActionDate" type="date" />
+
+        <button id="saveNoteBtn" class="small">메모 저장</button>
+        <button id="clearNoteBtn" class="small secondary">메모 삭제</button>
+
+        <p class="muted" id="noteStatus" style="margin-top:4px;">
+          아직 저장된 메모가 없습니다.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>⑤ 디버그 · 모듈 상태</h2>
+        <p class="muted">
+          나중에 7번 세팅 도구에서 자동 테스트·자동 수정 모듈과 연결할 수 있도록,  
+          현재 모듈 상태를 간단히 기록합니다.
+          <span class="tag">공통 규칙 후보</span>
+        </p>
+        <div class="debug-log" id="debugLog"></div>
+        <button id="clearLogBtn" class="small danger">로그 삭제</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== 공통 상수 / 상태 =====
+    const STORAGE_KEY_SOURCES = "tool2_sources_v1";
+    const STORAGE_KEY_BIDS = "tool2_bids_v1";
+    const STORAGE_KEY_NOTES = "tool2_notes_v1";
+    const STORAGE_KEY_DEBUG = "tool2_debug_v1";
+
+    let bidData = [];        // 현재 화면에 쓰는 공고 데이터
+    let allBidData = [];     // 예시 + 로컬 저장 전체
+    let selectedBidId = null;
+
+    // ===== 유틸 함수 =====
+    function logDebug(message) {
+      const logEl = document.getElementById("debugLog");
+      const now = new Date();
+      const time = now.toTimeString().split(" ")[0];
+      const line = "[" + time + "] " + message;
+      logEl.textContent = line + "\n" + logEl.textContent;
+      try {
+        let saved = JSON.parse(localStorage.getItem(STORAGE_KEY_DEBUG) || "[]");
+        saved.unshift(line);
+        if (saved.length > 200) saved = saved.slice(0, 200);
+        localStorage.setItem(STORAGE_KEY_DEBUG, JSON.stringify(saved));
+      } catch (e) {
+        console.warn("debug save error", e);
+      }
+    }
+
+    function loadDebugFromStorage() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY_DEBUG) || "[]");
+        const logEl = document.getElementById("debugLog");
+        logEl.textContent = saved.join("\n");
+      } catch (e) {
+        console.warn("debug load error", e);
+      }
+    }
+
+    function saveToStorage(key, data) {
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (e) {
+        logDebug("저장 오류: " + key);
+      }
+    }
+
+    function loadFromStorage(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return fallback;
+        return JSON.parse(raw);
+      } catch (e) {
+        logDebug("불러오기 오류: " + key);
+        return fallback;
+      }
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return "-";
+      return dateStr;
+    }
+
+    function renderStatusPill(status) {
+      const span = document.createElement("span");
+      span.classList.add("status-pill");
+      if (status === "진행중") span.classList.add("status-open");
+      else if (status === "임박") span.classList.add("status-soon");
+      else span.classList.add("status-closed");
+      span.textContent = status;
+      return span;
+    }
+
+    // ===== ① 입찰 소스 모듈 =====
+    function renderSources() {
+      const box = document.getElementById("sourceList");
+      const sources = loadFromStorage(STORAGE_KEY_SOURCES, []);
+      if (!sources.length) {
+        box.textContent = "아직 등록된 소스가 없습니다.";
+        return;
+      }
+      box.innerHTML = "";
+      sources.forEach((s, idx) => {
+        const div = document.createElement("div");
+        div.innerHTML = `<span class="chip">${idx + 1}. ${s.name}</span>
+          <a href="${s.url}" target="_blank" style="font-size:11px;">열기</a>`;
+        box.appendChild(div);
+      });
+    }
+
+    function addSource() {
+      const nameEl = document.getElementById("sourceName");
+      const urlEl = document.getElementById("sourceUrl");
+      const name = nameEl.value.trim();
+      const url = urlEl.value.trim();
+      if (!name || !url) {
+        logDebug("소스 추가 실패: 이름/URL 필요");
+        return;
+      }
+      const sources = loadFromStorage(STORAGE_KEY_SOURCES, []);
+      sources.push({ name, url });
+      saveToStorage(STORAGE_KEY_SOURCES, sources);
+      nameEl.value = "";
+      urlEl.value = "";
+      renderSources();
+      logDebug("소스 추가: " + name);
+    }
+
+    function clearSources() {
+      saveToStorage(STORAGE_KEY_SOURCES, []);
+      renderSources();
+      logDebug("소스 모두 삭제");
+    }
+
+    // ===== 예시 입찰 데이터 =====
+    function createSampleBids() {
+      const today = new Date();
+      const y = today.getFullYear();
+      const m = String(today.getMonth() + 1).padStart(2, "0");
+      const d = String(today.getDate()).padStart(2, "0");
+      const baseDate = y + "-" + m + "-" + d;
+
+      return [
+        {
+          id: "BID-001",
+          title: "글래스 서브스트레이트용 고기능성 접착제 연구용역",
+          agency: "KITECH",
+          region: "경기도",
+          budget: 3200,
+          deadline: baseDate,
+          status: "진행중",
+          tags: ["접착제", "glass substrate", "연구용역"]
+        },
+        {
+          id: "BID-002",
+          title: "페로브스카이트 태양전지 공정 최적화 장비 구매",
+          agency: "KIST",
+          region: "서울",
+          budget: 8500,
+          deadline: baseDate,
+          status: "임박",
+          tags: ["perovskite", "태양전지", "장비"]
+        },
+        {
+          id: "BID-003",
+          title: "화학 소재 분석·평가 용역",
+          agency: "KRICT",
+          region: "대전",
+          budget: 1800,
+          deadline: baseDate,
+          status: "진행중",
+          tags: ["analysis", "화학", "용역"]
+        },
+        {
+          id: "BID-004",
+          title: "R&D 보고서 번역 및 편집 서비스",
+          agency: "민간연구소",
+          region: "서울",
+          budget: 600,
+          deadline: baseDate,
+          status: "마감됨",
+          tags: ["번역", "편집", "보고서"]
+        }
+      ];
+    }
+
+    function initBidData() {
+      const saved = loadFromStorage(STORAGE_KEY_BIDS, null);
+      if (saved && saved.length) {
+        allBidData = saved;
+        logDebug("저장된 입찰 데이터 불러옴: " + saved.length + "건");
+      } else {
+        allBidData = createSampleBids();
+        saveToStorage(STORAGE_KEY_BIDS, allBidData);
+        logDebug("예시 입찰 데이터 생성: " + allBidData.length + "건");
+      }
+      bidData = allBidData.slice();
+      renderBidTable();
+    }
+
+    // ===== ③ 공고 목록 + 필터 =====
+    function applyFilter() {
+      const keyword = document.getElementById("keyword").value.trim().toLowerCase();
+      const agency = document.getElementById("agency").value.trim().toLowerCase();
+      const region = document.getElementById("region").value.trim().toLowerCase();
+      const minBudget = parseInt(document.getElementById("minBudget").value, 10);
+      const maxBudget = parseInt(document.getElementById("maxBudget").value, 10);
+      const deadlineFrom = document.getElementById("deadlineFrom").value;
+      const deadlineTo = document.getElementById("deadlineTo").value;
+      const allowOpen = document.getElementById("statusOpen").checked;
+      const allowSoon = document.getElementById("statusSoon").checked;
+      const allowClosed = document.getElementById("statusClosed").checked;
+
+      bidData = allBidData.filter(bid => {
+        if (keyword && !(
+          bid.title.toLowerCase().includes(keyword) ||
+          bid.tags.join(" ").toLowerCase().includes(keyword)
+        )) return false;
+
+        if (agency && !bid.agency.toLowerCase().includes(agency)) return false;
+        if (region && !bid.region.toLowerCase().includes(region)) return false;
+
+        if (!isNaN(minBudget) && bid.budget < minBudget) return false;
+        if (!isNaN(maxBudget) && bid.budget > maxBudget) return false;
+
+        if (deadlineFrom && bid.deadline < deadlineFrom) return false;
+        if (deadlineTo && bid.deadline > deadlineTo) return false;
+
+        if (bid.status === "진행중" && !allowOpen) return false;
+        if (bid.status === "임박" && !allowSoon) return false;
+        if (bid.status === "마감됨" && !allowClosed) return false;
+
+        return true;
+      });
+
+      renderBidTable();
+      logDebug("검색 조건 적용: 결과 " + bidData.length + "건");
+    }
+
+    function resetFilter() {
+      document.getElementById("keyword").value = "";
+      document.getElementById("agency").value = "";
+      document.getElementById("region").value = "";
+      document.getElementById("minBudget").value = "";
+      document.getElementById("maxBudget").value = "";
+      document.getElementById("deadlineFrom").value = "";
+      document.getElementById("deadlineTo").value = "";
+      document.getElementById("statusOpen").checked = true;
+      document.getElementById("statusSoon").checked = true;
+      document.getElementById("statusClosed").checked = false;
+
+      bidData = allBidData.slice();
+      renderBidTable();
+      logDebug("검색 조건 초기화");
+    }
+
+    function resetToSample() {
+      allBidData = createSampleBids();
+      bidData = allBidData.slice();
+      saveToStorage(STORAGE_KEY_BIDS, allBidData);
+      selectedBidId = null;
+      renderBidTable();
+      renderSelectedBid(null);
+      logDebug("예시 데이터로 되돌림");
+    }
+
+    function renderBidTable() {
+      const tbody = document.getElementById("bidTableBody");
+      tbody.innerHTML = "";
+
+      let countOpen = 0, countSoon = 0, countClosed = 0;
+      bidData.forEach(bid => {
+        if (bid.status === "진행중") countOpen++;
+        else if (bid.status === "임박") countSoon++;
+        else countClosed++;
+
+        const tr = document.createElement("tr");
+        if (bid.id === selectedBidId) {
+          tr.classList.add("highlight");
+        }
+
+        const tdSelect = document.createElement("td");
+        const btn = document.createElement("button");
+        btn.textContent = "선택";
+        btn.classList.add("small");
+        btn.addEventListener("click", () => {
+          selectedBidId = bid.id;
+          renderBidTable();
+          renderSelectedBid(bid);
+        });
+        tdSelect.appendChild(btn);
+
+        const tdTitle = document.createElement("td");
+        tdTitle.innerHTML = `
+          <div class="section-title" style="margin-bottom:2px;">${bid.title}</div>
+          <div class="muted">${bid.agency} · ${bid.region}</div>
+          <div class="muted">
+            ${bid.tags.map(t => `<span class="chip">${t}</span>`).join("")}
+          </div>
+        `;
+
+        const tdStatus = document.createElement("td");
+        tdStatus.appendChild(renderStatusPill(bid.status));
+
+        const tdDeadline = document.createElement("td");
+        tdDeadline.textContent = formatDate(bid.deadline);
+
+        const tdBudget = document.createElement("td");
+        tdBudget.textContent = bid.budget.toLocaleString("ko-KR");
+
+        tr.appendChild(tdSelect);
+        tr.appendChild(tdTitle);
+        tr.appendChild(tdStatus);
+        tr.appendChild(tdDeadline);
+        tr.appendChild(tdBudget);
+
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById("bidCount").textContent = bidData.length;
+      document.getElementById("chipOpen").textContent = "진행중 " + countOpen;
+      document.getElementById("chipSoon").textContent = "임박 " + countSoon;
+      document.getElementById("chipClosed").textContent = "마감 " + countClosed;
+    }
+
+    // ===== ④ 상세 + 메모 모듈 =====
+    function renderSelectedBid(bid) {
+      const box = document.getElementById("selectedBidInfo");
+      const noteStatus = document.getElementById("noteStatus");
+      const noteField = document.getElementById("noteField");
+      const nextDate = document.getElementById("nextActionDate");
+
+      if (!bid) {
+        box.textContent = "아직 선택된 공고가 없습니다.";
+        noteField.value = "";
+        nextDate.value = "";
+        noteStatus.textContent = "아직 저장된 메모가 없습니다.";
+        return;
+      }
+
+      const notes = loadFromStorage(STORAGE_KEY_NOTES, {});
+      const note = notes[bid.id] || { memo: "", nextDate: "" };
+
+      box.innerHTML = `
+        <div class="section-title">${bid.title}</div>
+        <p class="muted">
+          발주처: ${bid.agency} · 지역: ${bid.region}<br />
+          마감일: ${formatDate(bid.deadline)} · 추정금액: ${bid.budget.toLocaleString("ko-KR")} 만원
+        </p>
+      `;
+      noteField.value = note.memo || "";
+      nextDate.value = note.nextDate || "";
+      if (note.memo || note.nextDate) {
+        noteStatus.textContent = "저장된 메모가 있습니다.";
+      } else {
+        noteStatus.textContent = "아직 저장된 메모가 없습니다.";
+      }
+    }
+
+    function saveNote() {
+      if (!selectedBidId) {
+        logDebug("메모 저장 실패: 선택된 공고 없음");
+        return;
+      }
+      const memo = document.getElementById("noteField").value.trim();
+      const nextDate = document.getElementById("nextActionDate").value;
+
+      const notes = loadFromStorage(STORAGE_KEY_NOTES, {});
+      notes[selectedBidId] = { memo, nextDate };
+      saveToStorage(STORAGE_KEY_NOTES, notes);
+      document.getElementById("noteStatus").textContent = "저장된 메모가 있습니다.";
+      logDebug("메모 저장: " + selectedBidId);
+    }
+
+    function clearNote() {
+      if (!selectedBidId) return;
+      const notes = loadFromStorage(STORAGE_KEY_NOTES, {});
+      delete notes[selectedBidId];
+      saveToStorage(STORAGE_KEY_NOTES, notes);
+      document.getElementById("noteField").value = "";
+      document.getElementById("nextActionDate").value = "";
+      document.getElementById("noteStatus").textContent = "아직 저장된 메모가 없습니다.";
+      logDebug("메모 삭제: " + selectedBidId);
+    }
+
+    // ===== ⑤ 초기화 =====
+    function initDebug() {
+      loadDebugFromStorage();
+      logDebug("도구 시작: 2번 입찰·전자조달 모듈 로딩");
+    }
+
+    function init() {
+      // 소스
+      renderSources();
+      document.getElementById("addSourceBtn").addEventListener("click", addSource);
+      document.getElementById("clearSourcesBtn").addEventListener("click", clearSources);
+
+      // 공고 데이터
+      initBidData();
+
+      // 필터
+      document.getElementById("applyFilterBtn").addEventListener("click", applyFilter);
+      document.getElementById("resetFilterBtn").addEventListener("click", resetFilter);
+      document.getElementById("resetToSampleBtn").addEventListener("click", resetToSample);
+
+      // 메모
+      document.getElementById("saveNoteBtn").addEventListener("click", saveNote);
+      document.getElementById("clearNoteBtn").addEventListener("click", clearNote);
+
+      // 디버그
+      document.getElementById("clearLogBtn").addEventListener("click", () => {
+        saveToStorage(STORAGE_KEY_DEBUG, []);
+        document.getElementById("debugLog").textContent = "";
+        logDebug("디버그 로그 삭제");
+      });
+
+      initDebug();
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
