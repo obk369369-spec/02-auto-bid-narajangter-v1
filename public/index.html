@@ -2,2005 +2,935 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>2번 도구 · 입찰 프로그램 · WIC 자동화 시스템</title>
+  <title>2번 도구 · 입찰 프로그램</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
-      --bg: #0f172a;
-      --bg-alt: #020617;
-      --card: #020617;
-      --card-soft: #0b1220;
-      --border: #1e293b;
-      --accent: #38bdf8;
-      --accent-soft: rgba(56, 189, 248, 0.1);
-      --accent-strong: #0ea5e9;
-      --text-main: #e5e7eb;
-      --text-muted: #9ca3af;
-      --danger: #f97373;
-      --success: #4ade80;
-      --warning: #facc15;
-      --radius-xl: 18px;
-      --shadow-soft: 0 18px 50px rgba(15, 23, 42, 0.8);
-      --transition-fast: 0.18s ease-out;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      color-scheme: light dark;
     }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html, body {
+    body {
       margin: 0;
       padding: 0;
-      height: 100%;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #1e293b 0, #020617 50%, #000 100%);
-      color: var(--text-main);
+      background: #0f172a;
+      color: #e5e7eb;
     }
-
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: stretch;
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
       padding: 16px;
+      box-sizing: border-box;
     }
-
-    .app-shell {
-      width: 100%;
-      max-width: 1240px;
-      background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.98));
-      border-radius: 24px;
-      border: 1px solid rgba(148, 163, 184, 0.18);
-      box-shadow: var(--shadow-soft);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+    h1, h2, h3 {
+      margin: 0 0 8px;
+      font-weight: 600;
     }
-
-    header.app-header {
-      padding: 16px 20px 10px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      background:
-        radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.16), transparent 55%),
-        radial-gradient(circle at 100% 0, rgba(52, 211, 153, 0.12), transparent 55%);
-    }
-
-    .app-title-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .tool-pill {
-      font-size: 12px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      color: var(--text-muted);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      backdrop-filter: blur(12px);
-    }
-
-    .tool-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.35);
-    }
-
     h1 {
-      margin: 0;
-      font-size: 20px;
-      display: flex;
-      gap: 8px;
-      align-items: baseline;
+      font-size: 1.4rem;
     }
-
-    h1 span.sub {
-      font-size: 13px;
-      font-weight: 400;
-      color: var(--text-muted);
+    h2 {
+      font-size: 1.1rem;
+      margin-top: 16px;
     }
-
-    .app-meta {
-      font-size: 11px;
-      color: var(--text-muted);
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      opacity: 0.9;
+    h3 {
+      font-size: 1rem;
+      margin-top: 12px;
     }
-
-    .app-meta strong {
-      color: var(--accent-strong);
-      font-weight: 500;
+    .tagline {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      margin-bottom: 12px;
     }
-
-    .badge-outline {
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      font-size: 11px;
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      gap: 12px;
     }
-
-    main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 10px 16px 16px 16px;
-      gap: 10px;
-    }
-
     .grid-3 {
       display: grid;
-      grid-template-columns: 1.1fr 1.1fr 1.2fr;
-      gap: 10px;
-      height: 100%;
-      min-height: 540px;
+      grid-template-columns: 2fr 3fr;
+      gap: 12px;
+      margin-top: 12px;
     }
-
-    @media (max-width: 1040px) {
-      .grid-3 {
-        grid-template-columns: 1fr;
-        grid-auto-rows: minmax(0, auto);
-        height: auto;
-      }
-    }
-
     .card {
-      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.98));
-      border-radius: var(--radius-xl);
-      border: 1px solid rgba(30, 64, 175, 0.7);
+      background: #020617;
+      border-radius: 10px;
+      border: 1px solid #1e293b;
       padding: 10px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      min-height: 0;
-      position: relative;
-      overflow: hidden;
+      box-sizing: border-box;
     }
-
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.08), transparent 55%);
-      opacity: 0.85;
-      pointer-events: none;
-    }
-
-    .card-inner {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      min-height: 0;
-    }
-
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 6px;
+      margin-bottom: 6px;
     }
-
-    .card-title {
-      font-size: 13px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .card-title span.icon {
-      width: 18px;
-      height: 18px;
+    .badge {
+      font-size: 0.75rem;
+      padding: 2px 6px;
       border-radius: 999px;
+      background: #0f766e;
+      color: #ecfdf5;
+      white-space: nowrap;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      margin: 6px 0 2px;
+      color: #cbd5f5;
+    }
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 1px solid #1f2937;
+      padding: 6px 8px;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+    input::placeholder,
+    textarea::placeholder {
+      color: #6b7280;
+    }
+    select {
+      padding-right: 24px;
+    }
+    button {
+      border-radius: 6px;
+      border: 1px solid #1d4ed8;
+      background: #1d4ed8;
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      padding: 6px 10px;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      background: rgba(15, 23, 42, 0.9);
-    }
-
-    .card-subtitle {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .pill-count {
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      color: var(--text-muted);
-    }
-
-    .card-section {
-      border-radius: 12px;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(51, 65, 85, 0.9);
-      padding: 6px 7px 5px 7px;
-      display: flex;
-      flex-direction: column;
       gap: 4px;
     }
-
-    .card-section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: var(--text-muted);
+    button.secondary {
+      border-color: #4b5563;
+      background: #111827;
     }
-
-    .card-section-header strong {
-      color: var(--text-main);
-      font-weight: 500;
+    button.danger {
+      border-color: #b91c1c;
+      background: #7f1d1d;
     }
-
-    .card-section-body {
-      font-size: 11px;
-      color: var(--text-muted);
+    button:disabled {
+      opacity: 0.4;
+      cursor: default;
     }
-
-    .input-row {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 4px;
-    }
-
-    .input-pair {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 4px;
-    }
-
-    .input-3 {
-      display: grid;
-      grid-template-columns: 2fr 1.4fr 1.4fr;
-      gap: 4px;
-    }
-
-    @media (max-width: 1040px) {
-      .input-3 {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    label {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    label span.req {
-      color: var(--accent-strong);
-      margin-left: 2px;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    input[type="date"],
-    textarea,
-    select {
-      background: rgba(15, 23, 42, 0.95);
-      border-radius: 9px;
-      border: 1px solid rgba(51, 65, 85, 0.95);
-      padding: 6px 8px;
-      font-size: 12px;
-      color: var(--text-main);
-      outline: none;
-      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
-      width: 100%;
-      resize: vertical;
-      min-height: 0;
-      max-height: 140px;
-    }
-
-    input[type="text"]::placeholder,
-    input[type="number"]::placeholder,
-    textarea::placeholder {
-      color: rgba(148, 163, 184, 0.8);
-    }
-
-    input[type="text"]:focus,
-    input[type="number"]:focus,
-    input[type="date"]:focus,
-    textarea:focus,
-    select:focus {
-      border-color: rgba(56, 189, 248, 0.9);
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.7);
-      background: rgba(15, 23, 42, 0.98);
-      transform: translateY(-0.5px);
-    }
-
-    textarea {
-      min-height: 46px;
-    }
-
-    .hint {
-      font-size: 10px;
-      color: rgba(148, 163, 184, 0.8);
-    }
-
     .btn-row {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-top: 3px;
+      margin-top: 8px;
     }
-
-    button {
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.9);
-      padding: 6px 12px;
-      background: rgba(15, 23, 42, 0.96);
-      color: var(--text-main);
-      font-size: 11px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
-      white-space: nowrap;
+    .summary-box {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+      line-height: 1.4;
     }
-
-    button span.dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: var(--accent);
-    }
-
-    button.primary {
-      background: linear-gradient(135deg, #0ea5e9, #06b6d4);
-      border-color: rgba(56, 189, 248, 0.1);
-      color: #0f172a;
-      box-shadow: 0 10px 25px rgba(8, 47, 73, 0.65);
+    .summary-highlight {
+      color: #a5f3fc;
       font-weight: 500;
     }
-
-    button.primary:hover {
-      background: linear-gradient(135deg, #38bdf8, #22d3ee);
-      transform: translateY(-1px);
-      box-shadow: 0 14px 32px rgba(8, 47, 73, 0.85);
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
     }
-
-    button.secondary {
-      background: rgba(15, 23, 42, 0.98);
+    th, td {
+      border-bottom: 1px solid #1f2937;
+      padding: 4px 6px;
+      text-align: left;
     }
-
-    button.secondary:hover {
-      background: rgba(15, 23, 42, 1);
-      border-color: rgba(148, 163, 184, 1);
-      transform: translateY(-1px);
+    th {
+      background: #020617;
+      position: sticky;
+      top: 0;
+      z-index: 1;
     }
-
-    button.ghost {
-      background: transparent;
-      border-style: dashed;
-      border-color: rgba(148, 163, 184, 0.7);
-      color: var(--text-muted);
-    }
-
-    button.ghost:hover {
-      border-color: rgba(148, 163, 184, 1);
-      color: var(--text-main);
-    }
-
-    button.danger {
-      border-color: rgba(248, 113, 113, 0.9);
-      color: #fecaca;
-    }
-
-    button.danger:hover {
-      background: rgba(248, 113, 113, 0.1);
-    }
-
-    button:disabled {
-      opacity: 0.35;
-      cursor: default;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .table-shell {
-      border-radius: 11px;
-      border: 1px solid rgba(30, 64, 175, 0.8);
-      overflow: hidden;
-      background: rgba(15, 23, 42, 0.95);
-    }
-
-    .table-header-row {
-      display: grid;
-      grid-template-columns: 2.4fr 1.2fr 1.1fr 0.9fr 0.9fr 0.8fr;
-      font-size: 11px;
-      padding: 5px 7px;
-      background: linear-gradient(to right, rgba(15, 23, 42, 1), rgba(15, 23, 42, 0.95));
-      border-bottom: 1px solid rgba(30, 64, 175, 0.9);
-      color: rgba(148, 163, 184, 0.95);
-    }
-
-    @media (max-width: 1040px) {
-      .table-header-row {
-        grid-template-columns: 2.2fr 1.2fr 1.1fr 0.9fr 0.9fr 0.8fr;
-      }
-    }
-
-    .table-body {
+    .table-wrapper {
       max-height: 260px;
       overflow: auto;
-      background: rgba(15, 23, 42, 0.97);
+      border-radius: 6px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      margin-top: 4px;
     }
-
-    .table-row {
-      display: grid;
-      grid-template-columns: 2.4fr 1.2fr 1.1fr 0.9fr 0.9fr 0.8fr;
-      font-size: 11px;
-      padding: 5px 7px;
-      border-bottom: 1px solid rgba(30, 64, 175, 0.4);
-      align-items: center;
-      cursor: pointer;
-      transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
-    }
-
-    .table-row:nth-child(even) {
-      background: rgba(15, 23, 42, 0.98);
-    }
-
-    .table-row:nth-child(odd) {
-      background: rgba(15, 23, 42, 0.94);
-    }
-
-    .table-row:hover {
-      background: rgba(15, 23, 42, 1);
-      transform: translateY(-0.5px);
-    }
-
-    .table-row.selected {
-      background: rgba(56, 189, 248, 0.12);
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.7);
-    }
-
-    .cell-main {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-    }
-
-    .cell-main-title {
-      color: var(--text-main);
-      font-weight: 500;
-    }
-
-    .cell-main-sub {
-      color: var(--text-muted);
-      font-size: 10px;
-    }
-
-    .status-pill {
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 10px;
-      text-align: center;
-      border: 1px solid rgba(148, 163, 184, 0.8);
-      background: rgba(15, 23, 42, 0.98);
-      color: var(--text-muted);
-    }
-
-    .status-준비 {
-      border-color: rgba(129, 140, 248, 0.9);
-      color: #a5b4fc;
-      background: rgba(79, 70, 229, 0.16);
-    }
-
-    .status-검토중 {
-      border-color: rgba(250, 204, 21, 0.9);
-      color: #facc15;
-      background: rgba(234, 179, 8, 0.16);
-    }
-
-    .status-투찰완료 {
-      border-color: rgba(74, 222, 128, 0.9);
-      color: #bbf7d0;
-      background: rgba(22, 163, 74, 0.2);
-    }
-
-    .status-유찰 {
-      border-color: rgba(248, 113, 113, 0.9);
-      color: #fecaca;
-      background: rgba(185, 28, 28, 0.24);
-    }
-
-    .badge {
-      font-size: 10px;
-      padding: 1px 6px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      color: rgba(148, 163, 184, 0.95);
-    }
-
-    .badge-soft {
-      background: rgba(15, 23, 42, 0.7);
-      border-style: dashed;
-    }
-
-    .summary-row {
+    .pill-row {
       display: flex;
       flex-wrap: wrap;
       gap: 4px;
-      font-size: 10px;
-      color: var(--text-muted);
+      margin-top: 4px;
     }
-
-    .summary-row strong {
-      color: var(--accent-strong);
-      font-weight: 500;
-    }
-
-    .flex-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .sim-grid {
-      display: grid;
-      grid-template-columns: 1.5fr 1.1fr;
-      gap: 6px;
-    }
-
-    @media (max-width: 1040px) {
-      .sim-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    }
-
-    .sim-output {
-      padding: 6px 7px;
-      border-radius: 11px;
-      border: 1px solid rgba(30, 64, 175, 0.9);
-      background: rgba(15, 23, 42, 0.98);
-      font-size: 11px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-height: 70px;
-    }
-
-    .sim-line {
-      display: flex;
-      justify-content: space-between;
-      gap: 6px;
-    }
-
-    .sim-label {
-      color: var(--text-muted);
-    }
-
-    .sim-value {
-      color: var(--text-main);
-      font-weight: 500;
-    }
-
-    .sim-highlight {
-      color: var(--accent-strong);
-    }
-
-    .sim-warning {
-      color: var(--warning);
-    }
-
-    .sim-danger {
-      color: var(--danger);
-    }
-
-    .sim-ok {
-      color: var(--success);
-    }
-
-    .footer-bar {
-      padding: 7px 14px 10px 14px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      color: var(--text-muted);
-      background: radial-gradient(circle at bottom, rgba(30, 64, 175, 0.6), rgba(15, 23, 42, 0.94));
-    }
-
-    .footer-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .dot-live {
-      width: 7px;
-      height: 7px;
+    .pill {
+      padding: 2px 6px;
       border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.4);
+      background: #111827;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      border: 1px solid #1f2937;
+      white-space: nowrap;
     }
-
-    .storage-state {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 2px 8px;
+    .log-list {
+      font-size: 0.75rem;
+      max-height: 160px;
+      overflow: auto;
+      padding-left: 16px;
+      margin: 4px 0 0;
+    }
+    .log-list li {
+      margin-bottom: 2px;
+      color: #9ca3af;
+    }
+    .badge-small {
+      font-size: 0.7rem;
+      padding: 1px 4px;
       border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      background: rgba(15, 23, 42, 0.9);
+      background: #111827;
+      color: #9ca3af;
+      border: 1px solid #1f2937;
     }
-
-    .footer-right {
+    .row {
       display: flex;
-      align-items: center;
-      gap: 4px;
       flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .kbd {
-      padding: 2px 5px;
-      border-radius: 5px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      background: rgba(15, 23, 42, 0.9);
-      font-size: 10px;
-      font-family: inherit;
-      color: var(--text-muted);
-    }
-
-    .no-data {
-      font-size: 11px;
-      color: var(--text-muted);
-      padding: 6px;
-      text-align: center;
-    }
-
-    .hard-divider {
-      height: 1px;
-      background: linear-gradient(to right, transparent, rgba(51, 65, 85, 1), transparent);
-      margin: 2px 0;
-    }
-
-    .scroll-y {
-      overflow-y: auto;
-    }
-
-    .mt-2 {
+      gap: 6px;
       margin-top: 2px;
     }
-
-    .mt-4 {
-      margin-top: 4px;
+    .row > div {
+      flex: 1 1 120px;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+    .status-dot.warn {
+      background: #facc15;
+    }
+    .status-dot.err {
+      background: #ef4444;
+    }
+    .status-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+    @media (max-width: 900px) {
+      .grid,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="app-shell" aria-label="2번 도구 입찰 프로그램">
-    <header class="app-header">
-      <div class="app-title-row">
-        <div class="tool-pill">
-          <span class="tool-dot"></span>
-          <span>2번 도구 · 입찰 프로그램</span>
+<div class="app">
+  <header class="card">
+    <div class="card-header">
+      <div>
+        <h1>2번 도구 · 입찰 프로그램</h1>
+        <div class="tagline">
+          기관·마감일·품목·금액을 한 화면에서 정리하고, 나중에 다시 꺼내 쓸 수 있게 만드는 입찰 도움 도구입니다.  
+          (Local-only · Safe DOM · index.html 하나로 동작)
         </div>
-        <h1>
-          WIC 입찰 관리 모듈
-          <span class="sub">공고 정리 · 마감 D-Day · 투찰률 확인</span>
-        </h1>
       </div>
-      <div class="app-meta">
-        <span><strong>WIC 자동화 시스템 · public/index.html</strong></span>
-        <span class="badge-outline">v1.0 · Local-only · Safe DOM</span>
-        <span>※ 이 화면에 보이는 것만 동작합니다. (저장: 브라우저 localStorage)</span>
+      <div>
+        <div class="badge">Bid Tool v1.0</div>
+        <div style="font-size:0.75rem;color:#9ca3af;margin-top:4px;">
+          저장 위치: <span class="badge-small">localStorage: wic_bid_tool_state_v1</span>
+        </div>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <main>
-      <div class="grid-3">
-        <!-- 좌측: 공고 목록 -->
-        <section class="card" aria-label="입찰 공고 목록">
-          <div class="card-inner">
-            <div class="card-header">
-              <div>
-                <div class="card-title">
-                  <span class="icon">①</span>
-                  <span>입찰 공고 목록</span>
-                </div>
-                <div class="card-subtitle">
-                  전체 공고를 한눈에 보고, 하나 클릭하면 오른쪽에 상세가 뜹니다.
-                </div>
-              </div>
-              <span class="pill-count" id="bidCountBadge">공고 0건</span>
-            </div>
+  <!-- 0. 요약 상태 -->
+  <section class="card">
+    <div class="card-header">
+      <h2>0. 요약 상태 · 한눈에 보기</h2>
+      <button id="refreshSummaryBtn" class="secondary">요약 새로고침</button>
+    </div>
+    <div class="summary-box" id="summaryBox">
+      ● 저장된 입찰 안건: <span class="summary-highlight" id="summaryCount">0</span> 건  
+      ● 오늘 기준 마감 안건: <span class="summary-highlight" id="summaryToday">0</span> 건  
+      ● 최근 기관: <span class="summary-highlight" id="summaryLastOrg">-</span>  
+      ● 최근 상태: <span class="status-line">
+        <span class="status-dot" id="summaryStatusDot"></span><span id="summaryStatusText">정상</span>
+      </span>
+    </div>
+    <div style="font-size:0.75rem;color:#9ca3af;margin-top:4px;">
+      읽기 흐름 예시: ① 요약에서 오늘 해야 할 일을 보고 → ② 왼쪽에서 안건을 작성 → ③ 오른쪽 표에서 이전 안건을 다시 꺼내 씁니다.
+    </div>
+  </section>
 
-            <div class="card-section">
-              <div class="card-section-header">
-                <strong>검색 · 필터</strong>
-                <span class="badge-soft">공고명 / 발주기관 / 공고번호 / 상태</span>
-              </div>
-              <div class="card-section-body">
-                <div class="input-row">
-                  <label>
-                    검색어
-                    <input
-                      type="text"
-                      id="searchInput"
-                      placeholder="예: KIST / 나라장터 / 2025-0001 / 준비"
-                      autocomplete="off"
-                    />
-                  </label>
-                </div>
-                <div class="btn-row">
-                  <button class="secondary" id="clearSearchBtn" type="button">
-                    <span class="dot"></span> 검색 초기화
-                  </button>
-                  <button class="ghost" id="filterDeadlineBtn" type="button">
-                    7일 이내 마감만 보기
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div class="table-shell mt-4" aria-label="공고 리스트 테이블">
-              <div class="table-header-row">
-                <div>공고명 · 발주기관</div>
-                <div>공고번호</div>
-                <div>마감일 · D-Day</div>
-                <div>추정금액</div>
-                <div>투찰가</div>
-                <div>상태</div>
-              </div>
-              <div class="table-body" id="bidTableBody">
-                <div class="no-data">
-                  등록된 공고가 없습니다.<br />
-                  아래 &lt;공고 입력·수정&gt;에서 첫 공고를 등록해주세요.
-                </div>
-              </div>
-            </div>
-
-            <div class="summary-row mt-4" id="listSummary">
-              <span>총 <strong>0</strong>건 · 준비 <strong>0</strong> · 검토중 <strong>0</strong> · 투찰완료 <strong>0</strong> · 유찰 <strong>0</strong></span>
-            </div>
-          </div>
-        </section>
-
-        <!-- 가운데: 공고 입력/수정 -->
-        <section class="card" aria-label="입찰 공고 입력 및 수정">
-          <div class="card-inner">
-            <div class="card-header">
-              <div>
-                <div class="card-title">
-                  <span class="icon">②</span>
-                  <span>공고 입력 · 수정</span>
-                </div>
-                <div class="card-subtitle">
-                  공고 정보를 저장하면 왼쪽 목록에 카드가 추가됩니다. (localStorage 저장)
-                </div>
-              </div>
-              <span class="pill-count" id="selectedBidLabel">선택: 없음</span>
-            </div>
-
-            <div class="card-section scroll-y" style="flex:1;">
-              <div class="card-section-header">
-                <strong>기본 정보</strong>
-                <span class="badge-soft">* 표시는 필수 항목</span>
-              </div>
-              <div class="card-section-body">
-                <div class="input-row">
-                  <label>
-                    공고명 <span class="req">*</span>
-                    <input
-                      type="text"
-                      id="titleInput"
-                      placeholder="예: 2025년 해외시장조사 용역 입찰"
-                      autocomplete="off"
-                    />
-                  </label>
-                </div>
-                <div class="input-pair mt-2">
-                  <label>
-                    발주기관 <span class="req">*</span>
-                    <input
-                      type="text"
-                      id="agencyInput"
-                      placeholder="예: 한국과학기술정보연구원(KISTI)"
-                      autocomplete="off"
-                    />
-                  </label>
-                  <label>
-                    공고번호
-                    <input
-                      type="text"
-                      id="numberInput"
-                      placeholder="예: 2025-0001-00"
-                      autocomplete="off"
-                    />
-                  </label>
-                </div>
-                <div class="input-pair mt-2">
-                  <label>
-                    마감일 <span class="req">*</span>
-                    <input
-                      type="date"
-                      id="deadlineInput"
-                    />
-                    <div class="hint">마감일을 기준으로 D-Day를 계산합니다.</div>
-                  </label>
-                  <label>
-                    상태 <span class="req">*</span>
-                    <select id="statusInput">
-                      <option value="준비">준비</option>
-                      <option value="검토중">검토중</option>
-                      <option value="투찰완료">투찰완료</option>
-                      <option value="유찰">유찰</option>
-                    </select>
-                    <div class="hint">현재 진행 상태를 선택합니다.</div>
-                  </label>
-                </div>
-
-                <div class="hard-divider"></div>
-
-                <div class="card-section-header">
-                  <strong>금액 정보 (선택)</strong>
-                  <span class="badge-soft">숫자만 입력 (단위: 원)</span>
-                </div>
-                <div class="card-section-body">
-                  <div class="input-3">
-                    <label>
-                      추정금액
-                      <input
-                        type="number"
-                        id="budgetInput"
-                        min="0"
-                        step="1000"
-                        placeholder="예: 80000000"
-                      />
-                      <div class="hint">발주기관 기준 추정금액.</div>
-                    </label>
-                    <label>
-                      투찰 예정가
-                      <input
-                        type="number"
-                        id="bidPriceInput"
-                        min="0"
-                        step="1000"
-                        placeholder="예: 71200000"
-                      />
-                      <div class="hint">우리 쪽에서 넣을 금액.</div>
-                    </label>
-                    <label>
-                      내부 목표 투찰률 (%)
-                      <input
-                        type="number"
-                        id="targetRateInput"
-                        min="0"
-                        max="120"
-                        step="0.01"
-                        placeholder="예: 89.00"
-                      />
-                      <div class="hint">예: 87.5 / 89.0 등.</div>
-                    </label>
-                  </div>
-                </div>
-
-                <div class="hard-divider"></div>
-
-                <div class="card-section-header">
-                  <strong>비고 · 메모</strong>
-                  <span class="badge-soft">입찰 전략, 필요 서류, 담당자 등</span>
-                </div>
-                <div class="card-section-body">
-                  <div class="input-row">
-                    <label>
-                      메모
-                      <textarea
-                        id="noteInput"
-                        placeholder="예: 시장조사 보고서 3권 포함 / 기술제안서 A양식 / 가격점수 비중 90% / 나라장터 투찰 예정 등"
-                      ></textarea>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="btn-row mt-4">
-              <button class="primary" id="saveBidBtn" type="button">
-                <span class="dot"></span> 공고 저장 / 업데이트
-              </button>
-              <button class="secondary" id="newBidBtn" type="button">
-                새 공고로 입력 초기화
-              </button>
-              <button class="danger" id="deleteBidBtn" type="button" disabled>
-                선택 공고 삭제
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- 오른쪽: 상세 & 시뮬레이션 -->
-        <section class="card" aria-label="상세 · 투찰 시뮬레이션">
-          <div class="card-inner">
-            <div class="card-header">
-              <div>
-                <div class="card-title">
-                  <span class="icon">③</span>
-                  <span>상세 보기 · 투찰 시뮬레이션</span>
-                </div>
-                <div class="card-subtitle" id="detailSubtitle">
-                  왼쪽에서 공고를 선택하면 여기에서 D-Day, 투찰률 등을 자동 계산합니다.
-                </div>
-              </div>
-              <span class="pill-count" id="detailStatusPill">선택: 없음</span>
-            </div>
-
-            <div class="card-section">
-              <div class="card-section-header">
-                <strong>선택한 공고</strong>
-                <span class="badge-soft mono" id="detailIdBadge">ID: -</span>
-              </div>
-              <div class="card-section-body" id="detailMain">
-                <div class="no-data">
-                  아직 선택된 공고가 없습니다.<br />
-                  목록에서 하나를 클릭하면 상세가 보입니다.
-                </div>
-              </div>
-            </div>
-
-            <div class="card-section mt-4">
-              <div class="card-section-header">
-                <strong>투찰 시뮬레이션</strong>
-                <span class="badge-soft">추정금액 / 투찰가 / 목표 투찰률 기준</span>
-              </div>
-              <div class="card-section-body">
-                <div class="sim-grid">
-                  <div>
-                    <div class="sim-output" id="simOutput">
-                      <div class="no-data">
-                        추정금액과 투찰가를 입력하면, 여기에서 투찰률과 차액을 보여줍니다.
-                      </div>
-                    </div>
-                    <div class="hint mt-2">
-                      * 추정금액이 0이거나 비어 있으면 투찰률 계산이 되지 않습니다.
-                    </div>
-                  </div>
-                  <div>
-                    <label>
-                      투찰률 직접 입력 (테스트용, 선택)
-                      <input
-                        type="number"
-                        id="manualRateInput"
-                        min="0"
-                        max="120"
-                        step="0.01"
-                        placeholder="예: 88.75"
-                      />
-                    </label>
-                    <div class="hint mt-2">
-                      이 칸은 별도 계산 없이, 단순히 감각 테스트용으로만 사용합니다.
-                    </div>
-                    <div class="sim-output mt-2" id="manualRateOutput">
-                      <div class="no-data">
-                        직접 입력한 투찰률을 간단히 표시합니다.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card-section mt-4">
-              <div class="card-section-header">
-                <strong>클립보드용 요약</strong>
-                <span class="badge-soft">메모장 / 메일 / 메신저에 바로 붙여넣기</span>
-              </div>
-              <div class="card-section-body">
-                <div class="flex-row">
-                  <button class="secondary" id="copySummaryBtn" type="button" disabled>
-                    공고 요약 복사 (텍스트)
-                  </button>
-                  <span class="hint" id="copyStateLabel">클립보드 상태: 대기</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+  <!-- 1+2 기본정보 + 품목 -->
+  <section class="grid">
+    <!-- 왼쪽: 기본 정보 -->
+    <div class="card">
+      <div class="card-header">
+        <h2>1. 기본 정보</h2>
+        <button id="fillExampleBtn" class="secondary">예시 넣기</button>
       </div>
-    </main>
 
-    <footer class="footer-bar">
-      <div class="footer-left">
-        <span class="dot-live"></span>
-        <span>localStorage · <span id="storageStateText">로드 시도 중…</span></span>
-        <span class="badge-soft">자동 저장: 공고 목록이 바뀔 때마다</span>
+      <label for="orgName">기관 / 발주처 *</label>
+      <input id="orgName" type="text" placeholder="예: KIST 세종 분원, KITECH, ○○공단" />
+
+      <label for="bidTitle">입찰 제목 / 안건명 *</label>
+      <input id="bidTitle" type="text" placeholder="예: 2026년 해외시장 보고서 구매 입찰" />
+
+      <div class="row">
+        <div>
+          <label for="bidDeadline">마감일 *</label>
+          <input id="bidDeadline" type="date" />
+        </div>
+        <div>
+          <label for="bidBudget">예산 (숫자)</label>
+          <input id="bidBudget" type="number" placeholder="예: 12000000" />
+        </div>
       </div>
-      <div class="footer-right">
-        <span class="kbd">클릭</span>
-        <span>목록에서 공고 선택 → 가운데에서 수정 → 오른쪽에서 시뮬레이션</span>
+
+      <div class="row">
+        <div>
+          <label for="bidType">입찰 유형</label>
+          <select id="bidType">
+            <option value="">선택 없음</option>
+            <option value="공개">공개</option>
+            <option value="지명">지명</option>
+            <option value="수의">수의</option>
+          </select>
+        </div>
+        <div>
+          <label for="bidStatus">진행 상태</label>
+          <select id="bidStatus">
+            <option value="준비중">준비중</option>
+            <option value="제출완료">제출완료</option>
+            <option value="낙찰">낙찰</option>
+            <option value="미선정">미선정</option>
+          </select>
+        </div>
       </div>
-    </footer>
-  </div>
 
-  <script>
-    (function () {
-      "use strict";
+      <label for="bidContact">담당자 / 연락처</label>
+      <input id="bidContact" type="text" placeholder="예: 홍길동 / 010-1234-5678 / email@domain" />
 
-      /**
-       * 안전한 JSON 파싱
-       * @param {string | null} str
-       * @param {any} fallback
-       * @returns {any}
-       */
-      function safeJsonParse(str, fallback) {
-        if (typeof str !== "string") return fallback;
-        try {
-          return JSON.parse(str);
-        } catch (_) {
-          return fallback;
-        }
+      <label for="bidNote">내부 메모</label>
+      <textarea id="bidNote" placeholder="예: 필수 제출 서류, 서식 번호, 특이 조건 등"></textarea>
+
+      <div class="btn-row">
+        <button id="saveCurrentBtn">현재 안건 저장</button>
+        <button id="clearCurrentBtn" class="secondary">입력 지우기</button>
+      </div>
+    </div>
+
+    <!-- 오른쪽: 품목 + 안건 목록 -->
+    <div class="card">
+      <div class="card-header">
+        <h2>2. 품목 / 보고서 목록</h2>
+        <span class="badge-small" id="itemSummaryBadge">품목 0개</span>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="itemName">품목 / 보고서 이름</label>
+          <input id="itemName" type="text" placeholder="예: 글라스 서브스트레이트 시장 보고서" />
+        </div>
+        <div>
+          <label for="itemCode">내부 코드</label>
+          <input id="itemCode" type="text" placeholder="예: WIC-GLASS-2026-01" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="itemQty">수량</label>
+          <input id="itemQty" type="number" placeholder="예: 1" />
+        </div>
+        <div>
+          <label for="itemPrice">단가 (선택)</label>
+          <input id="itemPrice" type="number" placeholder="예: 4800000" />
+        </div>
+      </div>
+
+      <label for="itemNote">비고</label>
+      <input id="itemNote" type="text" placeholder="예: PDF + 서적 세트, 옵션 포함 등" />
+
+      <div class="btn-row">
+        <button id="addItemBtn">품목 추가</button>
+        <button id="clearItemsBtn" class="secondary">품목 모두 지우기</button>
+      </div>
+
+      <div class="table-wrapper" style="margin-top:8px;">
+        <table>
+          <thead>
+          <tr>
+            <th style="width:36px;">#</th>
+            <th>품목</th>
+            <th style="width:70px;">수량</th>
+            <th style="width:90px;">단가</th>
+            <th style="width:70px;">관리</th>
+          </tr>
+          </thead>
+          <tbody id="itemsTableBody">
+          <tr><td colspan="5" style="color:#6b7280;">아직 품목이 없습니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 안건 목록 + 검색 -->
+  <section class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <h2>3. 저장된 입찰 안건</h2>
+        <button id="refreshListBtn" class="secondary">목록 새로고침</button>
+      </div>
+
+      <label for="searchKeyword">검색 (기관 / 제목 / 담당자)</label>
+      <input id="searchKeyword" type="text" placeholder="예: KIST, 글라스, 세종" />
+
+      <div class="btn-row">
+        <button id="searchBtn" class="secondary">검색</button>
+        <button id="resetSearchBtn" class="secondary">검색 지우기</button>
+      </div>
+
+      <div class="table-wrapper" style="margin-top:8px;">
+        <table>
+          <thead>
+          <tr>
+            <th style="width:40px;">선택</th>
+            <th>기관 / 제목</th>
+            <th style="width:80px;">마감일</th>
+            <th style="width:70px;">상태</th>
+          </tr>
+          </thead>
+          <tbody id="bidListBody">
+          <tr><td colspan="4" style="color:#6b7280;">저장된 안건이 없습니다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="btn-row" style="margin-top:8px;">
+        <button id="loadSelectedBtn">선택 안건 불러오기</button>
+        <button id="deleteSelectedBtn" class="danger">선택 안건 삭제</button>
+      </div>
+    </div>
+
+    <!-- 4. 로그 -->
+    <div class="card">
+      <div class="card-header">
+        <h2>4. 로그 · 상태 기록</h2>
+        <button id="clearLogsBtn" class="secondary">로그 지우기</button>
+      </div>
+      <div style="font-size:0.8rem;color:#9ca3af;">
+        ● 중요한 동작(저장, 삭제, 불러오기, 품목 추가 등)을 짧게 기록합니다.  
+        ● 문제 생기면 이 기록만 읽어도 최근 흐름을 떠올릴 수 있습니다.
+      </div>
+      <ul class="log-list" id="logList"></ul>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  const STORAGE_KEY = "wic_bid_tool_state_v1";
+
+  /** @type {{bids: any[], logs: string[]}} */
+  let state = {
+    bids: [],
+    logs: []
+  };
+
+  // 요소 찾기
+  const orgNameEl = document.getElementById("orgName");
+  const bidTitleEl = document.getElementById("bidTitle");
+  const bidDeadlineEl = document.getElementById("bidDeadline");
+  const bidBudgetEl = document.getElementById("bidBudget");
+  const bidTypeEl = document.getElementById("bidType");
+  const bidStatusEl = document.getElementById("bidStatus");
+  const bidContactEl = document.getElementById("bidContact");
+  const bidNoteEl = document.getElementById("bidNote");
+
+  const itemNameEl = document.getElementById("itemName");
+  const itemCodeEl = document.getElementById("itemCode");
+  const itemQtyEl = document.getElementById("itemQty");
+  const itemPriceEl = document.getElementById("itemPrice");
+  const itemNoteEl = document.getElementById("itemNote");
+  const itemsTableBody = document.getElementById("itemsTableBody");
+  const itemSummaryBadge = document.getElementById("itemSummaryBadge");
+
+  const summaryCountEl = document.getElementById("summaryCount");
+  const summaryTodayEl = document.getElementById("summaryToday");
+  const summaryLastOrgEl = document.getElementById("summaryLastOrg");
+  const summaryStatusDot = document.getElementById("summaryStatusDot");
+  const summaryStatusText = document.getElementById("summaryStatusText");
+
+  const bidListBody = document.getElementById("bidListBody");
+  const logListEl = document.getElementById("logList");
+
+  const saveCurrentBtn = document.getElementById("saveCurrentBtn");
+  const clearCurrentBtn = document.getElementById("clearCurrentBtn");
+  const addItemBtn = document.getElementById("addItemBtn");
+  const clearItemsBtn = document.getElementById("clearItemsBtn");
+  const refreshSummaryBtn = document.getElementById("refreshSummaryBtn");
+  const refreshListBtn = document.getElementById("refreshListBtn");
+  const fillExampleBtn = document.getElementById("fillExampleBtn");
+  const clearLogsBtn = document.getElementById("clearLogsBtn");
+  const searchKeywordEl = document.getElementById("searchKeyword");
+  const searchBtn = document.getElementById("searchBtn");
+  const resetSearchBtn = document.getElementById("resetSearchBtn");
+  const loadSelectedBtn = document.getElementById("loadSelectedBtn");
+  const deleteSelectedBtn = document.getElementById("deleteSelectedBtn");
+
+  function nowText() {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    return (
+      d.getFullYear() +
+      "-" +
+      pad(d.getMonth() + 1) +
+      "-" +
+      pad(d.getDate()) +
+      " " +
+      pad(d.getHours()) +
+      ":" +
+      pad(d.getMinutes())
+    );
+  }
+
+  function addLog(message) {
+    const line = "[" + nowText() + "] " + message;
+    state.logs.unshift(line);
+    // 100개까지만
+    if (state.logs.length > 100) state.logs = state.logs.slice(0, 100);
+    renderLogs();
+    saveState();
+  }
+
+  function saveState() {
+    try {
+      const toSave = JSON.stringify(state);
+      window.localStorage.setItem(STORAGE_KEY, toSave);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function loadState() {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.bids)) {
+        state.bids = parsed.bids;
       }
-
-      /**
-       * 숫자 포맷 (원 단위)
-       * @param {number | null | undefined} value
-       * @returns {string}
-       */
-      function formatWon(value) {
-        if (value === null || value === undefined || isNaN(value)) return "-";
-        try {
-          return value.toLocaleString("ko-KR") + "원";
-        } catch (_) {
-          return value + "원";
-        }
+      if (parsed && Array.isArray(parsed.logs)) {
+        state.logs = parsed.logs;
       }
-
-      /**
-       * 날짜 포맷 YYYY-MM-DD
-       * @param {string} value
-       * @returns {string}
-       */
-      function normalizeDate(value) {
-        if (!value) return "";
-        const date = new Date(value);
-        if (isNaN(date.getTime())) return "";
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return year + "-" + month + "-" + day;
-      }
-
-      /**
-       * D-Day 계산
-       * @param {string} dateStr (YYYY-MM-DD)
-       * @returns {{label: string, diff: number}}
-       */
-      function computeDDay(dateStr) {
-        if (!dateStr) return { label: "-", diff: NaN };
-        const target = new Date(dateStr + "T00:00:00");
-        if (isNaN(target.getTime())) return { label: "-", diff: NaN };
-        const today = new Date();
-        const todayMid = new Date(
-          today.getFullYear(),
-          today.getMonth(),
-          today.getDate()
-        );
-        const diffMs = target.getTime() - todayMid.getTime();
-        const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-        let label = "";
-        if (diffDays > 0) {
-          label = "D-" + diffDays;
-        } else if (diffDays === 0) {
-          label = "D-Day";
-        } else {
-          label = "D+" + Math.abs(diffDays);
-        }
-        return { label: label, diff: diffDays };
-      }
-
-      /**
-       * 투찰률 계산
-       * @param {number} budget
-       * @param {number} bidPrice
-       * @returns {number | null}
-       */
-      function computeRate(budget, bidPrice) {
-        if (!budget || isNaN(budget) || budget <= 0) return null;
-        if (!bidPrice || isNaN(bidPrice) || bidPrice <= 0) return null;
-        return (bidPrice / budget) * 100;
-      }
-
-      /**
-       * 상태 색상 클래스
-       * @param {string} status
-       * @returns {string}
-       */
-      function getStatusClass(status) {
-        switch (status) {
-          case "준비":
-            return "status-준비";
-          case "검토중":
-            return "status-검토중";
-          case "투찰완료":
-            return "status-투찰완료";
-          case "유찰":
-            return "status-유찰";
-          default:
-            return "";
-        }
-      }
-
-      /**
-       * 요약 문자열 생성 (클립보드용)
-       * @param {any} bid
-       * @returns {string}
-       */
-      function buildSummaryText(bid) {
-        var lines = [];
-        lines.push("[입찰 공고 요약]");
-        lines.push("공고명: " + (bid.title || "-"));
-        lines.push("발주기관: " + (bid.agency || "-"));
-        lines.push("공고번호: " + (bid.number || "-"));
-        lines.push("");
-        var deadline = bid.deadline || "";
-        var dInfo = computeDDay(deadline);
-        lines.push("마감일: " + (deadline || "-") + " (" + (dInfo.label || "-") + ")");
-        lines.push("상태: " + (bid.status || "-"));
-        lines.push("");
-        lines.push("추정금액: " + formatWon(bid.budget || null));
-        lines.push("투찰 예정가: " + formatWon(bid.bidPrice || null));
-        var rate = computeRate(bid.budget || 0, bid.bidPrice || 0);
-        if (rate !== null) {
-          lines.push("투찰률: " + rate.toFixed(2) + "%");
-        } else {
-          lines.push("투찰률: 계산 불가 (금액 정보 부족)");
-        }
-        if (typeof bid.targetRate === "number" && !isNaN(bid.targetRate)) {
-          lines.push("내부 목표 투찰률: " + bid.targetRate.toFixed(2) + "%");
-        }
-        lines.push("");
-        lines.push("메모: " + (bid.note || "-"));
-        return lines.join("\n");
-      }
-
-      // DOM 요소 캐시
-      var bidTableBody = document.getElementById("bidTableBody");
-      var bidCountBadge = document.getElementById("bidCountBadge");
-      var listSummary = document.getElementById("listSummary");
-      var selectedBidLabel = document.getElementById("selectedBidLabel");
-      var detailSubtitle = document.getElementById("detailSubtitle");
-      var detailStatusPill = document.getElementById("detailStatusPill");
-      var detailMain = document.getElementById("detailMain");
-      var detailIdBadge = document.getElementById("detailIdBadge");
-      var simOutput = document.getElementById("simOutput");
-      var manualRateInput = document.getElementById("manualRateInput");
-      var manualRateOutput = document.getElementById("manualRateOutput");
-      var copySummaryBtn = document.getElementById("copySummaryBtn");
-      var copyStateLabel = document.getElementById("copyStateLabel");
-      var storageStateText = document.getElementById("storageStateText");
-
-      var searchInput = document.getElementById("searchInput");
-      var clearSearchBtn = document.getElementById("clearSearchBtn");
-      var filterDeadlineBtn = document.getElementById("filterDeadlineBtn");
-
-      var titleInput = document.getElementById("titleInput");
-      var agencyInput = document.getElementById("agencyInput");
-      var numberInput = document.getElementById("numberInput");
-      var deadlineInput = document.getElementById("deadlineInput");
-      var statusInput = document.getElementById("statusInput");
-      var budgetInput = document.getElementById("budgetInput");
-      var bidPriceInput = document.getElementById("bidPriceInput");
-      var targetRateInput = document.getElementById("targetRateInput");
-      var noteInput = document.getElementById("noteInput");
-
-      var saveBidBtn = document.getElementById("saveBidBtn");
-      var newBidBtn = document.getElementById("newBidBtn");
-      var deleteBidBtn = document.getElementById("deleteBidBtn");
-
-      // 상태
-      var STATE_KEY = "wic_bid_tool_v1_bids";
-      var bids = [];
-      var selectedBidId = null;
-      var deadlineFilterActive = false;
-
-      /**
-       * localStorage에서 데이터 로드
-       */
-      function loadFromStorage() {
-        var raw = null;
-        try {
-          raw = window.localStorage.getItem(STATE_KEY);
-        } catch (e) {
-          raw = null;
-        }
-        var list = safeJsonParse(raw, []);
-        if (!Array.isArray(list)) {
-          bids = [];
-        } else {
-          bids = list.map(function (item) {
-            return {
-              id: item.id || generateId(),
-              title: item.title || "",
-              agency: item.agency || "",
-              number: item.number || "",
-              deadline: item.deadline || "",
-              status: item.status || "준비",
-              budget: typeof item.budget === "number" ? item.budget : null,
-              bidPrice: typeof item.bidPrice === "number" ? item.bidPrice : null,
-              targetRate:
-                typeof item.targetRate === "number" ? item.targetRate : null,
-              note: item.note || ""
-            };
-          });
-        }
-        storageStateText.textContent = "로드 완료";
-      }
-
-      /**
-       * localStorage에 저장
-       */
-      function saveToStorage() {
-        try {
-          var serialized = JSON.stringify(bids);
-          window.localStorage.setItem(STATE_KEY, serialized);
-          storageStateText.textContent = "저장 완료";
-        } catch (e) {
-          storageStateText.textContent = "저장 실패 (용량 또는 브라우저 제한)";
-        }
-      }
-
-      /**
-       * ID 생성
-       * @returns {string}
-       */
-      function generateId() {
-        return (
-          "bid_" +
-          Date.now().toString(36) +
-          "_" +
-          Math.random().toString(36).substring(2, 8)
-        );
-      }
-
-      /**
-       * 선택 해제
-       */
-      function clearSelection() {
-        selectedBidId = null;
-        selectedBidLabel.textContent = "선택: 없음";
-        detailStatusPill.textContent = "선택: 없음";
-        detailStatusPill.className = "pill-count";
-        detailIdBadge.textContent = "ID: -";
-        detailMain.innerHTML =
-          '<div class="no-data">아직 선택된 공고가 없습니다.<br />목록에서 하나를 클릭하면 상세가 보입니다.</div>';
-        simOutput.innerHTML =
-          '<div class="no-data">추정금액과 투찰가를 입력하면, 여기에서 투찰률과 차액을 보여줍니다.</div>';
-        manualRateInput.value = "";
-        manualRateOutput.innerHTML =
-          '<div class="no-data">직접 입력한 투찰률을 간단히 표시합니다.</div>';
-        copySummaryBtn.disabled = true;
-        deleteBidBtn.disabled = true;
-      }
-
-      /**
-       * 입력 폼 초기화
-       */
-      function resetFormForNewBid() {
-        titleInput.value = "";
-        agencyInput.value = "";
-        numberInput.value = "";
-        deadlineInput.value = "";
-        statusInput.value = "준비";
-        budgetInput.value = "";
-        bidPriceInput.value = "";
-        targetRateInput.value = "";
-        noteInput.value = "";
-        clearSelection();
-      }
-
-      /**
-       * 입력값 가져오기
-       * @returns {{ok: boolean, error?: string, data?: any}}
-       */
-      function collectFormData() {
-        var title = (titleInput.value || "").trim();
-        var agency = (agencyInput.value || "").trim();
-        var number = (numberInput.value || "").trim();
-        var deadlineRaw = (deadlineInput.value || "").trim();
-        var status = statusInput.value || "준비";
-        var deadline = normalizeDate(deadlineRaw);
-
-        if (!title) {
-          return { ok: false, error: "공고명을 입력해주세요." };
-        }
-        if (!agency) {
-          return { ok: false, error: "발주기관을 입력해주세요." };
-        }
-        if (!deadline) {
-          return { ok: false, error: "마감일을 올바르게 선택해주세요." };
-        }
-
-        var budget = null;
-        var bidPrice = null;
-        var targetRate = null;
-
-        var budgetStr = (budgetInput.value || "").trim();
-        var bidPriceStr = (bidPriceInput.value || "").trim();
-        var targetRateStr = (targetRateInput.value || "").trim();
-
-        if (budgetStr) {
-          var b = Number(budgetStr);
-          if (!isNaN(b) && b >= 0) {
-            budget = b;
-          }
-        }
-
-        if (bidPriceStr) {
-          var bp = Number(bidPriceStr);
-          if (!isNaN(bp) && bp >= 0) {
-            bidPrice = bp;
-          }
-        }
-
-        if (targetRateStr) {
-          var tr = Number(targetRateStr);
-          if (!isNaN(tr) && tr >= 0 && tr <= 120) {
-            targetRate = tr;
-          }
-        }
-
-        var note = (noteInput.value || "").trim();
-
-        return {
-          ok: true,
-          data: {
-            title: title,
-            agency: agency,
-            number: number,
-            deadline: deadline,
-            status: status,
-            budget: budget,
-            bidPrice: bidPrice,
-            targetRate: targetRate,
-            note: note
-          }
-        };
-      }
-
-      /**
-       * 공고 저장 또는 업데이트
-       */
-      function handleSaveBid() {
-        var result = collectFormData();
-        if (!result.ok) {
-          window.alert(result.error || "입력값을 확인해주세요.");
-          return;
-        }
-        var data = result.data;
-
-        if (selectedBidId) {
-          // 업데이트
-          var updated = false;
-          bids = bids.map(function (item) {
-            if (item.id === selectedBidId) {
-              updated = true;
-              return Object.assign({}, item, data);
-            }
-            return item;
-          });
-          if (!updated) {
-            // 선택된 ID가 리스트에 없는 경우, 새로 추가
-            var newId = generateId();
-            bids.push(Object.assign({ id: newId }, data));
-            selectedBidId = newId;
-          }
-        } else {
-          // 새로 추가
-          var id = generateId();
-          bids.push(Object.assign({ id: id }, data));
-          selectedBidId = id;
-        }
-
-        saveToStorage();
-        renderAll();
-        focusSelectedRow();
-      }
-
-      /**
-       * 선택된 공고 삭제
-       */
-      function handleDeleteBid() {
-        if (!selectedBidId) return;
-        var ok = window.confirm("선택한 공고를 삭제하시겠습니까?");
-        if (!ok) return;
-        bids = bids.filter(function (item) {
-          return item.id !== selectedBidId;
-        });
-        saveToStorage();
-        selectedBidId = null;
-        renderAll();
-        clearSelection();
-      }
-
-      /**
-       * 목록 렌더
-       */
-      function renderList() {
-        var searchText = (searchInput.value || "").trim().toLowerCase();
-        var hasSearch = searchText.length > 0;
-
-        var filtered = bids.slice();
-
-        // 검색 필터
-        if (hasSearch) {
-          filtered = filtered.filter(function (bid) {
-            var combined =
-              (bid.title || "") +
-              " " +
-              (bid.agency || "") +
-              " " +
-              (bid.number || "") +
-              " " +
-              (bid.status || "");
-            return combined.toLowerCase().indexOf(searchText) !== -1;
-          });
-        }
-
-        // 마감일 필터 (7일 이내)
-        if (deadlineFilterActive) {
-          filtered = filtered.filter(function (bid) {
-            var d = computeDDay(bid.deadline || "");
-            if (isNaN(d.diff)) return false;
-            return d.diff <= 7;
-          });
-        }
-
-        bidTableBody.innerHTML = "";
-
-        if (filtered.length === 0) {
-          var noDiv = document.createElement("div");
-          noDiv.className = "no-data";
-          if (bids.length === 0) {
-            noDiv.innerHTML =
-              "등록된 공고가 없습니다.<br />아래 &lt;공고 입력·수정&gt;에서 첫 공고를 등록해주세요.";
-          } else {
-            noDiv.innerHTML =
-              "조건에 맞는 공고가 없습니다.<br />검색어와 필터를 다시 확인해주세요.";
-          }
-          bidTableBody.appendChild(noDiv);
-        } else {
-          filtered.forEach(function (bid) {
-            var row = document.createElement("div");
-            row.className = "table-row";
-            row.dataset.id = bid.id;
-
-            if (bid.id === selectedBidId) {
-              row.classList.add("selected");
-            }
-
-            var deadlineInfo = computeDDay(bid.deadline || "");
-            var budget = bid.budget || null;
-            var bidPrice = bid.bidPrice || null;
-            var rate = computeRate(budget, bidPrice);
-
-            var cell1 = document.createElement("div");
-            cell1.className = "cell-main";
-            var titleDiv = document.createElement("div");
-            titleDiv.className = "cell-main-title";
-            titleDiv.textContent = bid.title || "-";
-            var subDiv = document.createElement("div");
-            subDiv.className = "cell-main-sub";
-            subDiv.textContent = bid.agency || "-";
-            cell1.appendChild(titleDiv);
-            cell1.appendChild(subDiv);
-
-            var cell2 = document.createElement("div");
-            cell2.className = "mono";
-            cell2.textContent = bid.number || "-";
-
-            var cell3 = document.createElement("div");
-            cell3.className = "cell-main";
-            var d1 = document.createElement("div");
-            d1.className = "cell-main-title";
-            d1.textContent = bid.deadline || "-";
-            var d2 = document.createElement("div");
-            d2.className = "cell-main-sub";
-            d2.textContent = deadlineInfo.label || "-";
-            cell3.appendChild(d1);
-            cell3.appendChild(d2);
-
-            var cell4 = document.createElement("div");
-            cell4.textContent = formatWon(budget);
-
-            var cell5 = document.createElement("div");
-            if (rate !== null) {
-              cell5.innerHTML =
-                '<div class="cell-main-title">' +
-                formatWon(bidPrice) +
-                '</div><div class="cell-main-sub">' +
-                rate.toFixed(2) +
-                "%</div>";
-            } else {
-              cell5.textContent = formatWon(bidPrice);
-            }
-
-            var cell6 = document.createElement("div");
-            var statusSpan = document.createElement("div");
-            statusSpan.className = "status-pill " + getStatusClass(bid.status);
-            statusSpan.textContent = bid.status || "-";
-            cell6.appendChild(statusSpan);
-
-            row.appendChild(cell1);
-            row.appendChild(cell2);
-            row.appendChild(cell3);
-            row.appendChild(cell4);
-            row.appendChild(cell5);
-            row.appendChild(cell6);
-
-            row.addEventListener("click", function () {
-              selectBid(bid.id);
-            });
-
-            bidTableBody.appendChild(row);
-          });
-        }
-
-        bidCountBadge.textContent = "공고 " + bids.length + "건";
-
-        var counts = {
-          준비: 0,
-          검토중: 0,
-          투찰완료: 0,
-          유찰: 0
-        };
-        bids.forEach(function (bid) {
-          if (counts.hasOwnProperty(bid.status)) {
-            counts[bid.status] += 1;
-          }
-        });
-
-        listSummary.innerHTML =
-          '<span>총 <strong>' +
-          bids.length +
-          "</strong>건 · 준비 <strong>" +
-          counts["준비"] +
-          "</strong> · 검토중 <strong>" +
-          counts["검토중"] +
-          "</strong> · 투찰완료 <strong>" +
-          counts["투찰완료"] +
-          "</strong> · 유찰 <strong>" +
-          counts["유찰"] +
-          "</strong></span>";
-      }
-
-      /**
-       * 시뮬레이션 영역 렌더
-       * @param {any | null} bid
-       */
-      function renderSimulation(bid) {
-        if (!bid) {
-          simOutput.innerHTML =
-            '<div class="no-data">추정금액과 투찰가를 입력하면, 여기에서 투찰률과 차액을 보여줍니다.</div>';
-          return;
-        }
-        var budget = bid.budget || null;
-        var bidPrice = bid.bidPrice || null;
-        var targetRate = bid.targetRate || null;
-        var rate = computeRate(budget || 0, bidPrice || 0);
-        var diff = null;
-        if (
-          budget !== null &&
-          budget !== undefined &&
-          bidPrice !== null &&
-          bidPrice !== undefined
-        ) {
-          diff = (budget || 0) - (bidPrice || 0);
-        }
-
-        var html = "";
-
-        html += '<div class="sim-line">';
-        html += '<div class="sim-label">추정금액</div>';
-        html +=
-          '<div class="sim-value mono">' + formatWon(budget) + "</div>";
-        html += "</div>";
-
-        html += '<div class="sim-line">';
-        html += '<div class="sim-label">투찰 예정가</div>';
-        html +=
-          '<div class="sim-value mono">' + formatWon(bidPrice) + "</div>";
-        html += "</div>";
-
-        html += '<div class="sim-line">';
-        html += '<div class="sim-label">투찰률</div>';
-        if (rate !== null) {
-          html +=
-            '<div class="sim-value sim-highlight mono">' +
-            rate.toFixed(2) +
-            "%</div>";
-        } else {
-          html +=
-            '<div class="sim-value sim-warning">계산 불가 (금액 정보 부족)</div>';
-        }
-        html += "</div>";
-
-        if (diff !== null) {
-          html += '<div class="sim-line">';
-          html += '<div class="sim-label">추정금액 - 투찰가 (차액)</div>';
-          var diffClass =
-            diff > 0 ? "sim-ok" : diff < 0 ? "sim-danger" : "sim-highlight";
-          html +=
-            '<div class="sim-value mono ' +
-            diffClass +
-            '">' +
-            formatWon(diff) +
-            "</div>";
-          html += "</div>";
-        }
-
-        if (targetRate !== null && !isNaN(targetRate)) {
-          html += '<div class="sim-line">';
-          html += '<div class="sim-label">내부 목표 투찰률</div>';
-          html +=
-            '<div class="sim-value mono">' +
-            targetRate.toFixed(2) +
-            "%</div>";
-          html += "</div>";
-
-          if (rate !== null) {
-            var gap = rate - targetRate;
-            html += '<div class="sim-line">';
-            html += '<div class="sim-label">실제 - 목표 (투찰률 차이)</div>';
-            var gapClass =
-              Math.abs(gap) <= 0.3
-                ? "sim-ok"
-                : Math.abs(gap) <= 1.0
-                ? "sim-highlight"
-                : "sim-warning";
-            html +=
-              '<div class="sim-value mono ' +
-              gapClass +
-              '">' +
-              gap.toFixed(2) +
-              "%</div>";
-            html += "</div>";
-          }
-        }
-
-        simOutput.innerHTML = html;
-      }
-
-      /**
-       * 수동 투찰률 출력
-       */
-      function renderManualRateOutput() {
-        var valStr = (manualRateInput.value || "").trim();
-        if (!valStr) {
-          manualRateOutput.innerHTML =
-            '<div class="no-data">직접 입력한 투찰률을 간단히 표시합니다.</div>';
-          return;
-        }
-        var val = Number(valStr);
-        if (isNaN(val)) {
-          manualRateOutput.innerHTML =
-            '<div class="sim-danger">숫자만 입력해주세요.</div>';
-          return;
-        }
-        var msgClass =
-          val >= 80 && val <= 95
-            ? "sim-ok"
-            : val < 80
-            ? "sim-warning"
-            : "sim-danger";
-        manualRateOutput.innerHTML =
-          '<div class="' +
-          msgClass +
-          '">직접 입력한 투찰률: ' +
-          val.toFixed(2) +
-          "%</div>";
-      }
-
-      /**
-       * 상세 영역 렌더
-       * @param {any | null} bid
-       */
-      function renderDetail(bid) {
-        if (!bid) {
-          detailMain.innerHTML =
-            '<div class="no-data">아직 선택된 공고가 없습니다.<br />목록에서 하나를 클릭하면 상세가 보입니다.</div>';
-          detailSubtitle.textContent =
-            "왼쪽에서 공고를 선택하면 여기에서 D-Day, 투찰률 등을 자동 계산합니다.";
-          detailIdBadge.textContent = "ID: -";
-          detailStatusPill.textContent = "선택: 없음";
-          detailStatusPill.className = "pill-count";
-          copySummaryBtn.disabled = true;
-          deleteBidBtn.disabled = true;
-          renderSimulation(null);
-          return;
-        }
-
-        detailIdBadge.textContent = "ID: " + (bid.id || "-");
-        selectedBidLabel.textContent =
-          "선택: " + (bid.title || "").substring(0, 24) + (bid.title.length > 24 ? "…" : "");
-        detailStatusPill.textContent = bid.status || "-";
-        detailStatusPill.className =
-          "pill-count " + (getStatusClass(bid.status) || "");
-
-        var dInfo = computeDDay(bid.deadline || "");
-        var rate = computeRate(bid.budget || 0, bid.bidPrice || 0);
-
-        var html = "";
-        html += '<div class="summary-row">';
-        html +=
-          '<span class="badge">공고명</span> <span>' +
-          (bid.title || "-") +
-          "</span>";
-        html += "</div>";
-
-        html += '<div class="summary-row mt-2">';
-        html +=
-          '<span class="badge-soft">발주기관</span> <span>' +
-          (bid.agency || "-") +
-          "</span>";
-        html +=
-          '<span class="badge-soft">공고번호</span> <span class="mono">' +
-          (bid.number || "-") +
-          "</span>";
-        html += "</div>";
-
-        html += '<div class="summary-row mt-2">';
-        html +=
-          '<span class="badge-soft">마감일</span> <span>' +
-          (bid.deadline || "-") +
-          "</span>";
-        html +=
-          '<span class="badge-soft">D-Day</span> <span>' +
-          (dInfo.label || "-") +
-          "</span>";
-        html += "</div>";
-
-        html += '<div class="summary-row mt-2">';
-        html +=
-          '<span class="badge-soft">추정금액</span> <span class="mono">' +
-          formatWon(bid.budget || null) +
-          "</span>";
-        html +=
-          '<span class="badge-soft">투찰 예정가</span> <span class="mono">' +
-          formatWon(bid.bidPrice || null) +
-          "</span>";
-        if (rate !== null) {
-          html +=
-            '<span class="badge-soft">투찰률</span> <span class="mono">' +
-            rate.toFixed(2) +
-            "%</span>";
-        }
-        html += "</div>";
-
-        html += '<div class="summary-row mt-2">';
-        html +=
-          '<span class="badge-soft">내부 목표 투찰률</span> <span class="mono">' +
-          (typeof bid.targetRate === "number" && !isNaN(bid.targetRate)
-            ? bid.targetRate.toFixed(2) + "%"
-            : "-") +
-          "</span>";
-        html += "</div>";
-
-        html += '<div class="summary-row mt-2">';
-        html += '<span class="badge-soft">메모</span>';
-        html +=
-          '<span style="white-space:pre-wrap;word-break:keep-all;">' +
-          (bid.note || "-") +
-          "</span>";
-        html += "</div>";
-
-        detailMain.innerHTML = html;
-        detailSubtitle.textContent =
-          "선택한 공고의 기본 정보와 금액 정보를 한 번에 확인할 수 있습니다.";
-
-        copySummaryBtn.disabled = false;
-        deleteBidBtn.disabled = false;
-
-        renderSimulation(bid);
-      }
-
-      /**
-       * 전체 렌더
-       */
-      function renderAll() {
-        renderList();
-        if (selectedBidId) {
-          var current = bids.find(function (item) {
-            return item.id === selectedBidId;
-          });
-          renderDetail(current || null);
-        } else {
-          renderDetail(null);
-        }
-      }
-
-      /**
-       * 공고 선택
-       * @param {string} id
-       */
-      function selectBid(id) {
-        selectedBidId = id;
-        var bid = bids.find(function (item) {
-          return item.id === id;
-        });
-        if (!bid) {
-          clearSelection();
-          return;
-        }
-
-        // 폼에 넣기
-        titleInput.value = bid.title || "";
-        agencyInput.value = bid.agency || "";
-        numberInput.value = bid.number || "";
-        deadlineInput.value = bid.deadline || "";
-        statusInput.value = bid.status || "준비";
-        budgetInput.value =
-          typeof bid.budget === "number" && !isNaN(bid.budget)
-            ? String(bid.budget)
-            : "";
-        bidPriceInput.value =
-          typeof bid.bidPrice === "number" && !isNaN(bid.bidPrice)
-            ? String(bid.bidPrice)
-            : "";
-        targetRateInput.value =
-          typeof bid.targetRate === "number" && !isNaN(bid.targetRate)
-            ? String(bid.targetRate)
-            : "";
-        noteInput.value = bid.note || "";
-
-        renderAll();
-      }
-
-      /**
-       * 선택된 행으로 스크롤 포커스
-       */
-      function focusSelectedRow() {
-        if (!selectedBidId) return;
-        var rows = bidTableBody.querySelectorAll(".table-row");
-        var targetRow = null;
-        rows.forEach(function (row) {
-          if (row.dataset.id === selectedBidId) {
-            targetRow = row;
-          }
-        });
-        if (targetRow && typeof targetRow.scrollIntoView === "function") {
-          targetRow.scrollIntoView({ block: "nearest", behavior: "smooth" });
-        }
-      }
-
-      /**
-       * 클립보드 복사
-       */
-      function handleCopySummary() {
-        if (!selectedBidId) return;
-        var bid = bids.find(function (item) {
-          return item.id === selectedBidId;
-        });
-        if (!bid) return;
-        var text = buildSummaryText(bid);
-
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard
-            .writeText(text)
-            .then(function () {
-              copyStateLabel.textContent = "클립보드 상태: 복사 완료";
-              window.setTimeout(function () {
-                copyStateLabel.textContent = "클립보드 상태: 대기";
-              }, 2000);
-            })
-            .catch(function () {
-              copyStateLabel.textContent = "클립보드 상태: 실패 (브라우저 제한)";
-            });
-        } else {
-          // 구형 브라우저용
-          var textarea = document.createElement("textarea");
-          textarea.style.position = "fixed";
-          textarea.style.opacity = "0";
-          textarea.value = text;
-          document.body.appendChild(textarea);
-          textarea.select();
-          try {
-            var ok = document.execCommand("copy");
-            copyStateLabel.textContent = ok
-              ? "클립보드 상태: 복사 완료"
-              : "클립보드 상태: 실패 (브라우저 제한)";
-          } catch (e) {
-            copyStateLabel.textContent = "클립보드 상태: 실패 (브라우저 제한)";
-          }
-          document.body.removeChild(textarea);
-          window.setTimeout(function () {
-            copyStateLabel.textContent = "클립보드 상태: 대기";
-          }, 2000);
-        }
-      }
-
-      /**
-       * 필터 버튼 토글 표현
-       */
-      function updateFilterButtonState() {
-        if (deadlineFilterActive) {
-          filterDeadlineBtn.style.borderColor = "rgba(56, 189, 248, 0.9)";
-          filterDeadlineBtn.style.boxShadow =
-            "0 0 0 1px rgba(56, 189, 248, 0.6)";
-          filterDeadlineBtn.textContent = "전체 다시 보기";
-        } else {
-          filterDeadlineBtn.style.borderColor =
-            "rgba(148, 163, 184, 0.7)";
-          filterDeadlineBtn.style.boxShadow = "none";
-          filterDeadlineBtn.textContent = "7일 이내 마감만 보기";
-        }
-      }
-
-      /**
-       * 초기화
-       */
-      function init() {
-        loadFromStorage();
-        clearSelection();
-        renderAll();
-        updateFilterButtonState();
-
-        // 이벤트 바인딩
-        saveBidBtn.addEventListener("click", handleSaveBid);
-        newBidBtn.addEventListener("click", function () {
-          resetFormForNewBid();
-        });
-        deleteBidBtn.addEventListener("click", handleDeleteBid);
-
-        searchInput.addEventListener("input", function () {
-          renderList();
-        });
-        clearSearchBtn.addEventListener("click", function () {
-          searchInput.value = "";
-          renderList();
-        });
-
-        filterDeadlineBtn.addEventListener("click", function () {
-          deadlineFilterActive = !deadlineFilterActive;
-          updateFilterButtonState();
-          renderList();
-        });
-
-        manualRateInput.addEventListener("input", renderManualRateOutput);
-
-        copySummaryBtn.addEventListener("click", handleCopySummary);
-      }
-
-      // DOMContentLoaded 후 실행
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function currentItemListFromForm() {
+    const current = window.__currentItems || [];
+    return current;
+  }
+
+  function setCurrentItemList(list) {
+    window.__currentItems = Array.isArray(list) ? list : [];
+    renderItemsTable();
+  }
+
+  function renderLogs() {
+    logListEl.innerHTML = "";
+    if (state.logs.length === 0) {
+      const li = document.createElement("li");
+      li.textContent = "기록이 아직 없습니다.";
+      li.style.color = "#6b7280";
+      logListEl.appendChild(li);
+      return;
+    }
+    state.logs.forEach((line) => {
+      const li = document.createElement("li");
+      li.textContent = line;
+      logListEl.appendChild(li);
+    });
+  }
+
+  function renderItemsTable() {
+    const items = currentItemListFromForm();
+    itemsTableBody.innerHTML = "";
+    if (items.length === 0) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 5;
+      td.style.color = "#6b7280";
+      td.textContent = "아직 품목이 없습니다.";
+      tr.appendChild(td);
+      itemsTableBody.appendChild(tr);
+      itemSummaryBadge.textContent = "품목 0개";
+      return;
+    }
+    items.forEach((item, idx) => {
+      const tr = document.createElement("tr");
+
+      const tdIndex = document.createElement("td");
+      tdIndex.textContent = String(idx + 1);
+      tr.appendChild(tdIndex);
+
+      const tdName = document.createElement("td");
+      tdName.innerHTML =
+        "<strong>" +
+        (item.name || "-") +
+        "</strong><br/><span style='color:#9ca3af;font-size:0.7rem;'>" +
+        (item.code || "") +
+        "</span>";
+      tr.appendChild(tdName);
+
+      const tdQty = document.createElement("td");
+      tdQty.textContent = item.qty ? String(item.qty) : "-";
+      tr.appendChild(tdQty);
+
+      const tdPrice = document.createElement("td");
+      tdPrice.textContent = item.price ? String(item.price) : "-";
+      tr.appendChild(tdPrice);
+
+      const tdActions = document.createElement("td");
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "삭제";
+      delBtn.className = "danger";
+      delBtn.style.fontSize = "0.7rem";
+      delBtn.onclick = () => {
+        const list = currentItemListFromForm();
+        list.splice(idx, 1);
+        setCurrentItemList(list);
+        addLog("품목 삭제: " + (item.name || "-"));
+      };
+      tdActions.appendChild(delBtn);
+      tr.appendChild(tdActions);
+
+      itemsTableBody.appendChild(tr);
+    });
+    itemSummaryBadge.textContent = "품목 " + items.length + "개";
+  }
+
+  function renderBidList(filtered) {
+    const list = filtered || state.bids;
+    bidListBody.innerHTML = "";
+    if (list.length === 0) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 4;
+      td.style.color = "#6b7280";
+      td.textContent = "저장된 안건이 없습니다.";
+      tr.appendChild(td);
+      bidListBody.appendChild(tr);
+      return;
+    }
+
+    list.forEach((bid) => {
+      const tr = document.createElement("tr");
+
+      const tdRadio = document.createElement("td");
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = "bidSelected";
+      input.value = bid.id;
+      tdRadio.appendChild(input);
+      tr.appendChild(tdRadio);
+
+      const tdInfo = document.createElement("td");
+      tdInfo.innerHTML =
+        "<strong>" +
+        (bid.orgName || "-") +
+        "</strong><br/><span style='color:#9ca3af;font-size:0.7rem;'>" +
+        (bid.bidTitle || "-") +
+        "</span>";
+      tr.appendChild(tdInfo);
+
+      const tdDeadline = document.createElement("td");
+      tdDeadline.textContent = bid.bidDeadline || "-";
+      tr.appendChild(tdDeadline);
+
+      const tdStatus = document.createElement("td");
+      tdStatus.textContent = bid.bidStatus || "-";
+      tr.appendChild(tdStatus);
+
+      bidListBody.appendChild(tr);
+    });
+  }
+
+  function renderSummary() {
+    const total = state.bids.length;
+    summaryCountEl.textContent = String(total);
+
+    const today = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    const todayStr =
+      today.getFullYear() +
+      "-" +
+      pad(today.getMonth() + 1) +
+      "-" +
+      pad(today.getDate());
+
+    const todayCount = state.bids.filter(
+      (b) => b.bidDeadline === todayStr
+    ).length;
+    summaryTodayEl.textContent = String(todayCount);
+
+    if (total === 0) {
+      summaryLastOrgEl.textContent = "-";
+    } else {
+      const last = state.bids[state.bids.length - 1];
+      summaryLastOrgEl.textContent = last.orgName || "-";
+    }
+
+    summaryStatusDot.className = "status-dot";
+    summaryStatusText.textContent = "정상";
+  }
+
+  function getCurrentBidFromForm() {
+    const items = currentItemListFromForm();
+    return {
+      id: window.__currentBidId || null,
+      orgName: orgNameEl.value.trim(),
+      bidTitle: bidTitleEl.value.trim(),
+      bidDeadline: bidDeadlineEl.value,
+      bidBudget: bidBudgetEl.value ? Number(bidBudgetEl.value) : null,
+      bidType: bidTypeEl.value,
+      bidStatus: bidStatusEl.value || "준비중",
+      bidContact: bidContactEl.value.trim(),
+      bidNote: bidNoteEl.value.trim(),
+      items,
+      updatedAt: nowText()
+    };
+  }
+
+  function setFormFromBid(bid) {
+    window.__currentBidId = bid.id || null;
+    orgNameEl.value = bid.orgName || "";
+    bidTitleEl.value = bid.bidTitle || "";
+    bidDeadlineEl.value = bid.bidDeadline || "";
+    bidBudgetEl.value = bid.bidBudget != null ? String(bid.bidBudget) : "";
+    bidTypeEl.value = bid.bidType || "";
+    bidStatusEl.value = bid.bidStatus || "준비중";
+    bidContactEl.value = bid.bidContact || "";
+    bidNoteEl.value = bid.bidNote || "";
+    setCurrentItemList(bid.items || []);
+  }
+
+  function clearForm() {
+    window.__currentBidId = null;
+    orgNameEl.value = "";
+    bidTitleEl.value = "";
+    bidDeadlineEl.value = "";
+    bidBudgetEl.value = "";
+    bidTypeEl.value = "";
+    bidStatusEl.value = "준비중";
+    bidContactEl.value = "";
+    bidNoteEl.value = "";
+    setCurrentItemList([]);
+  }
+
+  // 이벤트 연결
+  addItemBtn.addEventListener("click", function () {
+    const name = itemNameEl.value.trim();
+    const code = itemCodeEl.value.trim();
+    const qty = itemQtyEl.value ? Number(itemQtyEl.value) : null;
+    const price = itemPriceEl.value ? Number(itemPriceEl.value) : null;
+    const note = itemNoteEl.value.trim();
+
+    if (!name) {
+      alert("품목 이름을 입력해 주세요.");
+      return;
+    }
+    const list = currentItemListFromForm();
+    list.push({ name, code, qty, price, note });
+    setCurrentItemList(list);
+    itemNameEl.value = "";
+    itemCodeEl.value = "";
+    itemQtyEl.value = "";
+    itemPriceEl.value = "";
+    itemNoteEl.value = "";
+    addLog("품목 추가: " + name);
+  });
+
+  clearItemsBtn.addEventListener("click", function () {
+    if (!confirm("현재 품목을 모두 지울까요?")) return;
+    setCurrentItemList([]);
+    addLog("품목 모두 삭제");
+  });
+
+  saveCurrentBtn.addEventListener("click", function () {
+    const bid = getCurrentBidFromForm();
+    if (!bid.orgName || !bid.bidTitle || !bid.bidDeadline) {
+      alert("기관, 제목, 마감일은 필수입니다.");
+      return;
+    }
+
+    if (!bid.id) {
+      bid.id = "bid_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+      state.bids.push(bid);
+      window.__currentBidId = bid.id;
+      addLog("새 입찰 안건 저장: " + bid.orgName + " / " + bid.bidTitle);
+    } else {
+      const idx = state.bids.findIndex((b) => b.id === bid.id);
+      if (idx >= 0) {
+        state.bids[idx] = bid;
+        addLog("입찰 안건 수정: " + bid.orgName + " / " + bid.bidTitle);
       } else {
-        init();
+        state.bids.push(bid);
+        addLog("입찰 안건 저장(새로): " + bid.orgName + " / " + bid.bidTitle);
       }
-    })();
-  </script>
+    }
+
+    saveState();
+    renderBidList();
+    renderSummary();
+  });
+
+  clearCurrentBtn.addEventListener("click", function () {
+    if (!confirm("현재 입력을 모두 지울까요?")) return;
+    clearForm();
+    addLog("입력 초기화");
+  });
+
+  refreshSummaryBtn.addEventListener("click", function () {
+    renderSummary();
+    addLog("요약 상태 새로고침");
+  });
+
+  refreshListBtn.addEventListener("click", function () {
+    renderBidList();
+    addLog("입찰 안건 목록 새로고침");
+  });
+
+  fillExampleBtn.addEventListener("click", function () {
+    orgNameEl.value = "KIST 세종 분원";
+    bidTitleEl.value = "2026년 해외 시장·기술 보고서 구매 입찰";
+    const today = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    const d = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    bidDeadlineEl.value =
+      d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+    bidBudgetEl.value = "12000000";
+    bidTypeEl.value = "공개";
+    bidStatusEl.value = "준비중";
+    bidContactEl.value = "홍길동 / 010-1234-5678 / user@example.com";
+    bidNoteEl.value = "서식 ○○번, 필수 첨부: 사업자등록증, 실적증명 등";
+
+    setCurrentItemList([
+      {
+        name: "글라스 서브스트레이트 시장 보고서 2026",
+        code: "WIC-GLASS-2026-01",
+        qty: 1,
+        price: 4800000,
+        note: "서적 + PDF 세트"
+      },
+      {
+        name: "반도체 패키징 재료 시장 보고서",
+        code: "WIC-PKG-2026-02",
+        qty: 1,
+        price: 5200000,
+        note: "PDF 단독"
+      }
+    ]);
+
+    addLog("예시 데이터 입력");
+  });
+
+  clearLogsBtn.addEventListener("click", function () {
+    if (!confirm("로그를 모두 지울까요?")) return;
+    state.logs = [];
+    renderLogs();
+    saveState();
+  });
+
+  searchBtn.addEventListener("click", function () {
+    const kw = searchKeywordEl.value.trim().toLowerCase();
+    if (!kw) {
+      renderBidList();
+      return;
+    }
+    const filtered = state.bids.filter((b) => {
+      const org = (b.orgName || "").toLowerCase();
+      const title = (b.bidTitle || "").toLowerCase();
+      const contact = (b.bidContact || "").toLowerCase();
+      return (
+        org.includes(kw) || title.includes(kw) || contact.includes(kw)
+      );
+    });
+    renderBidList(filtered);
+    addLog("검색 실행: " + kw);
+  });
+
+  resetSearchBtn.addEventListener("click", function () {
+    searchKeywordEl.value = "";
+    renderBidList();
+    addLog("검색 초기화");
+  });
+
+  loadSelectedBtn.addEventListener("click", function () {
+    const checked = document.querySelector(
+      'input[name="bidSelected"]:checked'
+    );
+    if (!checked) {
+      alert("불러올 안건을 선택해 주세요.");
+      return;
+    }
+    const id = checked.value;
+    const bid = state.bids.find((b) => b.id === id);
+    if (!bid) return;
+    setFormFromBid(bid);
+    addLog("입찰 안건 불러오기: " + (bid.orgName || "-"));
+  });
+
+  deleteSelectedBtn.addEventListener("click", function () {
+    const checked = document.querySelector(
+      'input[name="bidSelected"]:checked'
+    );
+    if (!checked) {
+      alert("삭제할 안건을 선택해 주세요.");
+      return;
+    }
+    if (!confirm("선택한 안건을 삭제할까요?")) return;
+    const id = checked.value;
+    const idx = state.bids.findIndex((b) => b.id === id);
+    if (idx >= 0) {
+      const removed = state.bids.splice(idx, 1)[0];
+      saveState();
+      renderBidList();
+      renderSummary();
+      addLog(
+        "입찰 안건 삭제: " + ((removed && removed.orgName) || "-")
+      );
+    }
+  });
+
+  // 초기 로딩
+  loadState();
+  renderLogs();
+  renderBidList();
+  renderSummary();
+  setCurrentItemList(window.__currentItems || []);
+
+})();
+</script>
 </body>
 </html>
