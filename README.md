@@ -1,1 +1,0 @@
-# auto-bid-narajangter-v1
