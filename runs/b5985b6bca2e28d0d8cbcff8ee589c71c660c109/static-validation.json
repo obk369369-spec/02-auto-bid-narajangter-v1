@@ -1,0 +1,21 @@
+{
+  "schema": "wic.external-evidence.v1",
+  "repository": "obk369369-spec/02-auto-bid-narajangter-v1",
+  "commit": "b5985b6bca2e28d0d8cbcff8ee589c71c660c109",
+  "checkedAt": "2026-08-07T00:19:12.396Z",
+  "entry": "index(예전 버전).html",
+  "htmlCandidates": [
+    "index(예전 버전).html"
+  ],
+  "bytes": 27884,
+  "controls": {
+    "inputs": 14,
+    "buttons": 12
+  },
+  "scripts": {
+    "classic": 1,
+    "module": 0
+  },
+  "result": "STRUCTURE_PASS",
+  "failures": []
+}
