@@ -31,7 +31,7 @@ jobs:
           for i in {1..20}; do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
       - name: Run real bid create-save-readback flow
         run: |
-          cat > /tmp/tool002-e2e.mjs <<'JS'
+          cat > tool002-e2e.mjs <<'JS'
           import { chromium } from 'playwright';
           import fs from 'node:fs';
           const browser = await chromium.launch({headless:true});
@@ -43,16 +43,7 @@ jobs:
           await page.goto(url,{waitUntil:'networkidle'});
           await page.evaluate(()=>localStorage.clear());
           await page.reload({waitUntil:'networkidle'});
-          const fixture={
-            org:'한국산업기술시험원',
-            title:'2026 해외시장 보고서 구매 입찰',
-            deadline:'2026-08-31',
-            budget:'12000000',
-            item:'AI 서버 시장 보고서',
-            code:'WIC-E2E-20260813',
-            qty:'1',
-            price:'4800000'
-          };
+          const fixture={org:'한국산업기술시험원',title:'2026 해외시장 보고서 구매 입찰',deadline:'2026-08-31',budget:'12000000',item:'AI 서버 시장 보고서',code:'WIC-E2E-20260813',qty:'1',price:'4800000'};
           await page.fill('#orgName',fixture.org);
           await page.fill('#bidTitle',fixture.title);
           await page.fill('#bidDeadline',fixture.deadline);
@@ -83,7 +74,7 @@ jobs:
           console.log(JSON.stringify(evidence));
           await browser.close();
           JS
-          node /tmp/tool002-e2e.mjs
+          node tool002-e2e.mjs
       - name: Preserve business E2E evidence
         if: always()
         uses: actions/upload-artifact@v4
