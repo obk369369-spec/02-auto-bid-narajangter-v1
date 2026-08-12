@@ -1,0 +1,94 @@
+name: TOOL002 actual bid business E2E
+
+on:
+  push:
+    paths:
+      - '.github/workflows/actual-bid-business-e2e.yml'
+      - 'index(예전 버전).html'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bid-business-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test runtime
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start local page
+        run: |
+          python3 -m http.server 4173 >/tmp/tool002-http.log 2>&1 &
+          echo $! >/tmp/tool002-http.pid
+          for i in {1..20}; do curl -fsS http://127.0.0.1:4173/ >/dev/null && break; sleep 1; done
+      - name: Run real bid create-save-readback flow
+        run: |
+          cat > /tmp/tool002-e2e.mjs <<'JS'
+          import { chromium } from 'playwright';
+          import fs from 'node:fs';
+          const browser = await chromium.launch({headless:true});
+          const page = await browser.newPage();
+          const errors=[];
+          page.on('pageerror', e=>errors.push(String(e)));
+          page.on('dialog', async d=>{ await d.accept(); });
+          const url='http://127.0.0.1:4173/index(%EC%98%88%EC%A0%84%20%EB%B2%84%EC%A0%84).html';
+          await page.goto(url,{waitUntil:'networkidle'});
+          await page.evaluate(()=>localStorage.clear());
+          await page.reload({waitUntil:'networkidle'});
+          const fixture={
+            org:'한국산업기술시험원',
+            title:'2026 해외시장 보고서 구매 입찰',
+            deadline:'2026-08-31',
+            budget:'12000000',
+            item:'AI 서버 시장 보고서',
+            code:'WIC-E2E-20260813',
+            qty:'1',
+            price:'4800000'
+          };
+          await page.fill('#orgName',fixture.org);
+          await page.fill('#bidTitle',fixture.title);
+          await page.fill('#bidDeadline',fixture.deadline);
+          await page.fill('#bidBudget',fixture.budget);
+          await page.fill('#itemName',fixture.item);
+          await page.fill('#itemCode',fixture.code);
+          await page.fill('#itemQty',fixture.qty);
+          await page.fill('#itemPrice',fixture.price);
+          await page.click('#addItemBtn');
+          const itemBadge=(await page.locator('#itemSummaryBadge').innerText()).trim();
+          if(!/1/.test(itemBadge)) throw new Error('item add/read-back failed: '+itemBadge);
+          await page.click('#saveCurrentBtn');
+          await page.waitForTimeout(300);
+          const summaryCount=(await page.locator('#summaryCount').innerText()).trim();
+          if(summaryCount!=='1') throw new Error('saved bid summary count != 1: '+summaryCount);
+          const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem('wic_bid_tool_state_v1')||'{}'));
+          const bids=Array.isArray(stored.bids)?stored.bids:[];
+          const saved=bids.find(b=>b.orgName===fixture.org && b.bidTitle===fixture.title);
+          if(!saved) throw new Error('saved bid missing from localStorage read-back');
+          if(!Array.isArray(saved.items) || saved.items.length!==1) throw new Error('saved item list missing');
+          if(String(saved.bidBudget)!==fixture.budget) throw new Error('budget read-back mismatch: '+saved.bidBudget);
+          const tableText=await page.locator('#bidListBody').innerText();
+          if(!tableText.includes(fixture.org) || !tableText.includes(fixture.title)) throw new Error('saved bid missing from visible list');
+          if(errors.length) throw new Error('page errors: '+errors.join(' | '));
+          const evidence={status:'PASS',fixture,summaryCount,itemBadge,storedBid:{orgName:saved.orgName,bidTitle:saved.bidTitle,bidDeadline:saved.bidDeadline,bidBudget:saved.bidBudget,itemCount:saved.items.length},visibleListContainsSaved:true,pageErrors:errors,source:'index(예전 버전).html'};
+          fs.mkdirSync('evidence',{recursive:true});
+          fs.writeFileSync('evidence/tool002-actual-bid-business-e2e.json',JSON.stringify(evidence,null,2));
+          console.log(JSON.stringify(evidence));
+          await browser.close();
+          JS
+          node /tmp/tool002-e2e.mjs
+      - name: Preserve business E2E evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tool002-actual-bid-business-e2e-${{ github.sha }}
+          path: evidence/tool002-actual-bid-business-e2e.json
+          retention-days: 90
+          if-no-files-found: error
