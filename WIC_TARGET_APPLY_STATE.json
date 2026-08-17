@@ -6,6 +6,17 @@
   "canonical_revision": "fa09bcdec96669d97ef3a18f",
   "apply_mode": "CENTRAL_RULE_REFERENCE_REVISION_ACK",
   "changed_scope": ["GLOBAL_PRIORITY_AND_WORK_GATE"],
-  "status": "APPLIED_READBACK_PENDING_TEST_EVIDENCE",
-  "external_independent_verification": false
+  "status": "APPLIED_TEST_PASS_INTERNAL_GITHUB",
+  "test_evidence": {
+    "github_workflow_run_id": 31617559130,
+    "github_workflow_head_sha": "b79bd62777e67b952b33b9c1927c0c751cb97a1b",
+    "validation_job_id": 94184067046,
+    "pages_deployment_job_id": 94184125347,
+    "evidence_archive_job_id": 94184125348,
+    "result": "success"
+  },
+  "runtime_entrypoint_status": "HOLD_NO_CURRENT_ROOT_INDEX_HTML",
+  "runtime_entrypoint_note": "Repository root currently contains index(예전 버전).html but no current index.html. Central rule integration/test evidence is PASS; canonical runtime entrypoint cleanup/implementation remains a Work item.",
+  "external_independent_verification": false,
+  "note": "Existing GitHub Actions E2E evidence was successful; this update removes stale pending status without claiming third-party independent verification."
 }
