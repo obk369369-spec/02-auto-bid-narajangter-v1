@@ -15,8 +15,16 @@
     "evidence_archive_job_id": 94184125348,
     "result": "success"
   },
+  "institution_accumulator": {
+    "root": "T2-RC-HEADER-ROW-INSTITUTION-ACCUMULATION-GAP",
+    "status": "FIXED_MODULE_TEST_PASS_RUNTIME_HOLD",
+    "header_search_limit": 20,
+    "actual_derived_header_row": 5,
+    "test": "node tests/institution-accumulator.test.mjs",
+    "usb_candidate_promoted_wholesale": false
+  },
   "runtime_entrypoint_status": "HOLD_NO_CURRENT_ROOT_INDEX_HTML",
-  "runtime_entrypoint_note": "Repository root currently contains index(예전 버전).html but no current index.html. Central rule integration/test evidence is PASS; canonical runtime entrypoint cleanup/implementation remains a Work item.",
+  "runtime_entrypoint_note": "The verified institution accumulator module is present, but the repository still has no current root index.html. Do not claim runtime completion until a canonical entrypoint consumes the module and passes actual E2E.",
   "external_independent_verification": false,
   "note": "Existing GitHub Actions E2E evidence was successful; this update removes stale pending status without claiming third-party independent verification."
 }
