@@ -17,10 +17,13 @@
   },
   "institution_accumulator": {
     "root": "T2-RC-HEADER-ROW-INSTITUTION-ACCUMULATION-GAP",
-    "status": "FIXED_MODULE_TEST_PASS_RUNTIME_HOLD",
+    "status": "REMOTE_VERIFIED_MODULE_TEST_PASS_RUNTIME_HOLD",
     "header_search_limit": 20,
     "actual_derived_header_row": 5,
     "test": "node tests/institution-accumulator.test.mjs",
+    "implementation_commit": "aad85319436bc90fe35ea764bd73b4abb0be05f7",
+    "github_workflow_run_id": 32951474062,
+    "github_workflow_result": "success",
     "usb_candidate_promoted_wholesale": false
   },
   "runtime_entrypoint_status": "HOLD_NO_CURRENT_ROOT_INDEX_HTML",
