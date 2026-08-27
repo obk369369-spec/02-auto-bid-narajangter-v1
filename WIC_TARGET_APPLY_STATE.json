@@ -36,10 +36,17 @@
     "actual_deduped_rows": 48481,
     "actual_institution_count": 6264,
     "sum_invariant": true,
-    "actual_runtime_e2e": "PASS_LOCAL_PENDING_REMOTE_CI"
+    "actual_runtime_e2e": "REMOTE_VERIFIED_PASS",
+    "implementation_commit": "d4172bfc2415a5e30cdd91639dd1b31a9c8001c3",
+    "ci_fixture_commit": "6a5dffb43999423c5a8ae7920ec2a4b430459bf9",
+    "validator_commit": "8c8f82735606703f957118d71ce904368e207684",
+    "actual_e2e_run": 33030647779,
+    "external_evidence_run": 33030861619,
+    "pages_run": 33030861091,
+    "remote_file_readback": true
   },
-  "runtime_entrypoint_status": "ACTUAL_RUNTIME_E2E_PASS_PENDING_REMOTE",
-  "runtime_entrypoint_note": "Canonical worker runtime passed the same 48,486-row Narajangter XLSX locally; remote CI/read-back and checkpoint are the remaining gates.",
+  "runtime_entrypoint_status": "REMOTE_VERIFIED_RUNTIME_E2E_PASS",
+  "runtime_entrypoint_note": "Canonical worker runtime passed the same 48,486-row Narajangter XLSX locally and the 48,486-row CI fixture remotely; header row, deduped rows, institution output and sum invariant are verified.",
   "external_independent_verification": false,
   "note": "Existing GitHub Actions E2E evidence was successful; this update removes stale pending status without claiming third-party independent verification."
 }
