@@ -89,10 +89,10 @@ jobs:
           TOOL002_URL: http://127.0.0.1:4173/index.html
         run: |
           node - <<'JS'
-          const XLSX=require('./vendor/xlsx.full.min.js');
+          const fs=require('fs'),XLSX=require('./vendor/xlsx.full.min.js');
           const rows=[['입찰공고 목록'],['검색일','2026-03-16'],['검색조건','전체'],[],['업무구분','업무여부','구분','입찰공고번호','공고명','공고기관','수요기관','게시일시(입찰마감일시)']];
           for(let i=1;i<=48481;i++) rows.push(['물품','대상','일반',`CI-${i}`,`보고서 ${i}`,`기관 ${i%6264}`,'','2026-03-16']);
-          const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),'입찰공고');XLSX.writeFile(wb,process.env.TOOL002_ACTUAL_XLSX);
+          const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),'입찰공고');fs.writeFileSync(process.env.TOOL002_ACTUAL_XLSX,XLSX.write(wb,{type:'buffer',bookType:'xlsx'}));
           JS
           node tests/tool002_actual_xlsx_e2e.cjs
       - name: Preserve business E2E evidence
