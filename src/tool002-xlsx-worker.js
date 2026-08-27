@@ -1,0 +1,2 @@
+importScripts('../vendor/xlsx.full.min.js','./institution-accumulator-core.js');
+self.onmessage=event=>{try{const workbook=XLSX.read(event.data,{type:'array',dense:true,cellStyles:false,cellNF:false,cellHTML:false});const sheet=workbook.Sheets[workbook.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:'',raw:false});const result=WICInstitutionAccumulator.accumulateInstitutions(rows);self.postMessage({ok:true,result});}catch(error){self.postMessage({ok:false,error:String(error&&error.message||error)});}};

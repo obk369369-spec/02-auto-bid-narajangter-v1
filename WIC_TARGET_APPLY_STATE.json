@@ -26,8 +26,20 @@
     "github_workflow_result": "success",
     "usb_candidate_promoted_wholesale": false
   },
-  "runtime_entrypoint_status": "HOLD_NO_CURRENT_ROOT_INDEX_HTML",
-  "runtime_entrypoint_note": "The verified institution accumulator module is present, but the repository still has no current root index.html. Do not claim runtime completion until a canonical entrypoint consumes the module and passes actual E2E.",
+  "canonical_runtime": {
+    "entrypoint": "index.html",
+    "worker": "src/tool002-xlsx-worker.js",
+    "shared_core": "src/institution-accumulator-core.js",
+    "xlsx_asset": "vendor/xlsx.full.min.js",
+    "actual_input_rows": 48486,
+    "actual_header_row": 5,
+    "actual_deduped_rows": 48481,
+    "actual_institution_count": 6264,
+    "sum_invariant": true,
+    "actual_runtime_e2e": "PASS_LOCAL_PENDING_REMOTE_CI"
+  },
+  "runtime_entrypoint_status": "ACTUAL_RUNTIME_E2E_PASS_PENDING_REMOTE",
+  "runtime_entrypoint_note": "Canonical worker runtime passed the same 48,486-row Narajangter XLSX locally; remote CI/read-back and checkpoint are the remaining gates.",
   "external_independent_verification": false,
   "note": "Existing GitHub Actions E2E evidence was successful; this update removes stale pending status without claiming third-party independent verification."
 }
