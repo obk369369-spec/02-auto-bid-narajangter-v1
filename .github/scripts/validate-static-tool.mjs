@@ -27,11 +27,12 @@ const entry = candidates[0];
 const html = fs.readFileSync(entry, "utf8");
 const controls = {
   inputs: (html.match(/<(input|textarea|select)\b/gi) || []).length,
-  buttons: (html.match(/<button\b/gi) || []).length
+  buttons: (html.match(/<button\b/gi) || []).length,
+  autoFileRun: /<input\b[^>]*type=["']file["']/i.test(html) && /addEventListener\(["']change["']/i.test(html)
 };
 const failures = [];
 if (controls.inputs === 0) failures.push("no input control");
-if (controls.buttons === 0) failures.push("no button");
+if (controls.buttons === 0 && !controls.autoFileRun) failures.push("no executable button or file-change trigger");
 
 let classicScripts = 0;
 let moduleScripts = 0;
