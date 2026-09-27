@@ -48,5 +48,13 @@
   "runtime_entrypoint_status": "REMOTE_VERIFIED_RUNTIME_E2E_PASS",
   "runtime_entrypoint_note": "Canonical worker runtime passed the same 48,486-row Narajangter XLSX locally and the 48,486-row CI fixture remotely; header row, deduped rows, institution output and sum invariant are verified.",
   "external_independent_verification": false,
-  "note": "Existing GitHub Actions E2E evidence was successful; this update removes stale pending status without claiming third-party independent verification."
+  "external_independent_verification_evidence": {
+    "checked_at": "2026-09-27",
+    "deployed_url": "https://obk369369-spec.github.io/02-auto-bid-narajangter-v1/",
+    "result": "HOLD_EXTERNAL_VERIFIER_ACCESS_UNAVAILABLE",
+    "observed": "The independent web verifier could not access the deployed URL, so no third-party ACTUAL_PASS is claimed.",
+    "runtime_e2e_reused_without_rerun": true,
+    "resume_point": "Run one independent public-URL verification from an external verifier that can access the deployed page, persist its timestamped response and artifact, then set external_independent_verification to true only if that evidence passes."
+  },
+  "note": "Existing GitHub Actions E2E evidence remains successful; third-party independent verification stays HOLD until an accessible external verifier produces timestamped evidence."
 }
