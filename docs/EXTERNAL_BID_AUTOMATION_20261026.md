@@ -226,3 +226,52 @@ PASS requires:
 - TenderGraph: WORKFLOW/UI DONOR
 - tenders-bot: OBSERVER DONOR
 - Info21C/BidQ: SERVICE ONLY; not counted as imported automation programs
+
+
+## 2026-10-26 STRICT READY-TO-USE GATE
+
+The user's required external-tool class is stricter than "open-source code exists".
+
+A candidate may be called READY-TO-USE only if ALL are evidence-backed:
+1. 24-hour continuous operation is supported.
+2. No paid license/subscription is required for the required WIC scope.
+3. It is already a usable program/service, not merely source code.
+4. It can be connected as a narrow socket/plugin/MCP/API without rebuilding its internals.
+5. It already performs a useful end-to-end procurement function.
+6. Actual execution evidence exists.
+7. It can consume or coexist with TOOL002 without rewriting PASS_LOCKED core.
+8. It does not require the user to become the operator/programmer.
+9. It does not depend on a vendor manually doing the work for the user.
+10. Security/login/final submission boundaries are explicit.
+
+Under this strict gate, current candidates are NOT yet READY:
+- opendata-kr/narajangteo-bid-mcp: reusable local MCP package, but not an autonomous 24h hosted observer; requires data.go.kr key and a running MCP client/runtime.
+- donghyeon01/kr-public-mcp: remote MCP is closest to socket-form, but free tier is limited (README states IP-based 30 calls/day); watch_bids is Pro. Therefore not free 24h monitoring.
+- Narabot: source program requiring deployment/runtime/configuration; not a zero-setup 24h finished service.
+- tenders-bot: source program requiring Python/Playwright/Gemini/SMTP/cron and Korea provider adaptation; not ready for WIC.
+- TenderGraph: workflow shell requiring its own runtime and optional model credentials; not G2B-ready out of box.
+- narajangteo-crawler: batch script, not continuous ready-to-use automation.
+
+Therefore:
+CURRENT VERIFIED COUNT OF STRICT "24H + FREE + FINISHED + SOCKET + IMMEDIATE PRACTICAL" EXTERNAL TOOLS = 0.
+
+The above projects remain only component candidates and MUST NOT be presented as already-acquired completed tools.
+
+## Relationship to WIC archive
+The user's uploaded bid archive contains WIC/KISTI-specific historical evidence, business rules, result history, documents, old credentials/process artifacts, and bid calculation experience.
+External G2B tools do not automatically understand or use that archive.
+They can only supply current public procurement data unless an explicit import/adapter exists.
+
+Therefore an external tool qualifies for WIC only if it either:
+A. can ingest WIC historical/rule data directly, or
+B. provides a narrow socket that TOOL002 can call without modifying its PASS_LOCKED core.
+
+If neither is true, it is not "ready for WIC practical use".
+
+## Search priority after this correction
+Search order must be:
+1. Fully finished 24h free/self-hosted procurement application with G2B support.
+2. Finished remote MCP/API/plugin with no practical free-tier barrier and direct socket connection.
+3. Finished self-hosted app requiring only deployment/config values.
+4. Only after 1-3 fail: component composition.
+5. Custom coding is last.
