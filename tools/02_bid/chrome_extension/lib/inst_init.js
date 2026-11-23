@@ -1,0 +1,1 @@
+window.__INST_WORKER_URL = chrome.runtime.getURL('lib/inst_worker.js'); window.__INST_CORE_SRC = '';

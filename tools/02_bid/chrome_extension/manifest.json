@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "02 입찰 도구 (나라장터 공고 분석)",
+  "version": "1.0.0",
+  "description": "나라장터·연구기관 입찰공고 화면에서 기초금액·낙찰하한율 등을 자동으로 읽고 하한가·권장 투찰가·마진을 계산합니다. 모든 계산은 이 PC 안에서만 이뤄집니다(외부 전송 없음).",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "02 입찰 도구 — 이 화면의 공고 분석",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "background": {
+    "service_worker": "sw.js"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "*://*.g2b.go.kr/*",
+    "*://*.kisti.re.kr/*",
+    "*://*.d2b.go.kr/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.g2b.go.kr/*",
+        "*://*.kisti.re.kr/*",
+        "*://*.d2b.go.kr/*"
+      ],
+      "js": [
+        "engine.js",
+        "content.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_idle"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "web_accessible_resources": []
+}

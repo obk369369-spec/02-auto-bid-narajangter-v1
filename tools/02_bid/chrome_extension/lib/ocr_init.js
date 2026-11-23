@@ -1,0 +1,1 @@
+window.__OCR_URLS = {worker: chrome.runtime.getURL('lib/ocr/worker.min.js'), core: chrome.runtime.getURL('lib/ocr/tesseract-core-simd-lstm.wasm.js'), lang: chrome.runtime.getURL('lib/ocr')};

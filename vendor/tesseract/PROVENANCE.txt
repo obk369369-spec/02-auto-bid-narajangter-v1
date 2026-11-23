@@ -1,0 +1,5 @@
+오프라인 OCR 구성요소 출처 (npm 공식 패키지 · sha512 무결성 대조 완료 2026-11-20)
+tesseract.js@5.1.1 (Apache-2.0)            sha512-lzVl/Ar3P3zhpUT31NjqeCo1f+D5+YfpZ5J62eo2S14QNVOmHBTtbchHm/YAbOOOzCegFnKf4B3Qih9LuldcYQ==
+tesseract.js-core@5.1.1 (Apache-2.0)       sha512-KX3bYSU5iGcO1XJa+QGPbi+Zjo2qq6eBhNjSGR5E5q0JtzkoipJKOUQD7ph8kFyteCEfEQ0maWLu8MCXtvX5uQ==  (tesseract-core-simd-lstm.wasm.js)
+@tesseract.js-data/kor@1.0.0 (MIT 패키지/Apache-2.0 데이터)  sha512-tepYhsYiRJ8E44R27MHxVteEDDLfYQxuvM6u4JlEHcCYqwpefvI5TGzoMgB67kunOvtyEJYtT5zfJ/6R6FVU9w==  (4.0.0_best_int/kor.traineddata.gz)
+@tesseract.js-data/eng@1.0.0                sha512-mbTumm6KQPUHyzTPQaF3ObXYnx0SqqfV2nabqFVQBwD6Kl7PhGSLSzOlfFTWy0P3BjghaSKA2W9GB19Jk+ZcTg==  (4.0.0_best_int/eng.traineddata.gz)

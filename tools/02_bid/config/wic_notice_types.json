@@ -1,0 +1,7 @@
+{
+  "status": "HOLD_9_TYPES_DEFINITION_NOT_PROVIDED",
+  "note": "WIC 9대 공고 유형의 정의(이름·키워드·발행사 공급권한 필요 여부)가 지시서에 없어 비워 둡니다. 아래 형식으로 채우면 ops.classify 가 발행사 공급권한과 대조해 입찰/확인필요를 가릅니다.",
+  "types": [],
+  "publisher_authority": [],
+  "example": {"types": [{"id": "T1", "name": "예: 해외 시장조사 보고서", "keywords": ["market", "시장보고서"], "requiresPublisher": true}], "publisher_authority": ["Mordor Intelligence"]}
+}
