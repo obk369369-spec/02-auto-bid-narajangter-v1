@@ -374,7 +374,7 @@
   }
   async function loadSaved() { try { const st = await db.get('state'); if (st) { S.items = st.items || []; S.dup = st.dup || 0; log(`복원: ${S.items.length}건`); } } catch (e) { log('복원 실패: ' + e.message); } render(); }
   $('addBtn').onclick = () => { const t = $('paste').value; if (!t.trim()) return; const rows = rowsFromText(t); $('paste').value = ''; return addRows(rows); };
-  $('fileInput').onchange = async e => { for (const f of e.target.files) { const p = await WIC.readFile(f); if (p && p.rows) await addRows(p.rows); } e.target.value = ''; };
+  $('listInput').onchange = async e => { for (const f of e.target.files) { const p = await WIC.readFile(f); if (p && p.rows) await addRows(p.rows); } e.target.value = ''; };
   $('resetBtn').onclick = async () => { S.items = []; S.dup = 0; try { await db.clear(); } catch (e) {} render(); log('누적 초기화'); };
   const lines = () => { const head = ['분류', '공고번호', '공고명', '수요기관', '마감일', '기초금액', '하한가(추정)', '권장 입찰금액', '비고']; return [head, ...S.items.map(i => [i.cls, i.no, i.name, i.org, i.due, i.base, i.floor || '', i.bidv || i.bid, i.note])]; };
   $('csvBtn').onclick = () => { const q = v => '"' + str(v).replace(/"/g, '""') + '"'; const csv = '﻿' + lines().map(r => r.map(q).join(',')).join('\r\n'); WIC.download('입찰 공고 누적.csv', new Blob([csv], {type: 'text/csv;charset=utf-8'})); };
