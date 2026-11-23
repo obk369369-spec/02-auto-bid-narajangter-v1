@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>02 입찰 도구</title>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--line:#dfe4ee;--ink:#111827;--mute:#64748b;--blue:#2563eb;--blue2:#dbe7ff;--green:#047857;--green2:#d1fae5;--red:#b91c1c;--red2:#fee2e2;--amber:#b45309;--amber2:#fef3c7;--rad:14px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 "Malgun Gothic",Arial,sans-serif;overflow-wrap:anywhere}
+.top{position:sticky;top:0;z-index:50;background:#0f172a;color:#fff;padding:10px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:14px 28px}
+.brand b{font-size:18px;display:block;line-height:1.2}.brand span{font-size:12px;color:#94a3b8}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;flex:1}
+.tabs button{border:0;background:#1e293b;color:#cbd5e1;padding:10px 18px;border-radius:999px;cursor:pointer;font:inherit;font-weight:600;display:flex;align-items:center;gap:8px}
+.tabs button i{font-style:normal;width:22px;height:22px;border-radius:50%;background:#475569;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+.tabs button.on{background:var(--blue);color:#fff}.tabs button.on i{background:#fff;color:var(--blue)}
+.tabs button.done i{background:var(--green);}
+.tabs button.sub{background:transparent;border:1px solid #334155}
+.tabs button.sub.on{background:#334155}
+.meta{font-size:12px;color:#94a3b8;display:flex;gap:14px;flex-wrap:wrap}
+main{max-width:1180px;margin:0 auto;padding:28px 24px 80px}
+.pane{display:none}.pane.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:26px 28px;margin-bottom:24px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.card>h2{margin:0 0 6px;font-size:18px}.card>.lead{margin:0 0 18px;color:var(--mute)}
+h3{font-size:15px;margin:22px 0 10px}
+.small{font-size:12.5px;color:var(--mute)}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+button{font:inherit;padding:9px 16px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--blue);color:var(--blue)}
+button.primary{background:var(--blue);border-color:var(--blue);color:#fff}button.primary:hover{background:#1d4ed8;color:#fff}
+button.sm{padding:4px 10px;font-size:12.5px}
+button.gen{background:#f8fafc;text-align:left;padding:14px 16px;min-width:210px;flex:1}
+button.gen b{display:block;margin-bottom:2px}button.gen span{font-size:12px;color:var(--mute)}
+input,select,textarea{font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);max-width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--blue2);border-color:var(--blue)}
+textarea{width:100%}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px 20px}
+.grid label{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:#334155;font-weight:600}
+.grid input,.grid select{width:100%;font-weight:400}
+.grid .wide{grid-column:1/-1}
+.auto{border-color:#34d399!important;background:#f0fdf9}
+.autotag{display:inline-block;margin-left:6px;font-size:11px;color:var(--green);background:var(--green2);padding:0 7px;border-radius:99px;font-weight:600}
+#drop{border:2px dashed #93a4c4;border-radius:var(--rad);background:#f8fafd;padding:44px 20px;text-align:center;cursor:pointer;transition:.15s;display:block}
+#drop.over{border-color:var(--blue);background:var(--blue2)}
+#drop b{font-size:17px;display:block;margin-bottom:6px}
+#drop input{display:none}
+.files{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.file{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:10px;background:#f8fafc;border:1px solid var(--line);font-size:13px}
+.file.ok{border-color:#a7f3d0;background:#f0fdf9}.file.err{border-color:#fecaca;background:#fef2f2}
+.badge{display:inline-block;padding:1px 9px;border-radius:99px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.b-hi{background:var(--green2);color:var(--green)}.b-mid{background:var(--amber2);color:var(--amber)}.b-low{background:var(--red2);color:var(--red)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}
+th{background:#f8fafc;font-size:12.5px;color:#334155;white-space:nowrap}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.sel td{background:#eff6ff}
+.scroll{overflow:auto}
+.ok{color:var(--green);font-weight:700}.bad{color:var(--red);font-weight:700}.warn{color:var(--amber);font-weight:700}
+.t-bid{color:var(--green);font-weight:700}.t-int{color:var(--blue);font-weight:700}.t-ex{color:var(--mute)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:8px}
+.kpi{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:#fbfcfe}
+.kpi small{display:block;color:var(--mute);font-size:12px;margin-bottom:4px}.kpi b{font-size:20px;font-variant-numeric:tabular-nums}.kpi em{display:block;font-style:normal;font-size:12px;color:var(--mute);margin-top:2px}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,540px),1fr));gap:22px}
+.chart .row{gap:0}.chart .row svg{width:50%;min-width:200px}
+.chart{border:1px solid var(--line);border-radius:12px;padding:16px 18px 10px;background:#fff}
+.chart h4{margin:0 0 2px;font-size:14px}.chart p{margin:0 0 8px;font-size:12px;color:var(--mute)}
+.chart svg{width:100%;height:auto;display:block}
+.chart text{font-family:"Malgun Gothic",Arial,sans-serif}
+.recs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.rec{border:2px solid var(--line);border-radius:12px;padding:16px 18px;cursor:pointer;background:#fff}
+.rec:hover{border-color:#93c5fd}.rec.sel{border-color:var(--blue);background:#f5f9ff}
+.rec h4{margin:0 0 6px;font-size:14px}.rec .big{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.rec ul{margin:8px 0 0;padding-left:18px;font-size:12.5px;color:#334155}
+.explain{background:#f8fafc;border-left:4px solid var(--blue);padding:14px 18px;font-size:13px;line-height:1.75;white-space:pre-wrap;border-radius:0 10px 10px 0}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:2px 12px;font-size:12.5px;margin:3px 6px 3px 0;background:#fff}
+details{border:1px solid var(--line);border-radius:var(--rad);background:#fff;margin-bottom:24px}
+details>summary{cursor:pointer;font-weight:700;padding:18px 26px;font-size:15px}
+details>.inner{padding:4px 28px 26px}
+.bar{height:10px;background:#e5e7eb;border-radius:99px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--green)}
+.chk{display:flex;gap:12px;align-items:flex-start;padding:11px 14px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#fff}
+.chk input{margin-top:4px;width:18px;height:18px}.chk.done{background:#f0fdf9;border-color:#a7f3d0}.chk.done .ct{text-decoration:line-through;color:var(--mute)}
+.chk .ct{font-weight:600}.chk .src{font-size:12px;color:var(--mute)}
+.stage{margin:26px 0 10px;font-size:14px;font-weight:800;color:#1e3a8a}
+.gens{display:flex;gap:14px;flex-wrap:wrap}
+.toast{position:fixed;right:22px;bottom:22px;z-index:99;background:#0f172a;color:#fff;padding:12px 18px;border-radius:12px;max-width:380px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:13px;display:none}
+.explainbox{background:var(--amber2);border:1px solid #fcd34d;border-radius:10px;padding:12px 16px;font-size:12.5px;margin:12px 0}
+pre.log{white-space:pre-wrap;font-size:12px;color:var(--mute);margin:0;max-height:240px;overflow:auto}
+.empty{padding:34px 10px;text-align:center;color:var(--mute);border:1px dashed var(--line);border-radius:12px;background:#fafbfd}
+@media(max-width:720px){main{padding:16px 12px 60px}.card{padding:18px 16px}.top{padding:10px 12px}.charts{grid-template-columns:1fr}details>.inner{padding:4px 14px 20px}}
+@media print{.top,.toast,button{display:none!important}.pane{display:block!important}}
+</style></head><body>
+<header class="top">
+  <div class="brand"><b>02 입찰 도구</b><span>공고 문서 → 투찰가 → 제출서류, 한 흐름으로</span></div>
+  <nav class="tabs" id="tabs" role="tablist">
+    <button data-tab="1" class="on" role="tab" title="기능: 공고문 파일을 끌어다 놓아 핵심 숫자를 자동 입력 · 결과: 기초금액·낙찰하한율 등이 빈칸에 채워짐 · 사용시점: 새 공고를 처음 볼 때"><i>1</i>공고 등록·문서 분석</button>
+    <button data-tab="2" role="tab" title="기능: 하한가·권장 투찰가·마진을 그래프로 확인 · 결과: 투찰 금액 확정 · 사용시점: 공고 숫자가 채워진 뒤"><i>2</i>투찰가 계산·시각화</button>
+    <button data-tab="3" role="tab" title="기능: 제출서류 체크리스트와 서류 초안 내려받기 · 결과: 산출내역서·입찰참가신청서 등 · 사용시점: 투찰가를 정한 뒤"><i>3</i>제출 서류 체크·작성</button>
+    <button data-tab="5" class="sub" role="tab" title="기능: 입찰 건·품목을 저장·검색·불러오기 · 결과: 이 PC 브라우저에 보관 · 사용시점: 여러 건을 관리할 때"><i>·</i>보관함</button>
+    <button data-tab="4" class="sub" role="tab" title="기능: 계산 자가검증·분류 키워드 설정·작업 로그 · 결과: Evidence(JSON) · 사용시점: 도구를 수정했거나 결과를 의심할 때"><i>·</i>검증·설정</button>
+  </nav>
+  <div class="meta"><span id="info">누적 0건</span><span id="saveState">저장: 대기</span></div>
+</header>
+<main>
+
+<!-- ══════════ ① 공고 등록·문서 분석 ══════════ -->
+<section id="tab1" class="pane on">
+  <div class="card">
+    <h2>공고 문서 올리기</h2>
+    <p class="lead">나라장터 공고문·과업내용서·견적요청서를 아래 상자에 끌어다 놓으면 기초금액, 낙찰하한율, 입찰보증금율, 면세·과세 등을 찾아 빈칸에 자동 입력합니다. 찾지 못한 값은 비워 두고 "확인 필요"로 표시합니다.</p>
+    <label id="drop" for="docInput" title="기능: 공고 문서를 끌어다 놓거나 눌러서 선택 · 결과: 핵심 숫자 자동 추출 · 사용시점: 새 공고가 생겼을 때">
+      <b>여기로 파일을 끌어다 놓으세요</b>
+      <span class="small">한글(.hwp·.hwpx) · PDF(글자가 있는 파일) · 워드(.docx) · 엑셀(.xlsx·.xls·.csv) · 텍스트(.txt·.html) — 여러 개 동시에 가능</span>
+      <input id="docInput" type="file" multiple accept=".pdf,.hwp,.hwpx,.docx,.xlsx,.xls,.csv,.tsv,.txt,.html,.htm,.md,.json">
+    </label>
+    <label class="small" style="display:flex;gap:8px;align-items:center;margin-top:14px" title="기능: 이미지·스캔 문서를 글자 인식(OCR)으로 읽기 · 결과: 사진·스캔본에서도 값을 찾음(오인식 가능) · 사용시점: 파일에 글자층이 없을 때"><input type="checkbox" id="ocrOn" checked> 이미지·스캔 문서는 글자 인식(OCR)으로 읽기 — 장당 5~30초 · 오인식 가능(OCR로 읽은 값은 항상 "낮음 · 확인 필요")</label>
+    <div class="files" id="fileList"></div>
+    <details style="margin:18px 0 0;border:0;background:none"><summary style="padding:8px 0;font-size:13px" title="기능: 파일 대신 공고 글을 붙여넣어 추출 · 결과: 위와 같은 자동 입력 · 사용시점: 스캔본·이미지처럼 파일을 읽을 수 없을 때">또는 공고문 글을 복사해서 붙여넣기</summary>
+      <div style="padding:6px 0 0"><textarea id="docPaste" rows="6" placeholder="나라장터 공고 화면에서 글을 복사해 여기에 붙여넣으세요" title="기능: 공고문 글 붙여넣기 · 결과: 아래 버튼으로 추출 · 사용시점: 파일 업로드가 어려울 때"></textarea>
+      <div class="row" style="margin-top:10px"><button id="docPasteBtn" class="primary" title="기능: 붙여넣은 글에서 핵심 숫자 추출 · 결과: 공고 정보 칸 자동 입력 · 사용시점: 글을 붙여넣은 뒤">붙여넣은 글에서 추출</button></div></div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>자동 추출 결과</h2>
+    <p class="lead">값 옆의 "근거" 문장이 공고문에서 읽은 부분입니다. 신뢰도가 낮은 값은 반드시 공고문과 대조하세요.</p>
+    <div id="exBox"><div class="empty">아직 올린 문서가 없습니다. 위 상자에 공고문을 끌어다 놓으면 이곳에 추출 결과가 나옵니다.</div></div>
+  </div>
+
+  <div class="card">
+    <h2>공고 정보 <span class="small" style="font-weight:400">· 자동 입력된 칸은 초록색 · 직접 고쳐도 됩니다</span></h2>
+    <p class="lead">② 투찰가 계산에 그대로 쓰이는 값입니다. 빈칸은 계산하지 않고 "확인 필요"로 남습니다.</p>
+    <div class="grid" id="nForm">
+      <label class="wide">공고명<input id="n_title" type="text" title="기능: 공고 제목 · 결과: 서류 초안과 장부에 사용 · 사용시점: 자동 입력 후 확인"></label>
+      <label>공고번호<input id="n_no" type="text" title="기능: 공고 식별번호 · 결과: 서류·체크리스트 저장 기준 · 사용시점: 자동 입력 후 확인"></label>
+      <label>수요기관<input id="n_org" type="text" title="기능: 발주 기관명 · 결과: 서류 수신처 · 사용시점: 자동 입력 후 확인"></label>
+      <label>입찰마감일시<input id="n_due" type="text" placeholder="예) 2018. 12. 7. 11:20" title="기능: 투찰 마감 시각 · 결과: 서류 초안에 표시 · 사용시점: 자동 입력 후 확인"></label>
+      <label>개찰일시<input id="n_open" type="text" title="기능: 개찰 시각 · 결과: 서류·일정 확인용 · 사용시점: 자동 입력 후 확인"></label>
+      <label>공급가액 (원)<input id="n_supply" type="text" inputmode="numeric" title="기능: 원가계산서·내역서의 공급가액 · 결과: 면세/과세 판단 근거 · 사용시점: 내역서를 올렸을 때"></label>
+      <label>부가가치세액 (원)<input id="n_vatamt" type="text" inputmode="numeric" title="기능: 공고·내역서의 부가세 금액 · 결과: 0보다 크면 과세로 판정 · 사용시점: 자동 입력 후 확인"></label>
+      <label>총계 / 합계금액 (원)<input id="n_total" type="text" inputmode="numeric" title="기능: 내역서의 총계(투찰 금액 후보) · 결과: ③ 서류의 확정 투찰금액 후보 · 사용시점: 내역서를 올렸을 때"></label>
+      <label>총 수량<input id="n_qty" type="text" inputmode="numeric" title="기능: 공고·규격서의 총 수량 · 결과: 산출내역서 수량 · 사용시점: 자동 입력 후 확인"></label>
+      <label>기초금액 (공고문 표기, 원)<input id="n_base" type="text" inputmode="numeric" title="기능: 공고의 기초금액 · 결과: 하한가·투찰가 계산의 기준 · 사용시점: 필수"></label>
+      <label>기초금액 계산 기준<select id="n_basis" title="기능: 기초금액을 어떻게 쓸지 선택 · 결과: 예정가격 기준 결정 · 사용시점: 공고의 부가세 표기를 확인한 뒤">
+        <option value="asis">그대로 사용 (부가세 포함 입찰 · 입찰장부 방식)</option><option value="incl">부가세 포함 금액 → 예정가격은 부가세 제외로 환산</option><option value="est">이미 부가세 제외 금액(추정가격)</option></select></label>
+      <label>낙찰하한율 (%) — 공고문 값<input id="n_floor" type="text" inputmode="decimal" placeholder="예) 88 또는 87.745" title="기능: 낙찰 하한 비율 · 결과: 낙찰하한가 = 예정가격 × 하한율 · 사용시점: 필수(추측 금지, 공고문 값)"></label>
+      <label>예비가격 변동폭 ± (%)<input id="n_range" type="text" inputmode="decimal" placeholder="예) 2 · 조달청 ±2, 지자체 ±3" title="기능: 복수예비가격 범위 · 결과: 하한가 변동 구간 · 사용시점: 복수예가 공고일 때"></label>
+      <label>예가 하한 −(%) · 비대칭일 때만<input id="n_rlo" type="text" inputmode="decimal" placeholder="예) 3" title="기능: 예가범위가 −3%~+0%처럼 비대칭일 때 아래쪽 폭 · 결과: 하한가 구간 계산 · 사용시점: 공고에 비대칭 범위가 있을 때"></label>
+      <label>예가 상한 +(%) · 비대칭일 때만<input id="n_rhi" type="text" inputmode="decimal" placeholder="예) 0" title="기능: 예가범위의 위쪽 폭 · 결과: 하한가 구간 계산 · 사용시점: 공고에 비대칭 범위가 있을 때"></label>
+      <label>낙찰자 결정방식 (자동 판별)<select id="n_award" title="기능: 공고 문구로 자동 판별한 낙찰방식 · 결과: ②의 계산 방식이 분기됨(하한율제/최저가/적격심사/협상) · 사용시점: 자동 입력 후 확인"><option value="">(확인 필요)</option><option value="floor">복수예가·낙찰하한율제</option><option value="lowest">최저가 낙찰제</option><option value="eval">적격심사</option><option value="nego">협상에 의한 계약</option></select></label>
+      <label>발행사<input id="n_pub" type="text" title="기능: 보고서 발행사 · 결과: 제조사 칸·공급권한 대조 · 사용시점: 자동 입력 후 확인"></label>
+      <label>예정가격 결정방식<select id="n_method" title="기능: 예정가격 방식 · 결과: 모의 계산 방식 결정 · 사용시점: 공고문 확인 후"><option value="">(확인 필요)</option><option value="multi">복수예비가격 (15개 중 2개 선택)</option><option value="single">단일 예가 (기초금액 = 예정가격)</option></select></label>
+      <label>입찰보증금율 (%) — 없으면 비움<input id="n_bond" type="text" inputmode="decimal" title="기능: 입찰보증금 비율 · 결과: 보증금액 계산 · 사용시점: 공고에 비율이 있을 때"></label>
+      <label>품목 부가세 구분<select id="n_tax" title="기능: 면세/과세 구분 · 결과: 공급가액·부가세 분리 · 사용시점: 품목 확인 후"><option value="">(확인 필요)</option><option value="free">면세 (도서·학술지·정기간행물)</option><option value="tax">과세 (그 외)</option></select></label>
+      <label>부가세율 (%)<input id="n_vat" type="text" inputmode="decimal" value="10" title="기능: 과세 품목의 부가세율 · 결과: 공급가액 분리 · 사용시점: 과세 품목일 때"></label>
+    </div>
+    <div class="row" style="margin-top:22px"><button id="toCalc" class="primary" title="기능: ② 투찰가 계산 탭으로 이동해 계산 · 결과: 그래프와 권장 투찰 구간 · 사용시점: 공고 정보 확인 후">② 투찰가 계산하러 가기 →</button><button id="nClear" title="기능: 공고 정보 칸 비우기 · 결과: 새 공고 입력 준비 · 사용시점: 다른 공고로 바꿀 때">공고 정보 비우기</button><span id="nMsg" class="small"></span></div>
+  </div>
+
+  <details id="listBox">
+    <summary title="기능: 공고 목록을 붙여넣어 입찰/내부안내/제외로 자동 분류 · 결과: 누적 표와 CSV · 사용시점: 여러 공고를 한 번에 훑을 때">공고 목록 붙여넣기 · 자동 분류 (누적 · 기존 기능)</summary>
+    <div class="inner">
+      <p class="small">비드큐·나라장터 목록을 엑셀에서 복사해 붙여넣거나 파일을 올리세요. 열 이름이 없으면 공고번호·공고명·수요기관·마감일·기초금액 순서로 읽고, 한 줄짜리 제목만 붙여도 됩니다.</p>
+      <textarea id="paste" rows="4" placeholder="여기에 붙여넣기 (예) 공고번호[탭]공고명[탭]수요기관[탭]마감일[탭]기초금액" title="기능: 공고 목록 붙여넣기 · 결과: 아래 버튼으로 분류 · 사용시점: 목록을 복사한 뒤"></textarea>
+      <div class="row" style="margin-top:12px"><button id="addBtn" class="primary" title="기능: 붙여넣은 목록을 누적·분류 · 결과: 분류 결과 표 갱신 · 사용시점: 붙여넣기 후">붙여넣기 반영 · 자동 분류</button><input id="listInput" type="file" accept=".xlsx,.xls,.csv,.tsv,.txt" multiple title="기능: 목록 파일 올리기 · 결과: 누적 표에 추가 · 사용시점: 엑셀 목록이 있을 때"><label class="small">목록의 금액은 <select id="amtVat" title="기능: 목록 금액의 부가세 포함 여부 · 결과: 하한가 추정 기준 · 사용시점: 목록 표기를 확인한 뒤"><option value="incl">부가세 포함</option><option value="excl">부가세 제외</option></select> 입니다</label></div>
+      <h3>대용량 나라장터 XLSX 기관 누적 <span class="small">(원격 저장소 기능 보존 · 4만 행도 별도 작업자에서 처리)</span></h3>
+      <div class="row"><label class="small">나라장터 XLSX <input id="fileInput" type="file" accept=".xlsx,.xls" title="기능: 나라장터 공고목록 엑셀을 헤더행 자동 탐지·공고번호 중복 제거·기관별 누적 · 결과: 아래 요약 · 사용시점: 월간 공고목록을 한꺼번에 볼 때"></label><span id="status" class="small hold">HOLD — 파일을 선택하세요.</span></div>
+      <p class="small">헤더 행: <strong id="headerRow">-</strong> / 중복 제거 공고: <strong id="rowCount">-</strong> / 기관 수: <strong id="institutionCount">-</strong></p>
+      <div class="scroll" style="max-height:240px"><table><thead><tr><th>기관</th><th>누적 공고</th></tr></thead><tbody id="resultBody"></tbody></table></div>
+      <h3>분류 결과 <span id="stat" class="small"></span></h3>
+      <div class="row" style="margin-bottom:12px"><button id="csvBtn" title="기능: 누적 표를 CSV로 저장 · 결과: 입찰 공고 누적.csv · 사용시점: 엑셀로 옮길 때">CSV 내려받기</button><button id="copyBtn" title="기능: 표를 탭 구분으로 복사 · 결과: 엑셀에 바로 붙여넣기 · 사용시점: 엑셀 작업 시">표 복사</button><button id="resetBtn" title="기능: 누적 목록 전체 삭제 · 결과: 목록 초기화 · 사용시점: 새로 시작할 때">누적 초기화</button><label class="small"><input type="checkbox" id="onlyBid" title="기능: 입찰 분류만 표시 · 결과: 표 필터 · 사용시점: 입찰 대상만 볼 때"> 입찰만 보기</label></div>
+      <div class="scroll"><table id="tbl"><thead><tr><th>#</th><th>분류</th><th>공고번호</th><th>공고명</th><th>수요기관</th><th>마감일</th><th>기초금액</th><th>하한가(추정)</th><th>권장 입찰금액</th><th>비고</th><th></th></tr></thead><tbody></tbody></table></div>
+      <div class="empty" id="emptyMsg" style="margin-top:12px">아직 공고가 없습니다.</div>
+      <h3>기관 누적</h3>
+      <div class="scroll"><table id="orgTbl"><thead><tr><th>기관명</th><th>공고 건수</th><th>최근 공고명</th><th>상태 요약</th></tr></thead><tbody></tbody></table></div>
+      <h3>과거 공고 목록 통계 <span class="small">(비드큐 목록 187건 · 2018-10-08 수집)</span></h3>
+      <div id="listStats"></div>
+    </div>
+  </details>
+</section>
+
+<!-- ══════════ ② 투찰가 계산·시각화 ══════════ -->
+<section id="tab2" class="pane">
+  <div class="card">
+    <h2>원가·전략 입력 <span class="small" style="font-weight:400">· 공고 숫자는 ①에서 이어받습니다</span></h2>
+    <p class="lead">정가·환율·원가 계수를 넣으면 마진까지 계산합니다. 비워 두면 하한가와 권장 투찰 구간만 계산하고 마진은 "확인 필요"로 남습니다.</p>
+    <div class="explainbox" id="calcHead"></div>
+    <div class="grid" id="calcForm">
+      <label>보고서 정가 (외화 또는 원)<input id="c_list" type="text" inputmode="decimal" title="기능: 발행사 정가 · 결과: 원가 계산 · 사용시점: 마진을 보고 싶을 때"></label>
+      <label>정가 통화<select id="c_cur" title="기능: 정가 통화 · 결과: 환율 적용 여부 · 사용시점: 정가 입력 시"><option>KRW</option><option>USD</option><option>EUR</option><option>GBP</option><option>JPY</option></select></label>
+      <label>원화 환율 (1 외화 = 원)<input id="c_fx" type="text" inputmode="decimal" placeholder="예) 1169" title="기능: 환율 · 결과: 원화 원가 환산 · 사용시점: 외화 정가일 때"></label>
+      <label>원가 계산 방식<select id="c_costmode" title="기능: 원가 산식 선택 · 결과: 원가 = 정가×환율×계수(장부) 또는 ×(1−할인율) · 사용시점: 평소 쓰는 방식 선택"><option value="ledger">장부 방식: 정가 × 환율 × 계수</option><option value="disc">할인율 방식: 정가 × 환율 × (1 − 할인율)</option></select></label>
+      <label id="c_discLbl">원가 계수 (장부 '발행사 디스카운트' 열 값, 예 0.4)<input id="c_disc" type="text" inputmode="decimal" title="기능: 정가 대비 매입 비율 또는 할인율 · 결과: 원가 · 사용시점: 계약 조건 확인 후"></label>
+      <label>투찰률 후보 (쉼표, 비우면 하한율+α 자동)<input id="c_rates" type="text" placeholder="예) 88.1, 88.2" title="기능: 확인할 투찰률 목록 · 결과: 투찰률별 표·그래프 · 사용시점: 직접 비교하고 싶을 때"></label>
+      <label>참가 업체 수 (모의 가정)<input id="c_people" type="text" inputmode="numeric" value="30" title="기능: 복수예가 모의에 쓸 참가자 수 가정 · 결과: 하한 통과 확률 · 사용시점: 경쟁 규모를 추정할 때(가정값)"></label>
+      <label>보수적 전략 여유 (%)<input id="c_safe" type="text" inputmode="decimal" value="2" title="기능: 예정가격에서 줄일 비율 · 결과: 보수적 전략 금액 · 사용시점: 전략 비교"></label>
+      <label>중간 전략 마진 (%)<input id="c_mid" type="text" inputmode="decimal" value="5" title="기능: 원가 위 마진 비율 · 결과: 중간 전략 금액 · 사용시점: 전략 비교"></label>
+      <label>공격적 전략 최소마진 (%)<input id="c_min" type="text" inputmode="decimal" value="0" title="기능: 최소 마진 · 결과: 공격적 전략 금액 · 사용시점: 전략 비교"></label>
+    </div>
+    <details style="margin-top:18px;border:0;background:none"><summary style="padding:8px 0;font-size:13px" title="기능: 최저가·적격심사·협상계약에 필요한 추가 입력 · 결과: 방식별 계산 · 사용시점: ① 낙찰방식이 해당 방식일 때">낙찰방식별 추가 입력 (최저가 · 적격심사 · 협상계약)</summary>
+      <div class="grid" style="margin-top:10px">
+        <label>[최저가] 최소 마진 (원가 대비 %)<input id="c_mmin" type="text" inputmode="decimal" value="8" title="기능: 지켜야 할 최소 마진 · 결과: A안(최저가 도전) 금액 · 사용시점: 최저가 낙찰제"></label>
+        <label>[최저가] 목표 마진 (원가 대비 %)<input id="c_mtgt" type="text" inputmode="decimal" value="15" title="기능: 목표 마진 · 결과: B안 금액 · 사용시점: 최저가 낙찰제"></label>
+        <label>[최저가] 부대비용 (원: 결제수수료·송금비 등)<input id="c_extra" type="text" inputmode="numeric" title="기능: 원가에 더할 비용 · 결과: 원가 합계 · 사용시점: 해외 결제 비용이 있을 때"></label>
+        <label>[적격심사] 기준 투찰률 (%)<input id="c_ref" type="text" inputmode="decimal" placeholder="88" title="기능: 평점 산식의 기준율(공고 평가표 값) · 결과: 가격평점 · 사용시점: 적격심사"></label>
+        <label>[적격심사] 가격 배점<input id="c_weight" type="text" inputmode="decimal" placeholder="70" title="기능: 입찰가격 배점 · 결과: 가격평점 · 사용시점: 적격심사"></label>
+        <label>[적격심사] 감점 계수<input id="c_k" type="text" inputmode="decimal" placeholder="2" title="기능: 기준율에서 벗어난 만큼 깎는 계수 · 결과: 가격평점 · 사용시점: 적격심사"></label>
+        <label>[적격심사] 기타 항목 점수(신용 등)<input id="c_other" type="text" inputmode="decimal" placeholder="30" title="기능: 가격 외 점수 · 결과: 총점 · 사용시점: 적격심사"></label>
+        <label>[적격심사] 통과 점수<input id="c_pass" type="text" inputmode="decimal" placeholder="85" title="기능: 통과 기준 총점 · 결과: 통과 최저 투찰률 · 사용시점: 적격심사"></label>
+        <label>[협상] 예상 기술(제안서) 점수<input id="c_tech" type="text" inputmode="decimal" title="기능: 기술점수 · 결과: 총점 · 사용시점: 협상에 의한 계약"></label>
+        <label>[협상] 가격 배점<input id="c_pw" type="text" inputmode="decimal" title="기능: 가격평가 배점 · 결과: 가격점수 · 사용시점: 협상에 의한 계약"></label>
+        <label>[협상] 예상 최저 입찰가 (원)<input id="c_low" type="text" inputmode="numeric" title="기능: 경쟁 최저가 가정 · 결과: 가격점수 · 사용시점: 협상에 의한 계약"></label>
+        <label>[협상] 비교할 입찰가들 (쉼표)<input id="c_bids" type="text" title="기능: 점수를 볼 입찰가 목록 · 결과: 총점 표 · 사용시점: 협상에 의한 계약"></label>
+      </div></details>
+    <div class="row" style="margin-top:22px"><button id="calcBtn" class="primary" title="기능: 하한가·권장 투찰가·마진 계산과 그래프 그리기 · 결과: 아래 결과 영역 갱신 · 사용시점: 입력을 바꾼 뒤">계산하기</button><button id="exLoad" title="기능: 예시 값을 불러오기 · 결과: 화면 동작 확인 · 사용시점: 사용법을 익히거나 검증할 때">장부 사례 불러오기</button><button id="calcClear" title="기능: 원가 입력칸 비우기 · 결과: 새 계산 준비 · 사용시점: 다른 공고로 바꿀 때">원가 칸 비우기</button><span id="calcMsg" class="small"></span></div>
+  </div>
+  <div id="calcOut"><div class="empty">공고 숫자(기초금액·낙찰하한율)를 ①에서 입력한 뒤 [계산하기]를 누르세요.</div></div>
+</section>
+
+<!-- ══════════ ③ 제출 서류 체크·작성 ══════════ -->
+<section id="tab3" class="pane">
+  <div class="card">
+    <h2>서류 초안 만들기</h2>
+    <p class="lead">공고 정보와 확정한 투찰금액으로 표준 서류 초안을 만듭니다. 빈칸은 "확인 필요"로 남으며, 제출 전에 기관 양식과 대조하세요.</p>
+    <div class="grid">
+      <label>확정 투찰금액 (원, 부가세 등 제세포함 총액)<input id="d_bid" type="text" inputmode="numeric" title="기능: 서류에 넣을 투찰금액 · 결과: ②에서 선택한 금액이 자동 입력 · 사용시점: 투찰가 확정 후"></label>
+      <label>상호<input id="co_name" type="text" title="기능: 회사 상호 · 결과: 서류에 입력(이 PC에만 저장) · 사용시점: 처음 한 번"></label>
+      <label>대표자<input id="co_ceo" type="text" title="기능: 대표자 성명 · 결과: 서류에 입력(이 PC에만 저장) · 사용시점: 처음 한 번"></label>
+      <label>사업자등록번호<input id="co_biz" type="text" title="기능: 사업자번호 · 결과: 서류에 입력(이 PC에만 저장) · 사용시점: 처음 한 번"></label>
+      <label>주소<input id="co_addr" type="text" title="기능: 회사 주소 · 결과: 서류에 입력(이 PC에만 저장) · 사용시점: 처음 한 번"></label>
+      <label>전화<input id="co_tel" type="text" title="기능: 연락처 · 결과: 서류에 입력(이 PC에만 저장) · 사용시점: 처음 한 번"></label>
+      <label>입찰 담당자<input id="co_mgr" type="text" title="기능: 담당자 이름 · 결과: 서류에 입력(이 PC에만 저장) · 사용시점: 처음 한 번"></label>
+    </div>
+    <p class="small" style="margin-top:10px">회사 정보는 이 브라우저(이 PC)에만 저장되며 어디로도 전송되지 않습니다.</p>
+    <h3>산출내역서 품목</h3>
+    <div class="scroll"><table id="itemTbl"><thead><tr><th>품목(보고서명)</th><th>발행사</th><th>수량</th><th>정가</th><th>통화</th><th>환율</th><th></th></tr></thead><tbody></tbody></table></div>
+    <div class="row" style="margin-top:10px"><button id="itemAdd" class="sm" title="기능: 품목 한 줄 추가 · 결과: 산출내역서에 반영 · 사용시점: 여러 품목을 한 번에 입찰할 때">+ 품목 추가</button><span class="small">투찰금액은 품목 정가(원화환산) 비율로 배분됩니다. 정가가 없으면 균등 배분합니다.</span></div>
+    <h3>내려받기</h3>
+    <div class="gens">
+      <button class="gen" data-gen="cost" title="기능: 산출내역서(.xls) 생성 · 결과: 품목·단가·금액·합계 · 사용시점: 공고가 산출내역서를 요구할 때"><b>산출내역서 (.xls)</b><span>품목별 단가·금액·공급가액·부가세·합계</span></button>
+      <button class="gen" data-gen="apply" title="기능: 입찰참가신청서 초안(.doc) · 결과: 공고·회사 정보 채움 · 사용시점: 참가신청이 필요할 때"><b>입찰참가신청서 (.doc)</b><span>공고정보·입찰금액·회사정보 채움</span></button>
+      <button class="gen" data-gen="bidform" title="기능: 물품구매입찰서 입력값 정리(.doc) · 결과: 나라장터 입찰서 화면에 넣을 값 · 사용시점: 투찰 직전"><b>물품구매입찰서 입력값 (.doc)</b><span>나라장터 입찰서 화면 칸 기준</span></button>
+      <button class="gen" data-gen="bond" title="기능: 입찰보증금 지급각서 초안(.doc) · 결과: 5% 이상 금액 표기 · 사용시점: 보증금 면제대상일 때"><b>입찰보증금 지급각서 (.doc)</b><span>낙찰금액 5% 이상 현금 납입 확약</span></button>
+      <button class="gen" data-gen="contract" title="기능: 낙찰 후 계약 입력 카드(.doc) · 결과: 계약금액·보증금·소비자가 · 사용시점: 낙찰된 다음 날"><b>계약 입력 카드 (.doc)</b><span>계약금액·계약보증금·소비자가(KISTI 절차)</span></button>
+      <button class="gen" data-gen="ledger" title="기능: 입찰장부 1행(.xls) · 결과: 장부 26열 양식 그대로 · 사용시점: 투찰 후 장부에 옮길 때"><b>입찰장부 1행 (.xls)</b><span>정본 26열 헤더 그대로</span></button>
+    </div>
+    <div id="prev" style="margin-top:22px"></div>
+  </div>
+  <div class="card">
+    <h2>제출 서류 체크리스트 <span id="chkProg" class="small" style="font-weight:400"></span></h2>
+    <p class="lead">입찰 전 준비 → 참가·투찰 → 계약 → 납품·대금 순서입니다. "공고문 언급"은 올린 문서에서 해당 서류 이름이 발견된 항목입니다. 체크 상태는 공고별로 저장됩니다.</p>
+    <div class="bar" style="margin-bottom:14px"><i id="chkBar" style="width:0"></i></div>
+    <div id="chkBox"></div>
+  </div>
+</section>
+
+<!-- ══════════ ④ 검증·설정 ══════════ -->
+<section id="tab4" class="pane">
+  <div class="card">
+    <h2>자가검증 (오류수정 → 재검증 → Evidence)</h2>
+    <p class="lead">원장·입찰장부·학습자료에 기록된 정답 숫자로 계산 엔진 전체를 시험합니다. 하나라도 FAIL이면 결과를 믿지 마세요.</p>
+    <div class="row"><button id="verifyBtn" class="primary" title="기능: 계산 엔진 전체 시험 · 결과: 기대값 vs 계산값 표 · 사용시점: 수정 후·의심될 때">자가검증 실행</button><button id="evBtn" title="기능: 시험 결과 JSON 저장 · 결과: 입찰도구_Evidence.json · 사용시점: 증거 보관">Evidence 내려받기(JSON)</button><span id="verifyMsg" class="small"></span></div>
+    <div class="scroll" style="margin-top:14px"><table id="vTbl"><thead><tr><th>검증 항목</th><th>기대값(Expected)</th><th>계산값(Actual)</th><th>판정</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <details id="cfgBox">
+    <summary title="기능: 입찰/내부안내/제외 키워드 설정 · 결과: 목록 분류 기준 변경 · 사용시점: 분류가 맞지 않을 때">분류 규칙 설정 (바꾸지 않아도 바로 사용 가능)</summary>
+    <div class="inner">
+      <p class="small">키워드는 쉼표 또는 줄바꿈으로 구분합니다. 분류 순서: ① 제외어와 입찰어가 함께 있으면 "내부안내"(애매하면 입찰로 올리지 않음) ② 제외어만 있으면 X ③ 입찰어 → 입찰 ④ 내부안내어 → 내부안내 ⑤ 해당 없음 → 내부안내.</p>
+      <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))"><label>입찰 키워드<textarea id="k_bid" rows="5" title="기능: 입찰 대상으로 볼 단어 목록 · 결과: 공고명에 있으면 '입찰' 분류 · 사용시점: 분류 기준을 바꿀 때"></textarea></label><label>내부안내 키워드<textarea id="k_int" rows="5" title="기능: 내부 안내 대상 단어 목록 · 결과: 공고명에 있으면 '내부안내' 분류 · 사용시점: 분류 기준을 바꿀 때"></textarea></label><label>제외(X) 키워드<textarea id="k_ex" rows="5" title="기능: 제외할 단어 목록 · 결과: 공고명에 있으면 'X' 분류 · 사용시점: 분류 기준을 바꿀 때"></textarea></label></div>
+      <div class="row" style="margin-top:12px"><button id="saveCfg" class="primary" title="기능: 키워드 저장 · 결과: 목록 재분류 · 사용시점: 키워드를 고친 뒤">설정 저장</button><button id="defCfg" title="기능: 기본 키워드로 복원 · 결과: 재분류 · 사용시점: 되돌리고 싶을 때">기본값으로 되돌리기</button><span id="cfgMsg" class="small"></span></div>
+    </div>
+  </details>
+  <div class="card"><h2>작업 로그 (AUTO_LOG)</h2><pre id="log" class="log"></pre></div>
+</section>
+<section id="tab5" class="pane">
+  <div class="card"><h2>입찰 건 보관함 <span class="small" style="font-weight:400">· 예전 버전(index 예전)의 입찰 건·품목 등록 기능 통합</span></h2>
+    <p class="lead">현재 ① 공고 정보와 ③ 품목을 한 건으로 저장하고, 나중에 검색해 다시 불러옵니다. 데이터는 이 브라우저에만 저장됩니다.</p>
+    <div class="row" style="margin-bottom:14px"><span id="sumCount" class="pill">저장 0건</span><span id="sumToday" class="pill">오늘 0건</span><span id="sumLast" class="pill">최근 기관 -</span></div>
+    <div class="grid"><label>기관<input id="bx_org" type="text"></label><label>공고명<input id="bx_title" type="text"></label><label>마감<input id="bx_due" type="text"></label><label>예산(원)<input id="bx_budget" type="text"></label>
+      <label>구분<select id="bx_type"><option>입찰</option><option>내부안내</option><option>제외(X)</option><option>확인필요</option></select></label><label>상태<select id="bx_status"><option>검토중</option><option>투찰완료</option><option>낙찰</option><option>탈락</option><option>유찰</option><option>포기</option></select></label><label>담당자<input id="bx_contact" type="text"></label><label>순위<input id="bx_rank" type="text" inputmode="numeric" title="기능: 개찰 결과 순위 · 결과: 이력 분석 · 사용시점: 개찰 후"></label><label>낙찰금액(원)<input id="bx_win" type="text" inputmode="numeric" title="기능: 기록된 낙찰금액 · 결과: 사정율 역산 · 사용시점: 개찰 후"></label><label>낙찰하한율(%)<input id="bx_floor" type="text" inputmode="decimal" title="기능: 그 공고의 낙찰하한율 · 결과: 사정율 역산 · 사용시점: 개찰 후"></label><label class="wide">메모<input id="bx_note" type="text"></label></div>
+    <div class="row" style="margin-top:16px"><button id="bx_fill" title="기능: ①공고 정보와 ③품목을 이 칸에 채움 · 결과: 저장 준비 · 사용시점: 현재 공고를 저장하려 할 때">현재 공고·품목 가져오기</button><button id="bx_save" class="primary" title="기능: 이 건 저장(같은 기관+공고명은 덮어씀) · 결과: 아래 목록 갱신 · 사용시점: 정리했을 때">저장</button><button id="bx_clear" title="기능: 입력칸 비우기 · 결과: 새 건 준비 · 사용시점: 새로 입력할 때">비우기</button></div>
+    <div class="row" style="margin-top:22px"><input id="bx_search" type="text" placeholder="기관·공고명·메모 검색" style="min-width:260px"><button id="bx_find" title="기능: 검색 · 결과: 일치 건만 표시 · 사용시점: 찾을 때">검색</button><button id="bx_reset" title="기능: 검색 해제 · 결과: 전체 표시 · 사용시점: 전체를 볼 때">전체</button></div>
+    <div class="scroll" style="margin-top:12px"><table><thead><tr><th>기관</th><th>공고명</th><th>마감</th><th>예산</th><th>구분</th><th>상태</th><th>품목</th><th></th></tr></thead><tbody id="bx_body"></tbody></table></div>
+    <div class="empty" id="bx_empty" style="margin-top:12px">저장된 입찰 건이 없습니다.</div></div></section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script src="lib/xlsx.full.min.js"></script>
+<script src="lib/wic_core.js"></script>
+<script src="lib/pdf.min.js"></script>
+<script src="lib/cmaps.js"></script>
+<script src="lib/pdf_init.js"></script>
+<script src="lib/pdfjs_glue.js"></script>
+<script src="lib/ocr/tesseract.min.js"></script>
+<script src="lib/ocr_init.js"></script>
+<script src="lib/ocr_glue.js"></script>
+<script src="engine.js"></script>
+<script src="pricing.js"></script>
+<script src="ops.js"></script>
+<script src="lib/institution_core.js"></script>
+<script src="lib/inst_init.js"></script>
+<script src="ui2.js"></script>
+<script src="ui.js"></script>
+</body></html>

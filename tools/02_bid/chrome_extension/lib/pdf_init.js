@@ -1,0 +1,1 @@
+window.__PDF_WORKER_URL = (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getURL) ? chrome.runtime.getURL('lib/pdf.worker.min.js') : undefined;
