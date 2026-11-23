@@ -5,7 +5,7 @@
   let U = null; const B = () => window.BIDENG, P = () => window.BIDENG.pricing, O = () => window.BIDENG.ops; const api = window.__BIDUI2 = {};
   const CLSCOL = {'자동 수집': '#0e7490', '자동 작성': '#2563eb', '자동 검사': '#047857', '사용자 인증 필요': '#b45309', '법적 확인 필요': '#7c3aed', '수동 처리': '#64748b'};
   const AWNAME = {floor: '복수예가·낙찰하한율제', lowest: '최저가 낙찰제', eval: '적격심사', nego: '협상에 의한 계약'};
-  api.init = u => { U = u; api._ready = true; U.S.hist = U.ls.get('wic02v3_hist', {}); U.S.instHist = U.ls.get('wic02v3_inst', {}); bindBox(); bindXlsx(); bindDocInputs(); renderBox(); };
+  api.init = u => { U = u; api._ready = true; U.S.hist = U.ls.get('wic02v3_hist', {}); U.S.instHist = U.ls.get('wic02v3_inst', {}); bindBox(); bindXlsx(); bindDocInputs(); renderBox(); kistiCard(); };
 
   /* ───────── 변경 감지 · 기관 이력 ───────── */
   api.track = (it, ex0) => {
@@ -108,6 +108,14 @@
   }
   /* 낙찰금액이 기록돼 있으면 사정율(예정가격이 기초금액에서 벗어난 정도)을 거꾸로 계산 — 한 기관의 하한율을 보편값으로 쓸 수 없다는 근거 */
   function implied(b) { const w = U.num(b.win), base = U.num(String(b.budget || '').replace(/[^\d.]/g, '')), f = U.num(b.floor); if (w.s !== 'ok' || base.s !== 'ok' || f.s !== 'ok' || !(base.n > 0) || !(f.n > 0)) return ''; const v = P().impliedSajung(w.n, base.n, f.n); return (v >= 0 ? '+' : '') + v + '%'; }
+  /* 비공개 본 전용: 과거 KISTI 이력 카드 (E.kisti 가 있을 때만) */
+  function kistiCard() {
+    const K = U.E && U.E.kisti || window.BIDENG && window.BIDENG.kisti; const host = document.getElementById('tab5'); if (!K || !host || document.getElementById('kistiHist')) return; const sm = K.summary(), won = n => Number(n).toLocaleString('ko-KR');
+    let h = '<div class="card" id="kistiHist"><h2>과거 KISTI 개찰 이력 (비공개 본 · 직접 판독 ' + sm.n + '건)</h2><p class="small">' + U.esc(K.note) + '</p><div class="tablewrap"><table><thead><tr><th>공고번호</th><th>결과</th><th>우리 투찰가</th><th>투찰률(추정예산 대비)</th><th>하한가 대비</th><th>비고</th></tr></thead><tbody>';
+    sm.wins.forEach(w => { h += '<tr><td>' + U.esc(w.no) + '</td><td>1등</td><td class="n">' + won(w.bid) + '</td><td class="n">' + w.rateOfEstimate + '%</td><td class="n">' + (w.rateOfFloor == null ? '' : w.rateOfFloor + '%') + '</td><td>2등과 차이 +' + w.secondGapPct + '%</td></tr>'; });
+    sm.gaps.forEach(g => { h += '<tr><td>' + U.esc(g.no) + '</td><td>' + g.ourRank + '등(1등과 +' + g.behindPct + '% · ' + won(g.behindWon) + '원 차이)</td><td class="n">' + won(g.ourBid) + '</td><td class="n">' + g.rateOfEstimate + '%</td><td></td><td>1등 ' + won(g.winnerBid) + '</td></tr>'; });
+    h += '</tbody></table></div></div>'; host.insertAdjacentHTML('afterbegin', h);
+  }
   function bindBox() {
     const {$, S, ls, toast, nget, esc} = U;
     $('bx_fill').onclick = () => { const n = nget(); fillBox({org: n.org, title: n.title, due: n.due, budget: n.base, type: U.classify(n.title || '').cls, status: '검토중', floor: n.floor}); toast('현재 공고 정보를 가져왔습니다 (품목 ' + (S.itemsDoc || []).filter(i => i.name).length + '건 포함 저장)'); };

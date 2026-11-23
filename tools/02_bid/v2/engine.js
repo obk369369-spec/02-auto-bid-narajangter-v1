@@ -354,7 +354,7 @@
     {stage: '2 계약(낙찰 당일~다음날)', id: 'cbond', t: '계약보증금지급각서 — 출력 → 사용 도장 날인 → 스캔 → 첨부 (계약보증금 = 계약금의 10%)', src: 'KISTI 절차.doc ②', gen: 'contract'},
     {stage: '2 계약(낙찰 당일~다음날)', id: 'ct2', t: '물품내역서 입력: 품목구분=공고명, 제조사=발행사, 옵션=PDF, 소비자가=기준예비가격의 88%, 단위 1·수량 1, 납품가=계약금액', src: 'KISTI 절차.doc ②', gen: 'contract'},
     {stage: '3 납품·검수·대금', id: 'ins', t: '검수요청서 작성 → 계약담당자 결재 → 검수부서', src: 'KISTI 절차.doc ③', gen: false},
-    {stage: '3 납품·검수·대금', id: 'pay', t: '대금 청구 → 계약담당자 결재 · 결재 문자 미수신 시 재무관리실 연락 · 수요자에게 PDF 송부 기한 문의', src: 'KISTI 절차.doc ④', gen: false}
+    {stage: '3 납품·검수·대금', id: 'pay', t: '대금 청구 → 계약담당자 결재 · 결재 문자 미수신 시 재무관리실 연락 · 수요자에게 PDF 송부 기한 문의', src: 'KISTI 절차.doc ④ · 대금요청 현황 화면(실제 화면 캡처)', gen: 'payreq'}
   ];
 
   /* 공고문에서 발견됐지만 기본 목록에 없는 서류 → 체크리스트 "공고문 발견" 항목으로 추가 */
@@ -388,11 +388,16 @@
   /* 계약 단계 입력 카드 — KISTI 절차 문서의 문구 그대로(해석 여지가 있는 부분은 확인 필요로 표기) */
   function contractCard(n, bid, base, F) {
     const contract = bid ? Math.round(bid * 0.9) : null;
-    return {contract, bond: contract ? Math.round(contract * 0.1) : null, consumer: base ? Math.round(base * (F || 88) / 100) : null};
+    return {contract, exVat: bid ? Math.round(bid / 1.1) : null, bond: contract ? Math.round(contract * 0.1) : null, consumer: base ? Math.round(base * (F || 88) / 100) : null};
+  }
+  /* 대금 청구(KISTI 전자조달 「대금요청 현황」 화면 칸 기준 입력값) — 계약금액·요청금액·세액·계산서 구분 */
+  function docPayReq(n, co, bid, taxfree) {
+    const supply = bid ? (taxfree ? bid : Math.round(bid / 1.1)) : null, vat = bid ? (taxfree ? 0 : bid - supply) : null;
+    return docWrap('대금요청서 입력값', '<h1>대 금 요 청 (입력값 정리)</h1><p class="note">전자조달 「대금요청 현황」 화면의 칸 이름 기준. 계약번호·검수번호는 계약·검수 완료 후 화면에서 선택하는 값이라 비워 둡니다. 금액은 입력한 확정 투찰금액 기준 계산값이며 기관 시스템의 계약금액과 다르면 시스템 값이 우선입니다(확인 필요).</p><table><tr><th>계약번호</th><td>' + blank('') + '</td></tr><tr><th>계약명</th><td>' + blank(n.name) + '</td></tr><tr><th>검수번호</th><td>' + blank('') + '</td></tr><tr><th>계약금액(원)</th><td>' + (supply ? won(supply) : blank('')) + ' <span class="note">' + (taxfree ? '면세 품목 — 부가세 0' : '투찰금액 ÷ 1.1 (과세)') + '</span></td></tr><tr><th>지급 구분</th><td>잔금 (선금 / 중도금 / 잔금 중 선택)</td></tr><tr><th>지급 방법</th><td>현금</td></tr><tr><th>계산서 구분</th><td>' + (taxfree ? '계산서(면세) — 확인 필요' : '세금계산서(전자) — 확인 필요') + '</td></tr><tr><th>계산서 발행일</th><td>' + blank('') + '</td></tr><tr><th>요청 금액(원)</th><td>' + (supply ? won(supply) : blank('')) + '</td></tr><tr><th>세액(원)</th><td>' + (vat === null ? blank('') : won(vat)) + '</td></tr><tr><th>요청 총금액(원)</th><td>' + (supply ? won(supply + vat) : blank('')) + '</td></tr><tr><th>첨부파일</th><td>4대보험 완납증명서 등 통장사본·납부증명서 (유효기간 확인)</td></tr><tr><th>보증 방법</th><td>해당없음 (계약보증금 면제 시) — 확인 필요</td></tr><tr><th>요청자</th><td>' + blank(co.name) + '</td></tr></table>');
   }
   function docContract(n, co, bid, base, F) {
     const c = contractCard(n, bid, base, F);
-    return docWrap('계약 단계 입력 카드', '<h1>계약(낙찰 후) 입력 카드</h1><p class="note">근거: KISTI 「낙찰시 검수 및 대금지급 관리까지 절차」 ②. 아래 "계약금액 = 투찰금액에서 10% 제외"는 해당 문서의 기재 문구를 그대로 적용한 값이며(면세 사업자 사유), 기관별로 다를 수 있어 <b>확인 필요</b>.</p><table><tr><th>품목 구분</th><td>' + blank(n.name) + ' (입찰공고 현황의 공고명 복사)</td></tr><tr><th>제조사</th><td>발행사 이하 (물품내역서 부분 복사)</td></tr><tr><th>옵션사항</th><td>PDF</td></tr><tr><th>소비자가</th><td>' + (c.consumer ? won(c.consumer) + ' 원 (기준예비가격의 ' + (F || 88) + '%' + (F ? '' : ' — 낙찰하한율 미입력, KISTI 문서 기본값') + ')' : blank('')) + '</td></tr><tr><th>단위 / 수량</th><td>1 / 1</td></tr><tr><th>납품가(계약금액)</th><td>' + (c.contract ? won(c.contract) + ' 원 (투찰금액 ' + won(bid) + ' − 10%)' : blank('')) + '</td></tr><tr><th>계약보증금(계약금의 10%)</th><td>' + (c.bond ? won(c.bond) + ' 원' : blank('')) + '</td></tr></table><p>계약보증금지급각서: 파일 열기 → 출력 → 회사 사용 도장 날인 → 스캔 → 첨부파일에 끌어서 첨부. 결재 요청 후 처리까지 시간이 걸립니다.</p>');
+    return docWrap('계약 단계 입력 카드', '<h1>계약(낙찰 후) 입력 카드</h1><p class="note">근거: KISTI 「낙찰시 검수 및 대금지급 관리까지 절차」 ②. 아래 "계약금액 = 투찰금액에서 10% 제외"는 해당 문서의 기재 문구를 그대로 적용한 값이며(면세 사업자 사유), 기관별로 다를 수 있어 <b>확인 필요</b>.</p><table><tr><th>품목 구분</th><td>' + blank(n.name) + ' (입찰공고 현황의 공고명 복사)</td></tr><tr><th>제조사</th><td>발행사 이하 (물품내역서 부분 복사)</td></tr><tr><th>옵션사항</th><td>PDF</td></tr><tr><th>소비자가</th><td>' + (c.consumer ? won(c.consumer) + ' 원 (기준예비가격의 ' + (F || 88) + '%' + (F ? '' : ' — 낙찰하한율 미입력, KISTI 문서 기본값') + ')' : blank('')) + '</td></tr><tr><th>단위 / 수량</th><td>1 / 1</td></tr><tr><th>납품가(계약금액)</th><td>' + (c.contract ? won(c.contract) + ' 원 (투찰금액 ' + won(bid) + ' − 10%)' : blank('')) + '</td></tr><tr><th>참고: 투찰금액 ÷ 1.1 (VAT 제외)</th><td>' + (c.exVat ? won(c.exVat) + ' 원 — 실제 계약에서 계약금액이 이 산식으로 정해진 사례가 있어 기관 시스템의 계약금액과 대조 필요(확인 필요)' : blank('')) + '</td></tr><tr><th>계약보증금(계약금의 10%)</th><td>' + (c.bond ? won(c.bond) + ' 원' : blank('')) + '</td></tr></table><p>계약보증금지급각서: 파일 열기 → 출력 → 회사 사용 도장 날인 → 스캔 → 첨부파일에 끌어서 첨부. 결재 요청 후 처리까지 시간이 걸립니다.</p>');
   }
   /* 입찰장부 1행 (입찰장부.xls Sheet1 · 26열 헤더 · 정본 그대로) — 수식은 값으로 계산해 넣는다 */
   const LEDGER_HEAD = ['상호', '공고번호', '공고명', '수요자정보', '계약담당자', '낙찰\n하한율', '추정예산\n(VAT포함)', '투찰기간', '모델명', '발행사', '기준예비가격\n(10% 부가세포함)', '낙찰하한율', '(주관사)디스\n카운트(%)\n(부가세포함)', '예비가격범위', '범위(-2)', '범위(-1)', '범위(0)', '범위(+1)', '범위(+2)', '투찰가격', '보고서가격\n(달러)', '보고서가격\n(엔화)', '환율', '(발행사)디스\n카운트(%)', '월드산업\n원가', '개찰조회'];
@@ -509,6 +514,6 @@
     throw new Error('지원하지 않는 형식(.' + ext + ')');
   }
 
-  g.BIDENG = {str, num, won, pct, mulRate, floorLimit, bidBySajung, calc, reverify, recommend, simulate, passProb, histogram, extractFields, extractItems, extractMemoBlocks, textQuality, normText, tableDates, detectDocs, DOC_KEYS, CHECKLIST, EXTRA_DOCS, HIST, LIST_STATS, ORG_RANGE, allocate, costSheetRows, docApply, docBidForm, docBond, docContract, contractCard, LEDGER_HEAD, ledgerRow, fileToText, pdfText, hwpText, escH};
+  g.BIDENG = {str, num, won, pct, mulRate, floorLimit, bidBySajung, calc, reverify, recommend, simulate, passProb, histogram, extractFields, extractItems, extractMemoBlocks, textQuality, normText, tableDates, detectDocs, DOC_KEYS, CHECKLIST, EXTRA_DOCS, HIST, LIST_STATS, ORG_RANGE, allocate, costSheetRows, docApply, docBidForm, docBond, docContract, docPayReq, contractCard, LEDGER_HEAD, ledgerRow, fileToText, pdfText, hwpText, escH};
   if (typeof module !== 'undefined') module.exports = g.BIDENG;
 })(typeof window !== 'undefined' ? window : globalThis);

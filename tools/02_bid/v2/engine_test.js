@@ -40,5 +40,11 @@ t('없는 값은 비움(추측 금지)', 'undefined', String(E.extractFields('�
 /* 참가자격·계약 조건 추출 (실무 매뉴얼 3번 15항목 중) */
 { const r = E.extractFields('소기업·소상공인확인서를 소지한 업체. 지역제한(종전 광주광역시 관할구역). 공동계약 불허합니다. 지문인식 신원확인 입찰. 적격심사 비대상입니다. 계약방법 : 수의(견적)  ');
   t('참가자격 제한 추출: 지역제한', true, !!r.region); t('참가자격 제한 추출: 소기업 확인서 요구', '필요', r.smeReq && r.smeReq.value); t('참가자격 제한 추출: 공동계약 불허', '불허', r.joint && r.joint.value); t('참가자격 제한 추출: 지문인식', '적용', r.fingerprint && r.fingerprint.value); t('참가자격 제한 추출: 적격심사 비대상', '비대상', r.evalTarget && r.evalTarget.value); t('참가자격 제한 추출: 계약방법', '수의(견적)', r.cmethod && r.cmethod.value); t('조건 문구가 없으면 비움(추측 금지)', '', Object.keys(E.extractFields('관련 없는 문장')).filter(k => ['region', 'smeReq', 'joint', 'fingerprint', 'evalTarget', 'cmethod'].includes(k)).join(',')); }
+/* 대금요청서 초안 · 계약금액(VAT 제외) 계산 */
+{ const hp = E.docPayReq({no: 'T-1', name: '시험 보고서', org: '시험기관'}, {name: '시험상사'}, 1100000, false), hf = E.docPayReq({no: 'T-2', name: '시험 보고서'}, {name: '시험상사'}, 6555000, true);
+  t('대금요청서 초안(과세): 계약금액 = 투찰금액 ÷ 1.1', true, hp.includes('1,000,000') && hp.includes('100,000'));
+  t('대금요청서 초안(면세): 세액 0 · 총액 = 투찰금액', true, hf.includes('6,555,000') && /세액\(원\)<\/th><td>0/.test(hf));
+  t('계약 카드: 참고 VAT 제외 금액(투찰금액÷1.1)', true, E.docContract({}, {}, 1100000, 1000000, 88).includes('1,000,000 원 — 실제 계약'));
+  t('대금 청구 체크리스트 항목에 초안 연결', 'payreq', (E.CHECKLIST.find(c => c.id === 'pay') || {}).gen); }
 console.log(`\n결과 PASS ${pass} / FAIL ${fail}`); process.exit(fail ? 1 : 0);
 })();
