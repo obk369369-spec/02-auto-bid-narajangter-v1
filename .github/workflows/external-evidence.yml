@@ -18,7 +18,7 @@ concurrency:
 jobs:
   validate:
     name: Independent validation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       entry: ${{ steps.entry.outputs.path }}
     steps:
@@ -55,7 +55,7 @@ jobs:
     name: Permanent evidence archive
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && always()
     needs: validate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -86,7 +86,7 @@ jobs:
     name: GitHub Pages deployment
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: validate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
