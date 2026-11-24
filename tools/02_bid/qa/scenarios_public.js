@@ -1,0 +1,30 @@
+/* 범용 전략 엔진 E2E 시나리오 — 공개 저장소용 (비식별 예시값)
+   실제 기관명·공고번호·정가·커미션·대외 안내 비율·낙찰 기록은 하나도 들어 있지 않다. 모든 값은 시험을 위해 만든 가상 예시이며 실제 업무 조건이 아니다.
+   구조는 비공개 본(scenarios_private.js)과 같아서 같은 시험 코드(strategy_test.js · e2e_strategy.js)가 그대로 돈다. */
+module.exports = [
+  {id: 'S1_KRICT_024', name: '[예시] 연구기관 · 최저가 · 사전견적 · 비과세', real: false,
+    n: {org: '예시연구원', no: 'EX-2026-0001', title: 'Example Market Report 2026', base: '10000000', basis: 'asis', floor: '', award: 'lowest', tax: 'free', vat: '10', pub: 'Example Publisher', due: '2026. 12. 01.(월) 10:00'},
+    c: {list: '3000', cur: 'USD', fx: '1300', costmode: 'ledger', disc: '', comm: '30', guide: '60', tlo: '75', thi: '85', smin: '0', spread: '2', trates: ''},
+    s: {org: 'research', orgKey: 'none', sales: 'prequote', contract: 'single', urgent: false, rebid: false},
+    note: '가상 예시값 (실제 공고·원가 아님). 환율 1,300 도 예시'},
+  {id: 'S2_KISTI_FLOOR', name: '[예시] 연구기관 · 복수예가 낙찰하한율제 88% · (-1)~(+1)', real: false,
+    n: {org: '예시연구원', no: 'EX-2026-0002', title: 'Example Floor-rate Report', base: '3000000', basis: 'asis', floor: '88', range: '1', rlo: '', rhi: '', method: 'multi', award: 'floor', tax: 'tax', vat: '10'},
+    c: {list: '2000', cur: 'USD', fx: '1300', costmode: 'ledger', disc: '', comm: '20', guide: '', tlo: '', thi: '', smin: '0', spread: '2', trates: ''},
+    s: {org: 'research', orgKey: 'none', sales: 'open', contract: 'single', urgent: false, rebid: false},
+    note: '가상 예시값. 공개 본에는 실측 개찰 기록이 없어 "반영 0" 으로 표시된다'},
+  {id: 'S3_UNIV_OPEN', name: '[예시] 대학·공공기관 일반 공개경쟁 · 최저가 · 과세', real: false,
+    n: {org: 'OO대학교', no: 'EX-2026-0003', title: '해외 시장조사 보고서 구매(예시)', base: '10000000', basis: 'incl', floor: '', award: 'lowest', tax: 'tax', vat: '10'},
+    c: {list: '3000', cur: 'USD', fx: '1400', costmode: 'ledger', disc: '', comm: '30', guide: '', tlo: '', thi: '', smin: '3', spread: '2', trates: ''},
+    s: {org: 's2b', orgKey: '', sales: 'open', contract: 'single', urgent: false, rebid: false},
+    note: '가상 예시값'},
+  {id: 'S4_G2B_EVAL', name: '[예시] 나라장터 적격심사(기본 평가표) · 과세', real: false,
+    n: {org: '조달청 수요기관', no: 'EX-2026-0004', title: '해외 데이터베이스 구독(예시)', base: '100000000', basis: 'incl', floor: '', award: 'eval', tax: 'tax', vat: '10'},
+    c: {list: '60000000', cur: 'KRW', fx: '', costmode: 'ledger', disc: '', comm: '0', guide: '', tlo: '', thi: '', smin: '0', spread: '2', trates: ''},
+    s: {org: 'g2b', orgKey: '', sales: 'open', contract: 'annual', urgent: false, rebid: false},
+    note: '가상 예시값 — 조달청 물품 적격심사 기본값(70−2×|88−x|, 통과 85, 기타 30)'},
+  {id: 'S5_NEGO', name: '[예시] 국방·공기업 협상에 의한 계약', real: false,
+    n: {org: '국방 OO', no: 'EX-2026-0005', title: '시장조사 구매(예시)', base: '50000000', basis: 'incl', floor: '', award: 'nego', tax: 'tax', vat: '10'},
+    c: {list: '20000000', cur: 'KRW', fx: '', costmode: 'ledger', disc: '', comm: '10', guide: '', tlo: '', thi: '', smin: '0', spread: '2', trates: ''},
+    s: {org: 'd2b', orgKey: '', sales: 'nonexcl', contract: 'unit', urgent: false, rebid: true},
+    note: '가상 예시값 — 협상은 가격 구간을 산출하지 않음을 확인'}
+];

@@ -381,6 +381,10 @@ details>.inner{padding:4px 28px 26px}
 .explainbox{background:var(--amber2);border:1px solid #fcd34d;border-radius:10px;padding:12px 16px;font-size:12.5px;margin:12px 0}
 pre.log{white-space:pre-wrap;font-size:12px;color:var(--mute);margin:0;max-height:240px;overflow:auto}
 .empty{padding:34px 10px;text-align:center;color:var(--mute);border:1px dashed var(--line);border-radius:12px;background:#fafbfd}
+.src{display:inline-block;padding:1px 9px;border-radius:99px;font-size:11px;font-weight:700;white-space:normal;line-height:1.5;margin:2px 4px 2px 0}
+.src-rule{background:#d1fae5;color:#065f46}.src-meas{background:#cffafe;color:#155e75}.src-input{background:#dbeafe;color:#1e40af}.src-assume{background:#fef3c7;color:#92400e}.src-def{background:#ffedd5;color:#9a3412}.src-none{background:#f1f5f9;color:#475569}
+tr.lossrow td{background:#fef2f2}
+.sim input[type=range]{width:100%;padding:0}
 @media(max-width:720px){main{padding:16px 12px 60px}.card{padding:18px 16px}.top{padding:10px 12px}.charts{grid-template-columns:1fr}details>.inner{padding:4px 14px 20px}}
 @media print{.top,.toast,button{display:none!important}.pane{display:block!important}}
 </style></head><body>
@@ -508,6 +512,35 @@ pre.log{white-space:pre-wrap;font-size:12px;color:var(--mute);margin:0;max-heigh
       </div></details>
     <div class="row" style="margin-top:22px"><button id="calcBtn" class="primary" title="기능: 하한가·권장 투찰가·마진 계산과 그래프 그리기 · 결과: 아래 결과 영역 갱신 · 사용시점: 입력을 바꾼 뒤">계산하기</button><button id="exLoad" title="기능: 예시 값을 불러오기 · 결과: 화면 동작 확인 · 사용시점: 사용법을 익히거나 검증할 때">장부 사례 불러오기</button><button id="calcClear" title="기능: 원가 입력칸 비우기 · 결과: 새 계산 준비 · 사용시점: 다른 공고로 바꿀 때">원가 칸 비우기</button><span id="calcMsg" class="small"></span></div>
   </div>
+  <div class="card sim" id="stratCard">
+    <h2>상황 진단 · 투찰 구간 (범용) <span class="small" style="font-weight:400">· 5가지 조건을 고르면 근거 있는 숫자만으로 구간을 계산합니다</span></h2>
+    <p class="lead">낙찰방식은 ① 공고 정보에서 이어받습니다. 근거 데이터가 없는 구간은 숫자를 만들지 않고, 아래 입력칸(목표 마진·예상 경쟁)을 직접 조절하는 계산 표로 보여 줍니다. <b>실제 원가·커미션은 내부용</b>이며 서류에는 출력되지 않습니다.</p>
+    <div class="grid">
+      <label>발주 기관 유형<select id="s_org" title="기능: 기관 성격 분류 · 결과: 공고 진단 문구(숫자에는 반영하지 않음) · 사용시점: 기관을 확인한 뒤"><option value="auto">자동 (수요기관 이름으로 판별)</option><option value="research">출연연 자체 시스템 (KISTI·화연·ETRI)</option><option value="g2b">나라장터 (G2B)</option><option value="s2b">학교장터 (S2B)·대학</option><option value="d2b">국방(D2B)·공기업</option><option value="other">그 밖의 공공기관</option></select></label>
+      <label>기관 개찰 기록 불러오기<select id="s_orgkey" title="기능: 이 기관의 과거 개찰 실측 기록 사용 여부 · 결과: 기록이 있으면 실측 라벨로 표시 · 사용시점: 기관 확인 후"><option value="auto">자동 (기관 이름으로 판별)</option><option value="none">사용 안 함</option><option value="kisti">KISTI</option><option value="kric">한국화학연구원</option><option value="etri">ETRI</option></select></label>
+      <label>사전 영업·독점성<select id="s_sales" title="기능: 영업 상황 분류 · 결과: 진단 문구 · 사용시점: 사전 견적을 냈는지, 단독 공급인지 확인한 뒤"><option value="open">일반 공개경쟁</option><option value="prequote">사전 견적 제출 공고</option><option value="exclusive">발행사 단독 공급권</option><option value="nonexcl">발행사 비독점 공급권</option></select></label>
+      <label>계약 형태<select id="s_contract" title="기능: 납품·계약 방식 분류 · 결과: 진단 문구 · 사용시점: 공고 확인 후"><option value="single">단건 납품</option><option value="unit">단가계약</option><option value="annual">연간 구독</option></select></label>
+      <label><span><input type="checkbox" id="s_urgent" title="기능: 긴급 공고 표시 · 결과: 진단 문구에 주의 추가 · 사용시점: 제출 기한이 촉박할 때"> 긴급 공고</span><span><input type="checkbox" id="s_rebid" title="기능: 재공고 표시 · 결과: 직전 개찰 비교 안내 · 사용시점: 재공고일 때"> 재공고</span></label>
+    </div>
+    <h3>내부 원가 · 대외 안내 (분리 관리)</h3>
+    <div class="grid">
+      <label>실제 커미션 (%) — 내부용<input id="c_comm" type="text" inputmode="decimal" placeholder="예) 매입계수 0.55 → 45" title="기능: 발행사에서 실제로 받는 할인(커미션) · 결과: 실제 원가 = 정가×환율×(1−커미션) · 사용시점: 진짜 순이익을 볼 때(서류에 출력되지 않음)"></label>
+      <label>대외 안내 비율 (% 기초금액 대비, 선택)<input id="c_guide" type="text" inputmode="decimal" placeholder="예) 70" title="기능: 고객에게 안내한 조건 · 결과: 이 아래로 쓰면 경고 · 사용시점: 대외 약속이 있을 때"></label>
+      <label>목표 투찰 구간 — 아래 (%, 선택)<input id="c_tlo" type="text" inputmode="decimal" title="기능: 계획한 투찰률의 아래쪽 · 결과: 후보 T1 · 사용시점: 목표를 비교할 때"></label>
+      <label>목표 투찰 구간 — 위 (%, 선택)<input id="c_thi" type="text" inputmode="decimal" title="기능: 계획한 투찰률의 위쪽 · 결과: 후보 T2·T3 · 사용시점: 목표를 비교할 때"></label>
+      <label>최소 마진 (원가 대비 %)<input id="c_smin" type="text" inputmode="decimal" value="0" title="기능: 지켜야 할 최소 마진 · 결과: 적자 방어선 · 사용시점: 0% 도 가능"></label>
+      <label>직접 후보 투찰률 (%, 쉼표)<input id="c_trates" type="text" placeholder="예) 80, 83.5, 85" title="기능: 확인할 투찰률 직접 입력 · 결과: 후보 U1.. 와 순이익 · 사용시점: 특정 비율을 비교할 때"></label>
+    </div>
+    <h3>시뮬레이션 조절 (근거 데이터가 없을 때 직접 비교)</h3>
+    <div class="grid">
+      <label>목표 마진율 (원가 대비 %) <input id="rng_mrg" type="range" min="0" max="100" step="0.5" value="0" title="기능: 슬라이더로 목표 마진 조절 · 결과: 목표 마진 가격선 · 사용시점: 마진을 정하며 비교할 때"><input id="c_mrg" type="text" inputmode="decimal" title="기능: 목표 마진율 숫자 입력 · 결과: 슬라이더와 동기화 · 사용시점: 정확한 값을 넣을 때"></label>
+      <label>예상 경쟁 할인율 (기초금액 −%) — 가정 <input id="rng_cdisc" type="range" min="0" max="60" step="0.5" value="0" title="기능: 경쟁자가 기초금액보다 얼마나 낮게 쓸지 가정 · 결과: 경쟁 가정선 · 사용시점: 경쟁을 가정해 비교할 때(근거 데이터 아님)"><input id="c_cdisc" type="text" inputmode="decimal" title="기능: 예상 경쟁 할인율 숫자 입력 · 결과: 슬라이더와 동기화 · 사용시점: 가정값을 넣을 때"></label>
+      <label>경쟁보다 더 낮출 폭 (%p, 선택)<input id="c_cgap" type="text" inputmode="decimal" title="기능: 경쟁 가정가보다 더 내릴 폭 · 결과: 경쟁−폭 선 · 사용시점: 경쟁보다 앞서려 할 때"></label>
+      <label>시뮬레이션 표 간격 (%p)<input id="c_step" type="text" inputmode="decimal" value="5" title="기능: 표의 투찰률 간격 · 결과: 표 줄 수 · 사용시점: 더 촘촘히 보고 싶을 때"></label>
+    </div>
+    <div class="row" style="margin-top:20px"><button id="stratBtn" class="primary" title="기능: 5가지 조건과 원가로 구간·후보·순이익 계산 · 결과: 아래 요약·차트·표 · 사용시점: 입력을 바꾼 뒤">상황 진단·구간 계산</button><button id="stratClear" title="기능: 내부 원가·안내·시뮬레이션 입력 비우기 · 결과: 새 공고 준비 · 사용시점: 다른 공고로 바꿀 때">내부 원가·전략 입력 비우기</button></div>
+  </div>
+  <div id="stratOut"><div class="empty">[상황 진단·구간 계산] 또는 [계산하기]를 누르면 이곳에 구간 차트와 후보·순이익 표가 나옵니다.</div></div>
   <div id="calcOut"><div class="empty">공고 숫자(기초금액·낙찰하한율)를 ①에서 입력한 뒤 [계산하기]를 누르세요.</div></div>
 </section>
 
@@ -1208,6 +1241,205 @@ pre.log{white-space:pre-wrap;font-size:12px;color:var(--mute);margin:0;max-heigh
 })(typeof window !== 'undefined' ? window : globalThis);
 
 </script>
+<script>/* strategy */
+/* 범용 투찰 전략 엔진 (v3.2) — 5가지 변수로 공고 성격을 진단하고, 근거가 있는 숫자만으로 투찰 구간을 계산한다.
+   [임의 가짜 숫자 금지] 이 파일의 모든 수치는 다음 세 근거에서만 나온다.
+     ① 실측 데이터   : 우리 입찰장부·KISTI 개찰 기록(비공개 본 qa/장부) — 표본 수를 함께 표시, 통계로 확대하지 않음
+     ② 공고·기관 규칙: 공고문에 적힌 낙찰하한율·예가범위·기초금액·평가표(없으면 "기본 평가표" 로 표시하고 공고 값으로 교체 요구)
+     ③ 사용자 입력   : 실제 원가(정가×환율×매입계수)·대외 안내 기준·목표 마진율·예상 경쟁 할인율 (경쟁 가정은 "가정"으로 표시)
+   근거가 모자라 낙찰 구간을 계산할 수 없으면(예: 하한율 없는 최저가) 구간을 만들어내지 않고 "산출 불가"로 두고, 사용자가 입력칸으로 조절하는 투명한 계산 표(simulate grid)만 제공한다.
+   보편 88%·공공입찰 평균(86.9%/90.4% 등)·허용 폭 같은 근거 없는 상수는 사용하지 않는다(출처 미확인 통계는 계산에서 제외).
+   내부 원가·커미션·순이익은 화면 전용 — leak.scan() 이 모든 .xls/.doc 출력 직전에 검사해 발견되면 내려받기를 막는다. */
+(function (g) {
+  'use strict';
+  const E = g.BIDENG || require('./engine.js'); const P = E.pricing || require('./pricing.js'); const {num, won} = E;
+  const r3 = x => Math.round(x * 1000) / 1000;
+
+  /* 근거 라벨 — 화면의 모든 숫자에 붙는다 */
+  const SRC = {
+    rule: {key: 'rule', label: '공고 규칙 기반', cls: 'src-rule'},
+    measured: {key: 'measured', label: '실측 데이터 기반 (우리 장부·KISTI 개찰)', cls: 'src-meas'},
+    input: {key: 'input', label: '사용자 입력 조건 기반', cls: 'src-input'},
+    assume: {key: 'assume', label: '사용자 가정 (시뮬레이션 · 근거 데이터 아님)', cls: 'src-assume'},
+    deflt: {key: 'deflt', label: '기본 평가표 (공고 평가표 값으로 교체 필요)', cls: 'src-def'}
+  };
+
+  /* ───────── 변수 ① 발주 기관 유형 · ③ 영업/독점성 · ④ 계약 조건: 공고 성격 진단용 분류(숫자를 만들지 않는다) ───────── */
+  const ORG_TYPES = {
+    research: {name: '출연연 자체 구매시스템 (KISTI·한국화학연구원·ETRI 등)', hint: /KISTI|한국과학기술정보|한국화학연구원|ETRI|한국전자통신|출연|연구원|연구소|KRICT|KIST/i},
+    g2b: {name: '나라장터 (G2B · 조달청)', hint: /조달청|나라장터|G2B/i},
+    s2b: {name: '학교장터 (S2B) · 대학', hint: /대학|학교|S2B|교육청|산학협력단/i},
+    d2b: {name: '국방전자조달 (D2B) · 공기업', hint: /국방|방위|D2B|공사|공단|한국전력|KEPCO|철도|수자원/i},
+    other: {name: '그 밖의 공공기관·일반', hint: null}
+  };
+  const SALES = {prequote: '사전 견적 제출 공고', exclusive: '발행사 단독 공급권', nonexcl: '발행사 비독점 공급권', open: '일반 공개경쟁'};
+  const CONTRACT = {single: '단건 납품', unit: '단가계약', annual: '연간 구독'};
+  const AWARD = {lowest: '단순 최저가', floor: '복수예가 낙찰하한율제', eval: '적격심사', nego: '협상에 의한 계약(기술+가격)'};
+  function detectOrg(text) { const t = String(text || ''); for (const k of ['g2b', 'research', 's2b', 'd2b']) { if (ORG_TYPES[k].hint && ORG_TYPES[k].hint.test(t)) return k; } return 'other'; }
+  function detectOrgKey(text) { const t = String(text || ''); if (/KISTI|한국과학기술정보연구원/i.test(t)) return 'kisti'; if (/한국화학연구원|KRICT/i.test(t)) return 'kric'; if (/ETRI|한국전자통신연구원/i.test(t)) return 'etri'; return ''; }
+
+  /* ① 실측 데이터: 개찰 기록(1등 낙찰금액 ÷ 기초금액). 같은 낙찰방식(복수예가 낙찰하한율제)의 기록만 쓴다 — 다른 방식에 억지 적용 금지. 비공개 본(E.kisti)에만 존재 */
+  function measuredFor(orgKey, award) {
+    if (orgKey === 'kisti' && award === 'floor' && E.kisti && E.kisti.summary) { try { return E.kisti.summary().wins.filter(w => w.rateOfBase != null).map(w => ({rate: w.rateOfBase, no: w.no, src: 'KISTI 개찰 상세조회 1등 기록 ' + w.no})); } catch (e) { return []; } }
+    return [];
+  }
+
+  /* ───────── 실제 매입 원가(내부용): 정가 × 환율 × (1 − 실제 커미션) (+부대비용) ───────── */
+  function internalCost(p, errors) {
+    const L = num(p.list), FX = num(p.fx), C = num(p.commission), X = num(p.extra); const cur = p.cur || 'KRW';
+    if (p.commission === '' || p.commission == null) { if (p.costOverride != null && p.costOverride > 0) return {cost: p.costOverride, k: null, note: '기존 입력의 원가(장부 방식)를 사용'}; return null; }
+    if (L.s !== 'ok' || !(L.n > 0)) { errors.push('발행사 정가 입력 필요 (실제 원가 계산용)'); return null; }
+    const fx = cur === 'KRW' ? 1 : (FX.s === 'ok' && FX.n > 0 ? FX.n : null); if (fx === null) { errors.push('통화 ' + cur + ' 의 환율 입력 필요'); return null; }
+    if (C.s !== 'ok' || C.n < 0 || C.n >= 100) { errors.push('실제 커미션은 0 이상 100 미만(%)'); return null; }
+    const k = 1 - C.n / 100, extra = X.s === 'ok' && X.n > 0 ? X.n : 0, base = Math.round(L.n * fx * k);
+    return {cost: base + extra, k, extra, commission: C.n, fx, listKrw: Math.round(L.n * fx), note: `실제 원가 = 정가 ${L.n.toLocaleString('ko-KR')} ${cur} × 환율 ${fx} × 매입계수 ${r3(k)} (실제 커미션 ${C.n}%)${extra ? ' + 부대비용 ' + won(extra) : ''} = ${won(base + extra)}원`};
+  }
+
+  /* ───────── 핵심 분석 ───────── */
+  function analyze(p) {
+    const errors = [], warns = [], reasons = [], layers = []; const out = {ok: false, errors, warns, reasons, layers, src: SRC};
+    const org = ORG_TYPES[p.org] ? p.org : 'other', award = AWARD[p.award] ? p.award : '', sales = SALES[p.sales] ? p.sales : 'open', taxfree = p.tax === 'free', contract = CONTRACT[p.contract] ? p.contract : 'single';
+    const vatRate = p.bidVat != null ? p.bidVat : (taxfree ? 0 : (num(p.vat).s === 'ok' ? num(p.vat).n : 10));
+    const ref = Number(p.ref); if (!(ref > 0)) errors.push('기준 금액(기초금액) 확인 필요');
+    if (!award) errors.push('낙찰방식을 먼저 정하세요 (최저가·하한율제·적격심사·협상) — 추측하지 않습니다');
+    const cst = internalCost(p, errors);
+    const opt = k => { const v = num(p[k]); if (v.s === 'ok') return v.n; if (v.s === 'bad') errors.push(k + ': 숫자가 아님'); return null; };
+    const minM = opt('minMargin') || 0, guide = (x => (x != null && x > 0 ? x : null))(opt('guide')), tLo = opt('tlo'), tHi = opt('thi'), tMargin = opt('targetMargin'), compDisc = opt('compDisc'), compGap = opt('compGap'), step = (x => (x != null && x > 0 ? x : 5))(opt('step'));
+    if (guide != null && guide > 100) errors.push('대외 안내 비율은 100% 이하');
+    if (errors.length) return Object.assign(out, {errors});
+    const supplyOf = bid => (vatRate > 0 ? P.splitVat(bid, vatRate).supply : bid);
+    const bidAt = rate => Math.floor(ref * Math.round(rate * 1000) / 100000 + 1e-9);
+    const rateOf = bid => ref ? bid / ref * 100 : 0;
+    const profile = {org, orgName: ORG_TYPES[org].name, award, awardName: AWARD[award], sales, salesName: SALES[sales], urgent: !!p.urgent, rebid: !!p.rebid, tax: taxfree ? 'free' : 'tax', contract, contractName: CONTRACT[contract], hasCost: !!cst, guide};
+    out.profile = profile; out.ref = ref; out.cost = cst ? cst.cost : null; out.costNote = cst ? cst.note : null; out.vatRate = vatRate; out.minMargin = minM; out.guide = guide;
+    const lines = []; const mk = (id, label, bid, src, detail) => { const L = {id, label, bid, rate: r3(rateOf(bid)), src, detail: detail || ''}; lines.push(L); return L; };
+    /* ③ 사용자 입력: 적자 방어선·대외 안내선 */
+    let beBid = null, guideBid = null;
+    if (cst) { const need = Math.ceil(cst.cost * (1 + minM / 100) - 1e-6); beBid = vatRate === 0 ? need : P.totalFromSupply(need, vatRate); mk('BE', '적자 방어선 (실제 원가' + (minM ? ' + 최소마진 ' + minM + '%' : '') + ')', beBid, SRC.input, cst.note); }
+    if (guide != null) { guideBid = bidAt(guide); mk('GD', '대외 안내선 ' + guide + '%', guideBid, SRC.input, '고객에게 안내한 조건 — 이 아래로 쓰면 안내를 어김'); }
+    mk('CAP', '기초금액 상한 (100%)', ref, SRC.rule, '기초금액 초과 투찰은 무효 위험');
+    const lows = [beBid, guideBid].filter(x => x != null); const defBid = lows.length ? Math.max(...lows) : null;
+    out.breakEven = beBid == null ? null : {bid: beBid, rate: r3(rateOf(beBid))}; out.guideLine = guideBid == null ? null : {bid: guideBid, rate: guide};
+    out.defense = defBid == null ? null : {bid: defBid, rate: r3(rateOf(defBid)), src: SRC.input, why: guideBid != null && guideBid >= (beBid || 0) ? '대외 안내 기준' : '적자 방어(원가+최소마진)'};
+    /* ② 공고 규칙 · ① 실측: 낙찰 가능 구간 */
+    let zone = null, winStatus = 'insufficient', basisNote = '';
+    if (award === 'floor') {
+      const fb = p.floorBand; if (!fb || !(fb.max > 0)) { errors.push('낙찰하한율제 구간은 ① 공고 정보의 하한율·예가범위가 필요합니다'); return Object.assign(out, {errors}); }
+      zone = {lo: Math.ceil(fb.min), hi: Math.floor(fb.max), src: SRC.rule}; winStatus = 'rule'; basisNote = `낙찰하한가는 예정가격에 따라 ${won(fb.min)}~${won(fb.max)}원 사이에서 움직입니다 (공고 하한율 ${fb.floorRate}% · 예가범위 반영). 아래끝 미만은 어떤 경우에도 탈락, 위쪽 끝 이상은 항상 통과.`;
+      mk('FL', '하한가 변동 아래끝 (이보다 낮으면 항상 탈락)', zone.lo, SRC.rule, '공고 낙찰하한율 × 예정가격 최저'); mk('FH', '하한가 변동 위쪽 끝 (항상 통과)', zone.hi, SRC.rule, '공고 낙찰하한율 × 예정가격 최고');
+      layers.push({id: 'rule', label: '입찰 방식 규칙 (복수예가 낙찰하한율제)', detail: basisNote, src: SRC.rule});
+    } else if (award === 'eval') {
+      const g2 = k => (num(p[k]).s === 'ok' ? num(p[k]).n : null); const has = ['evalRef', 'evalWeight', 'evalK', 'evalOther', 'evalPass'].every(k => g2(k) != null);
+      const ep = {ref: g2('evalRef') == null ? 88 : g2('evalRef'), weight: g2('evalWeight') == null ? 70 : g2('evalWeight'), k: g2('evalK') == null ? 2 : g2('evalK'), otherScore: g2('evalOther') == null ? 30 : g2('evalOther'), pass: g2('evalPass') == null ? 85 : g2('evalPass')}; const src = has ? SRC.rule : SRC.deflt;
+      const mr = P.minPassRate(ep);
+      if (mr == null) { warns.push('가격평점이 모자라 통과점수에 닿을 수 없습니다 — 평가표 확인 필요'); }
+      else { zone = {lo: Math.ceil(ref * mr / 100), hi: Math.ceil(ref * ep.ref / 100), src}; winStatus = has ? 'rule' : 'rule_default'; basisNote = `가격평점 = ${ep.weight} − ${ep.k}×|${ep.ref} − 투찰률|, 통과 ${ep.pass}점(기타 ${ep.otherScore}점) → 통과 최저 투찰률 ${mr}% ~ 평점 최고 ${ep.ref}%`; mk('EL', '심사 통과 최저선 (' + mr + '%)', zone.lo, src, basisNote); mk('EH', '가격평점 최고점 (' + ep.ref + '%)', zone.hi, src, basisNote); }
+      layers.push({id: 'rule', label: '입찰 방식 규칙 (적격심사 가격평점)', detail: basisNote || '산출 불가', src});
+      if (!has) warns.push('적격심사 평가표(기준율·배점·감점·기타점수·통과점수)를 공고에서 입력하지 않아 조달청 기본값으로 계산했습니다 — 공고 평가표 확인 필요.');
+    } else if (award === 'nego') {
+      winStatus = 'nego'; layers.push({id: 'rule', label: '입찰 방식 규칙 (협상에 의한 계약)', detail: '기술+가격 합산 평가 — 가격만으로 구간을 정할 수 없음', src: SRC.rule});
+      warns.push('협상에 의한 계약은 기술점수가 좌우합니다. 적자 방어선·기초금액 상한만 제시하고 낙찰 구간은 산출하지 않습니다.');
+    } else {
+      winStatus = 'insufficient'; layers.push({id: 'rule', label: '입찰 방식 규칙 (단순 최저가)', detail: '하한율이 없고 공고에 구간을 정할 수치가 없음 — 가장 낮은 가격이 낙찰', src: SRC.rule});
+    }
+    /* ① 실측 층 */
+    const meas = measuredFor(p.orgKey, award);
+    if (meas.length) { const avg = meas.reduce((a, b) => a + b.rate, 0) / meas.length; layers.push({id: 'meas', label: '과거 개찰 실측 (낙찰가÷기초금액)', detail: meas.map(m => m.rate.toFixed(2) + '%').join(' · ') + ` — 표본 ${meas.length}건 (통계 아님 · 위치 확인용)`, src: SRC.measured, rates: meas.map(m => m.rate)}); meas.forEach(m => mk('M' + m.no, '과거 1등 ' + m.no + ' (' + m.rate.toFixed(2) + '%)', Math.round(ref * m.rate / 100), SRC.measured, m.src)); out.measured = meas; out.measuredAvg = avg; }
+    else layers.push({id: 'meas', label: '과거 개찰 실측', detail: award === 'floor' || award === 'eval' ? '이 기관·방식의 누적 기록이 없음 → 반영 0 (기록이 쌓이면 표시)' : '이 낙찰방식의 실측 기록 없음 → 낙찰 구간을 숫자로 만들지 않음', src: SRC.measured});
+    layers.push({id: 'org', label: '기관 유형·영업 조건 진단', detail: `${profile.orgName} · ${profile.salesName} · ${profile.contractName}${profile.urgent ? ' · 긴급' : ''}${profile.rebid ? ' · 재공고' : ''} — 기관별 개찰 성향 실측 자료가 없어 숫자에 반영하지 않음(진단·주의 문구만)`, src: SRC.input});
+    /* ③ 사용자 시뮬레이션 라인: 목표 마진율 · 예상 경쟁 */
+    if (cst && tMargin != null) { const need = Math.ceil(cst.cost * (1 + tMargin / 100) - 1e-6); const b = vatRate === 0 ? need : P.totalFromSupply(need, vatRate); mk('TM', `목표 마진 ${tMargin}% 가격 (원가 대비)`, b, SRC.input, '원가 × (1 + 목표 마진율)'); }
+    if (compDisc != null) { const cb = bidAt(100 - compDisc); mk('CD', `경쟁 가정가 (기초금액 −${compDisc}%)`, cb, SRC.assume, '사용자가 입력한 예상 경쟁 할인율 — 실제 개찰 데이터 아님'); if (compGap != null) mk('CG', `경쟁 가정가 −${compGap}%p`, bidAt(100 - compDisc - compGap), SRC.assume, '경쟁 가정가보다 더 낮게 쓰는 폭(사용자 입력)'); }
+    out.lines = lines;
+    /* 구간 정리 */
+    let z = null;
+    if (zone) { let lo = zone.lo, hi = Math.min(zone.hi, ref); if (defBid != null && lo < defBid) lo = defBid; if (lo > hi) { winStatus = 'blocked'; warns.push(defBid > ref ? '방어선이 기초금액을 넘습니다 — 이 조건으로는 참여할 수 없습니다.' : '방어선(원가·대외 안내)이 가능 구간보다 위에 있습니다 — 이 구간에서는 마진/약속을 지킬 수 없습니다. 참여 여부를 재검토하세요.'); } else z = {lo, hi, loRate: r3(rateOf(lo)), hiRate: r3(rateOf(hi)), src: zone.src, rawLo: zone.lo, rawHi: zone.hi}; }
+    out.zone = z; out.winStatus = winStatus; out.basisNote = basisNote; out.award = award; out.floorBand = p.floorBand || null;
+    out.feasible = defBid != null ? (defBid <= ref ? {lo: defBid, hi: ref, loRate: r3(rateOf(defBid)), hiRate: 100, src: SRC.input} : null) : {lo: null, hi: ref, loRate: null, hiRate: 100, src: SRC.rule};
+    if (winStatus === 'insufficient') warns.push('근거 데이터가 부족해 낙찰 유력 구간은 산출하지 않았습니다 — 아래 시뮬레이션 표에서 목표 마진과 예상 경쟁 가정을 조절해 직접 비교하세요.');
+    /* 후보 투찰안 + 순이익 */
+    const rates = []; const addR = (id, rate, name, src, bid) => { if (rate == null || !isFinite(rate)) return; rates.push({id, rate: r3(rate), name, src, bid}); }; const addB = (id, bid, name, src) => { if (bid != null) addR(id, rateOf(bid), name, src, bid); };
+    if (z) { addB('D', z.lo, award === 'floor' ? '하한가 구간 아래쪽 (공격 · 탈락 위험)' : '심사 통과 최저선', z.src); if (z.hi > z.lo) { addB('M', Math.round((z.lo + z.hi) / 2), '구간 중앙', z.src); addB('X', z.hi, award === 'floor' ? '하한가 위쪽 끝 (항상 통과)' : '가격평점 최고점', z.src); } }
+    else if (defBid != null && defBid <= ref) addB('D', defBid, '방어선 (가장 낮게 쓸 수 있는 가격)', SRC.input);
+    lines.filter(l => ['TM', 'CD', 'CG'].includes(l.id)).forEach(l => addR(l.id, l.rate, l.label, l.src, l.bid));
+    if (tLo != null) addR('T1', tLo, '목표 구간 아래 ' + tLo + '%', SRC.input); if (tHi != null) addR('T2', tHi, '목표 구간 위 ' + tHi + '%', SRC.input); if (tLo != null && tHi != null && tHi > tLo) addR('T3', (tLo + tHi) / 2, '목표 구간 중앙', SRC.input);
+    (p.custom || []).forEach((x, i) => addR('U' + (i + 1), x, '직접 입력 ' + x + '%', SRC.input));
+    const rowOf = (c) => {
+      const bid = c.bid != null ? c.bid : bidAt(c.rate), sp = supplyOf(bid); const row = {id: c.id, name: c.name, rate: c.rate, bid, supply: sp, vat: bid - sp, src: c.src, flags: []};
+      if (cst) { row.profit = sp - cst.cost; row.profitPct = sp ? row.profit / sp * 100 : 0; row.markupPct = cst.cost ? row.profit / cst.cost * 100 : null; } else { row.profit = null; row.profitPct = null; row.markupPct = null; }
+      if (cst && row.profit < 0) row.flags.push('LOSS'); else if (cst && beBid != null && bid < beBid) row.flags.push('UNDER_MIN_MARGIN');
+      if (guide != null && c.rate < guide - 1e-9) row.flags.push('UNDER_GUIDE'); if (bid > ref) row.flags.push('OVER_BASE');
+      if (award === 'floor' && p.floorBand && bid < p.floorBand.min) row.flags.push('BELOW_FLOOR_ALWAYS'); else if (award === 'floor' && p.floorBand && bid < p.floorBand.max) row.flags.push('FLOOR_RISK');
+      if (z) row.inZone = bid >= z.lo && bid <= z.hi; return row;
+    };
+    const seen = new Set(); out.cands = rates.sort((a, b) => a.rate - b.rate).filter(c => (seen.has(c.rate) ? false : (seen.add(c.rate), true))).map(rowOf);
+    /* 시뮬레이션 표(투명한 계산 표) — 방어선(없으면 0)부터 100% 까지 step %p 간격(표시 간격일 뿐 추천이 아님) */
+    const start = defBid != null ? Math.max(0, Math.floor(rateOf(defBid) / step) * step) : 0; const grid = [];
+    for (let r = start; r <= 100 + 1e-9; r += step) grid.push(rowOf({id: 'G', name: '', rate: Math.min(100, r3(r)), src: SRC.input}));
+    if (!grid.length || grid[grid.length - 1].rate < 100) grid.push(rowOf({id: 'G', name: '', rate: 100, src: SRC.input}));
+    out.grid = grid; out.step = step;
+    out.cands.forEach(c => { if (c.flags.includes('LOSS')) warns.push(`⚠ 적자: ${c.id}안 ${won(c.bid)}원(기초금액의 ${c.rate}%) — 순이익 ${won(c.profit)}원. 이 금액으로는 투찰하지 마세요.`); if (c.flags.includes('UNDER_GUIDE')) warns.push(`대외 안내 ${guide}% 미만: ${c.id}안 ${c.rate}% — 고객에게 안내한 조건을 어기게 됩니다.`); if (c.flags.includes('OVER_BASE')) warns.push(`${c.id}안은 기초금액 초과 — 무효 위험`); if (c.flags.includes('BELOW_FLOOR_ALWAYS')) warns.push(`${c.id}안 ${won(c.bid)}원은 어떤 예정가격에서도 하한가 미만 — 탈락`); });
+    if (cst && out.breakEven && out.breakEven.bid > ref) warns.push(`적자 방어선 ${won(out.breakEven.bid)}원 > 기초금액 ${won(ref)}원 — 안전한 원가 미달`);
+    if (!cst) warns.push('실제 원가를 넣지 않아 순이익·적자 방어선은 계산하지 않았습니다.');
+    if (guide != null && cst && beBid != null && guideBid < beBid) warns.push(`대외 안내 ${guide}% 지점(${won(guideBid)}원)은 적자 방어선(${won(beBid)}원)보다 낮습니다 — 안내를 지키면 적자입니다.`);
+    out.recommended = award === 'floor' && z ? (out.cands.find(c => c.id === 'X' && c.profit != null && c.profit > 0 && !c.flags.length) || null) : null;
+    out.reasons = explain(out, {profile, tLo, tHi, tMargin, compDisc}); out.ok = true; return out;
+  }
+
+  function explain(o, c) {
+    const P0 = o.profile, r = [], f2 = x => (Math.round(x * 100) / 100) + '%';
+    const lead = [P0.orgName.split(' (')[0], P0.awardName, P0.salesName, P0.tax === 'free' ? '면세(부가세 0)' : '과세(부가세 ' + o.vatRate + '%)', P0.contractName + (P0.urgent ? ' · 긴급' : '') + (P0.rebid ? ' · 재공고' : '')].join(' + ');
+    if (o.winStatus === 'nego') r.push(`[${lead}] 기술점수가 낙찰을 좌우하므로 가격 구간을 정하지 않습니다. 적자 방어선 ${o.defense ? won(o.defense.bid) + '원' : '(원가 미입력)'} 이상 · 기초금액 이하에서 평가기준대로 판단하세요.`);
+    else if (o.winStatus === 'blocked') r.push(`[${lead}] 공고 규칙상 가능한 구간이 방어선과 겹치지 않습니다.`);
+    else if (o.zone && o.award === 'floor') r.push(`[${lead}] 하한율은 공고 값이므로, 낙찰하한가가 움직이는 ${won(o.zone.lo)}~${won(o.zone.hi)}원(기초금액의 ${f2(o.zone.loRate)}~${f2(o.zone.hiRate)})이 가능 구간입니다. 위쪽 끝은 어떤 예정가격에서도 통과하는 최대 마진 지점, 아래쪽 끝은 가장 공격적인 지점입니다. 〔${o.zone.src.label}〕`);
+    else if (o.zone && o.award === 'eval') r.push(`[${lead}] 가격평점 산식으로 통과 최저 투찰률부터 평점 최고율까지 ${won(o.zone.lo)}~${won(o.zone.hi)}원(기초금액의 ${f2(o.zone.loRate)}~${f2(o.zone.hiRate)})이 유효 구간입니다. 〔${o.zone.src.label}〕`);
+    else r.push(`[${lead}] 하한율이 없는 최저가라 공고 규칙으로는 낙찰 구간을 정할 수 없고, 실측 개찰 기록도 없어 숫자로 만들지 않았습니다. 계산 가능한 것은 ① 적자 방어선 ${o.defense ? won(o.defense.bid) + '원(기초금액의 ' + f2(o.defense.rate) + ')' : '(원가 입력 필요)'} ② 상한 ${won(o.ref)}원 사이의 범위뿐입니다 — 아래 시뮬레이션 표에서 목표 마진과 예상 경쟁을 조절해 정하세요.`);
+    if (o.defense && o.winStatus !== 'nego') r.push(`최저 방어선 ${won(o.defense.bid)}원(기초금액의 ${f2(o.defense.rate)}) — ${o.defense.why}. 이보다 낮게 쓰면 ${o.defense.why.startsWith('대외') ? '고객 안내를 어기게 됩니다' : '적자입니다'}. 〔${o.defense.src.label}〕`);
+    if (o.guideLine && o.cost != null) r.push(`대외 안내(${o.guideLine.rate}%)와 실제 원가를 분리해 계산했습니다 — 안내 기준 이상·기초금액 이하에서 후보별 실제 순이익을 비교하세요(내부용 · 서류에는 출력되지 않음).`);
+    if (c.tLo != null && c.tHi != null && o.zone) { const inside = c.tLo >= o.zone.loRate - 1e-9 && c.tHi <= o.zone.hiRate + 1e-9; r.push(`목표 투찰 ${c.tLo}~${c.tHi}% 는 공고 규칙 구간 ${f2(o.zone.loRate)}~${f2(o.zone.hiRate)} ${inside ? '안에 있습니다' : c.tHi < o.zone.loRate ? '보다 낮아 탈락 위험이 있습니다' : c.tLo > o.zone.hiRate ? '보다 높습니다' : '과 일부만 겹칩니다'}.`); }
+    if (P0.urgent) r.push('긴급 공고: 제출 기간이 짧아 서류 준비 시간이 변수입니다(가격 구간은 변경하지 않음).'); if (P0.rebid) r.push('재공고: 직전 개찰(유찰·무효) 결과가 있으면 그 금액을 예상 경쟁 할인율에 반영해 비교하세요(입력 자료 없음 → 반영 0).');
+    return r;
+  }
+
+  /* ───────── 화면 입력(공고 n · 원가 c · 상황 s) → analyze 입력 ───────── */
+  function fromForm(n, c, s, fo) {
+    const award = n.award || (n.floor ? 'floor' : ''), taxfree = n.tax === 'free', V = num(n.vat).s === 'ok' ? num(n.vat).n : 10; const B = num(n.base);
+    const p = {org: s.org, orgKey: s.orgKey, award, sales: s.sales, urgent: s.urgent, rebid: s.rebid, contract: s.contract, tax: taxfree ? 'free' : 'tax', vat: n.vat, list: c.list, cur: c.cur, fx: c.fx, commission: c.comm, extra: c.extra, minMargin: c.smin, guide: c.guide, tlo: c.tlo, thi: c.thi,
+      targetMargin: c.mrg, compDisc: c.cdisc, compGap: c.cgap, step: c.step, custom: String(c.trates || '').split(/[,\s;]+/).filter(Boolean).map(x => Number(x)).filter(x => isFinite(x) && x > 0), evalRef: c.ref, evalWeight: c.weight, evalK: c.k, evalOther: c.other, evalPass: c.pass, legacyCoef: c.costmode === 'ledger' ? c.disc : ''};
+    if (award === 'floor') { if (fo && fo.errors && !fo.errors.length) { p.ref = fo.est; p.floorBand = {min: fo.floorMin, max: fo.floorMax, floorRate: fo.floorRate}; p.bidVat = fo.basis === 'asis' && !taxfree ? V : 0; } else p.ref = B.s === 'ok' ? B.n : 0; }
+    else if (B.s === 'ok') { p.ref = (n.basis === 'est' && !taxfree) ? P.totalFromSupply(B.n, V) : B.n; } else p.ref = 0;
+    if ((c.comm === '' || c.comm == null) && String(c.list || '') !== '' && String(c.disc || '') !== '') { const er = [], fx = []; const k = P.costOf({list: c.list, cur: c.cur, fx: c.fx, disc: c.disc, costmode: c.costmode}, er, fx); if (k) p.costOverride = k.cost + (num(c.extra).s === 'ok' ? num(c.extra).n : 0); }
+    return p;
+  }
+
+  /* ───────── 내부 정보 유출 차단 ───────── */
+  const KEYWORDS = ['커미션', '매입계수', '매입원가', '실제 원가', '실제원가', '내부용', '순이익', '실제 마진'];
+  function buildSecrets(p, an) {
+    const t = {amounts: new Set(), small: [], keywords: KEYWORDS.slice()}; const errs = [];
+    const add = n => { if (n != null && isFinite(n) && Math.abs(n) >= 1000) t.amounts.add(Math.round(Math.abs(n))); };
+    const ctx = v => '(?:계수|디스카운트|커미션|매입|할인)[^\\d]{0,14}' + v + '(?!\\d)';
+    const c = internalCost(Object.assign({}, p, {costOverride: p.costOverride}), errs);
+    if (c) { add(c.cost); add(c.listKrw ? c.listKrw - c.cost : null); if (c.k != null && c.k < 1) { const ks = String(r3(c.k)).replace(/^0/, '').replace('.', '\\.'); t.small.push(ctx('0?' + ks)); t.small.push(ctx(String(c.commission).replace('.', '\\.') + '(?:\\.0+)?\\s*%?')); t.small.push('(?<![\\d.])' + String(c.commission).replace('.', '\\.') + '(?:\\.0+)?\\s*%[^\\n]{0,6}커미션'); } if (p.costOverride) add(p.costOverride); }
+    if (num(p.legacyCoef).s === 'ok' && num(p.legacyCoef).n > 0 && num(p.legacyCoef).n < 1) t.small.push(ctx('0?' + String(num(p.legacyCoef).n).replace(/^0/, '').replace('.', '\\.')));
+    if (an && an.ok) an.cands.concat(an.grid || []).forEach(x => add(x.profit)); return t;
+  }
+  /* allow: 서류에 정당하게 적히는 금액(투찰금액·공급가액·부가세) — 마진 0 지점처럼 우연히 원가와 같아도 차단하지 않는다 */
+  function scan(text, secrets, allow) {
+    const hits = []; const s = String(text == null ? '' : text); if (!secrets) return hits; const ok = new Set((allow || []).map(x => Math.round(Math.abs(Number(x)))));
+    secrets.keywords.forEach(k => { if (s.indexOf(k) >= 0) hits.push('키워드 "' + k + '"'); });
+    secrets.amounts.forEach(a => { if (ok.has(a)) return; [String(a), a.toLocaleString('ko-KR')].forEach(f => { const re = new RegExp('(?<![\\d,.])' + f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\d,])'); if (re.test(s)) hits.push('내부 금액 ' + a.toLocaleString('ko-KR')); }); });
+    secrets.small.forEach(re => { try { if (new RegExp(re).test(s)) hits.push('내부 계수/커미션 값'); } catch (e) { /* ignore */ } });
+    return Array.from(new Set(hits));
+  }
+  const rowsToText = rows => rows.map(r => r.join('\t')).join('\n');
+  const htmlToText = h => String(h).replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ');
+  const redactLedger = row => { const r = row.slice(); r[23] = ''; r[24] = ''; return r; };
+
+  const api = {SRC, ORG_TYPES, SALES, CONTRACT, AWARD, KEYWORDS, detectOrg, detectOrgKey, measuredFor, internalCost, analyze, fromForm, redactLedger, leak: {build: buildSecrets, scan, rowsToText, htmlToText}};
+  E.strategy = api; if (typeof module !== 'undefined') module.exports = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
 <script>/* ops */
 /* 운영 모듈 — 공고 4분류 · 변경 감지 · 기관 이력 · 제출서류 6단계 분류 · 서류 자동 검사 · 공고별 체크리스트 생성 (브라우저/Node 공용) */
 (function (g) {
@@ -1322,7 +1554,7 @@ pre.log{white-space:pre-wrap;font-size:12px;color:var(--mute);margin:0;max-heigh
 })(typeof window !== 'undefined' ? window : globalThis);
 
 </script>
-<script>window.__INST_CORE_SRC="(function(root){\n  const aliases={noticeNo:[\"입찰공고번호\",\"공고번호\",\"공고번호/차수\",\"입찰번호\",\"번호\"],title:[\"공고명\",\"입찰공고명\",\"사업명\",\"건명\",\"공고건명\"],agency:[\"공고기관\",\"발주기관\",\"기관명\",\"계약기관\"],demandAgency:[\"수요기관\",\"수요기관명\",\"실수요기관\"]};\n  const normalize=value=>String(value??\"\").trim().replace(/\\s+/g,\"\").toLowerCase();\n  function mapHeaders(row){const normalized=row.map(normalize);return Object.fromEntries(Object.entries(aliases).map(([key,names])=>[key,normalized.findIndex(value=>names.map(normalize).includes(value))]));}\n  function findHeaderRow(rows,limit=20){for(let index=0;index\u003cMath.min(rows.length,limit);index+=1){const map=mapHeaders(rows[index]);if(map.noticeNo>=0&&map.title>=0&&(map.agency>=0||map.demandAgency>=0))return{index,map};}return null;}\n  function accumulateInstitutions(rows){const header=findHeaderRow(rows);if(!header)return{status:\"HOLD_HEADER_ROW_NOT_FOUND\",headerRow:null,rows:[],institutions:[]};const get=(row,column)=>column>=0?String(row[column]??\"\").trim():\"\";const seen=new Set(),mapped=[];for(const row of rows.slice(header.index+1)){if(!row.some(value=>String(value??\"\").trim()))continue;const noticeNo=get(row,header.map.noticeNo),title=get(row,header.map.title);if(!noticeNo||!title||seen.has(noticeNo))continue;seen.add(noticeNo);const agency=get(row,header.map.agency),demandAgency=get(row,header.map.demandAgency);mapped.push({noticeNo,title,agency,demandAgency,institution:agency||demandAgency});}if(mapped.some(row=>!row.institution))return{status:\"HOLD_INSTITUTION_MISSING\",headerRow:header.index+1,rows:mapped,institutions:[]};const counts=new Map();for(const row of mapped)counts.set(row.institution,(counts.get(row.institution)||0)+1);const institutions=[...counts].map(([institution,count])=>({institution,count}));if(institutions.reduce((sum,item)=>sum+item.count,0)!==mapped.length)throw Error(\"institution accumulation invariant failed\");return{status:\"PASS\",headerRow:header.index+1,rows:mapped,institutions};}\n  root.WICInstitutionAccumulator={findHeaderRow,accumulateInstitutions};\n})(globalThis);\n";</script>
+<script>window.__INST_CORE_SRC="(function(root){\r\n  const aliases={noticeNo:[\"입찰공고번호\",\"공고번호\",\"공고번호/차수\",\"입찰번호\",\"번호\"],title:[\"공고명\",\"입찰공고명\",\"사업명\",\"건명\",\"공고건명\"],agency:[\"공고기관\",\"발주기관\",\"기관명\",\"계약기관\"],demandAgency:[\"수요기관\",\"수요기관명\",\"실수요기관\"]};\r\n  const normalize=value=>String(value??\"\").trim().replace(/\\s+/g,\"\").toLowerCase();\r\n  function mapHeaders(row){const normalized=row.map(normalize);return Object.fromEntries(Object.entries(aliases).map(([key,names])=>[key,normalized.findIndex(value=>names.map(normalize).includes(value))]));}\r\n  function findHeaderRow(rows,limit=20){for(let index=0;index\u003cMath.min(rows.length,limit);index+=1){const map=mapHeaders(rows[index]);if(map.noticeNo>=0&&map.title>=0&&(map.agency>=0||map.demandAgency>=0))return{index,map};}return null;}\r\n  function accumulateInstitutions(rows){const header=findHeaderRow(rows);if(!header)return{status:\"HOLD_HEADER_ROW_NOT_FOUND\",headerRow:null,rows:[],institutions:[]};const get=(row,column)=>column>=0?String(row[column]??\"\").trim():\"\";const seen=new Set(),mapped=[];for(const row of rows.slice(header.index+1)){if(!row.some(value=>String(value??\"\").trim()))continue;const noticeNo=get(row,header.map.noticeNo),title=get(row,header.map.title);if(!noticeNo||!title||seen.has(noticeNo))continue;seen.add(noticeNo);const agency=get(row,header.map.agency),demandAgency=get(row,header.map.demandAgency);mapped.push({noticeNo,title,agency,demandAgency,institution:agency||demandAgency});}if(mapped.some(row=>!row.institution))return{status:\"HOLD_INSTITUTION_MISSING\",headerRow:header.index+1,rows:mapped,institutions:[]};const counts=new Map();for(const row of mapped)counts.set(row.institution,(counts.get(row.institution)||0)+1);const institutions=[...counts].map(([institution,count])=>({institution,count}));if(institutions.reduce((sum,item)=>sum+item.count,0)!==mapped.length)throw Error(\"institution accumulation invariant failed\");return{status:\"PASS\",headerRow:header.index+1,rows:mapped,institutions};}\r\n  root.WICInstitutionAccumulator={findHeaderRow,accumulateInstitutions};\r\n})(globalThis);\r\n";</script>
 <script>/* institution core (원격 저장소 원본) */
 (function(root){
   const aliases={noticeNo:["입찰공고번호","공고번호","공고번호/차수","입찰번호","번호"],title:["공고명","입찰공고명","사업명","건명","공고건명"],agency:["공고기관","발주기관","기관명","계약기관"],demandAgency:["수요기관","수요기관명","실수요기관"]};
@@ -1370,6 +1602,7 @@ pre.log{white-space:pre-wrap;font-size:12px;color:var(--mute);margin:0;max-heigh
     const {svg, T, C, short, won} = U; const W = 640, H = 200, pl = 34, pr = 34, ay = 108; const pts = [L.totalCost, L.capTotal, ...L.rows.map(r => r.total)]; let lo = Math.min(...pts), hi = Math.max(...pts); const pad = (hi - lo) * 0.06 || 1; lo -= pad; hi += pad; const X = v => pl + (v - lo) / (hi - lo) * (W - pl - pr);
     let s = `<line x1="${pl}" x2="${W - pr}" y1="${ay}" y2="${ay}" stroke="${C.m}" stroke-width="2"/><rect x="${X(L.capTotal)}" y="${ay - 18}" width="${Math.max(0, W - pr - X(L.capTotal))}" height="36" fill="${C.r}" opacity=".16"/><rect x="${pl}" y="${ay - 18}" width="${Math.max(0, X(L.totalCost) - pl)}" height="36" fill="${C.r}" opacity=".16"/>`;
     s += T(X(L.capTotal) + 6, ay - 24, '기초금액 초과 = 무효 위험', {anchor: 'start', size: 10.5, fill: C.r}) + T(pl + 4, ay - 24, '원가 미만 = 적자', {anchor: 'start', size: 10.5, fill: C.r});
+    { const st = U.S.strat; if (st && st.ok && st.feasible && st.feasible.lo != null && st.feasible.hi > st.feasible.lo) { const a = Math.max(pl, X(st.feasible.lo)), b = Math.min(W - pr, X(st.feasible.hi)); if (b > a) s += `<rect x="${a}" y="${ay - 18}" width="${b - a}" height="36" fill="${C.g}" opacity=".14" stroke="${C.gd}" stroke-dasharray="4 3"/>` + T((a + b) / 2, ay + 34, '가능 범위(방어선~기초금액 · 낙찰 구간 아님)', {size: 10, fill: C.gd}); } }
     const tick = (v, col, label, y) => `<line x1="${X(v)}" x2="${X(v)}" y1="${ay - 22}" y2="${ay + 22}" stroke="${col}" stroke-width="2.5"/>` + T(X(v), y, label, {fill: col, bold: true, size: 11});
     s += tick(L.totalCost, C.gd, '원가 ' + won(L.totalCost), 170) + tick(L.capTotal, C.r, '기초금액(상한) ' + won(L.capTotal), 190);
     L.rows.forEach(r => { const sel = r.id === selId; s += `<path d="M${X(r.total) - 7} ${ay - 40}L${X(r.total) + 7} ${ay - 40}L${X(r.total)} ${ay - 28}Z" fill="${sel ? C.b : C.t}"/>` + T(X(r.total), ay - 46, r.id, {bold: true, fill: sel ? C.b : C.t}); });
@@ -1488,6 +1721,112 @@ pre.log{white-space:pre-wrap;font-size:12px;color:var(--mute);margin:0;max-heigh
       const buffer = await file.arrayBuffer(); w.postMessage(buffer, [buffer]);
     });
   }
+})();
+
+</script>
+<script>/* ui3 */
+/* 02 입찰 도구 v3.2 — 상황 진단·전략 구간 화면 (ui2.js 다음, ui.js 앞에서 로드. ui.js 가 끝에서 init(U) 를 호출한다)
+   · 5가지 변수 입력 → E.strategy.analyze → 근거 라벨이 붙은 구간 차트·후보표·시뮬레이션 표
+   · 출력 서류(.xls/.doc) 직전 내부 원가·커미션 유출 차단(guard) · 장부 1행의 원가 칸 비움(redactLedger) */
+(() => {
+  'use strict';
+  const api = window.__BIDUI3 = {}; let U = null; const E = () => window.BIDENG, ST = () => window.BIDENG.strategy;
+  const SKEY = 'wic02v31_s';
+  const FLAGTXT = {LOSS: ['적자', 'bad'], UNDER_MIN_MARGIN: ['최소마진 미달', 'warn'], UNDER_GUIDE: ['대외 안내 미달', 'warn'], OVER_BASE: ['기초금액 초과(무효 위험)', 'bad'], BELOW_FLOOR_ALWAYS: ['항상 탈락(하한 미만)', 'bad'], FLOOR_RISK: ['예정가격에 따라 탈락 가능', 'warn']};
+  const SHORT = {BE: '적자선', GD: '안내선', CAP: '기초금액', FL: '하한 아래끝', FH: '하한 위끝', EL: '통과 최저', EH: '평점 최고', TM: '목표마진', CD: '경쟁가정', CG: '경쟁−폭'};
+
+  api.init = u => {
+    U = u; const {$, ls} = U; const saved = ls.get(SKEY, {});
+    ['s_org', 's_orgkey', 's_sales', 's_contract'].forEach(id => { if (saved[id] !== undefined) $(id).value = saved[id]; });
+    ['s_urgent', 's_rebid'].forEach(id => { if (saved[id] !== undefined) $(id).checked = !!saved[id]; });
+    const store = () => { const o = {}; ['s_org', 's_orgkey', 's_sales', 's_contract'].forEach(id => o[id] = $(id).value); ['s_urgent', 's_rebid'].forEach(id => o[id] = $(id).checked); ls.set(SKEY, o); };
+    ['s_org', 's_orgkey', 's_sales', 's_contract', 's_urgent', 's_rebid'].forEach(id => $(id).addEventListener('change', () => { store(); live(); }));
+    let tm = null; const live = () => { if (!U.S.strat) return; clearTimeout(tm); tm = setTimeout(() => api.run(), 120); };
+    /* 슬라이더 ↔ 숫자 입력 동기화 (목표 마진율 · 예상 경쟁 할인율) */
+    [['rng_mrg', 'c_mrg'], ['rng_cdisc', 'c_cdisc']].forEach(([r, n]) => {
+      const rg = $(r), nu = $(n); if (nu.value !== '') rg.value = nu.value;
+      rg.addEventListener('input', () => { nu.value = rg.value; U.csave(); live(); });
+      nu.addEventListener('input', () => { const v = parseFloat(nu.value); if (isFinite(v)) rg.value = String(Math.min(Number(rg.max), Math.max(Number(rg.min), v))); U.csave(); live(); });
+    });
+    ['c_comm', 'c_guide', 'c_tlo', 'c_thi', 'c_smin', 'c_cgap', 'c_step', 'c_trates'].forEach(id => $(id).addEventListener('input', () => { U.csave(); live(); }));
+    $('stratBtn').onclick = () => { api.run(); };
+    $('stratClear').onclick = () => { ['c_comm', 'c_guide', 'c_tlo', 'c_thi', 'c_mrg', 'c_cdisc', 'c_cgap', 'c_trates'].forEach(id => $(id).value = ''); $('rng_mrg').value = 0; $('rng_cdisc').value = 0; $('c_smin').value = '0'; $('c_step').value = '5'; U.csave(); U.S.strat = null; $('stratOut').innerHTML = '<div class="empty">내부 원가·안내 기준을 비웠습니다. 값을 입력한 뒤 [상황 진단·구간 계산]을 누르세요.</div>'; U.toast('내부 원가·전략 입력을 비웠습니다'); };
+  };
+
+  function profileOf(n) {
+    const {$} = U; const S0 = ST(); const org = $('s_org').value === 'auto' ? S0.detectOrg(n.org) : $('s_org').value; const key = $('s_orgkey').value === 'auto' ? S0.detectOrgKey(n.org) : ($('s_orgkey').value === 'none' ? '' : $('s_orgkey').value);
+    return {org, orgKey: key, sales: $('s_sales').value, contract: $('s_contract').value, urgent: $('s_urgent').checked, rebid: $('s_rebid').checked};
+  }
+  /* 실제 커미션이 입력되면 기존 계산(최저가·하한율제 화면)도 같은 원가(정가×환율×(1−커미션))를 쓰도록 계수로 환산한다 — 화면 전용, 저장값은 그대로 */
+  api.eff = c => { const v = parseFloat(String(c.comm).replace(/,/g, '')); if (String(c.comm).trim() === '' || !isFinite(v) || v < 0 || v >= 100) return c; return Object.assign({}, c, {costmode: 'ledger', disc: String(Math.round((1 - v / 100) * 1e6) / 1e6)}); };
+  api.compute = () => {
+    const n = U.nget(), c = U.cget(), s = profileOf(n); const award = n.award || (n.floor ? 'floor' : ''); let fo = null;
+    if (award === 'floor') { try { fo = E().calc(U.buildInp()); } catch (e) { fo = null; } }
+    const p = ST().fromForm(n, c, s, fo); const an = ST().analyze(p); U.S.strat = an; U.S.stratP = p; return an;
+  };
+  const badge = src => `<span class="src ${src.cls}" title="기능: 이 숫자의 근거 · 결과: 어떤 자료에서 나온 값인지 표시 · 사용시점: 숫자를 믿고 쓰기 전에">${U.esc(src.label)}</span>`;
+  const pct2 = x => (Math.round(x * 100) / 100) + '%';
+
+  /* ───────── 구간 차트 (음영) ───────── */
+  function chart(an) {
+    const {won, svg, T, C} = U; const W = 700, H = 262, pl = 30, pr = 24, ay = 120, bh = 44;
+    const rates = an.lines.map(l => l.rate).concat(an.cands.map(c => c.rate), an.zone ? [an.zone.loRate, an.zone.hiRate] : []); let lo = Math.max(0, Math.floor((Math.min(...rates, 100) - 6) / 5) * 5), hi = Math.max(104, Math.ceil(Math.max(...rates) / 2) * 2 + 2); if (hi - lo < 20) lo = Math.max(0, hi - 40);
+    const X = r => pl + (r - lo) / (hi - lo) * (W - pl - pr); const rect = (a, b, fill, op, extra) => (b > a ? `<rect x="${X(a)}" y="${ay - bh / 2}" width="${X(b) - X(a)}" height="${bh}" fill="${fill}" opacity="${op}" ${extra || ''}/>` : '');
+    let s = `<rect x="${pl}" y="${ay - bh / 2}" width="${W - pl - pr}" height="${bh}" fill="#f1f5f9" stroke="#e2e8f0"/>`;
+    const be = an.breakEven ? an.breakEven.rate : null, gd = an.guideLine ? an.guideLine.rate : null;
+    if (be != null) s += rect(lo, Math.min(be, 100), C.r, .22); if (gd != null && (be == null || gd > be)) s += rect(be == null ? lo : be, gd, C.a, .2);
+    s += rect(100, hi, '#7f1d1d', .2);
+    if (an.zone) s += rect(an.zone.loRate, an.zone.hiRate, C.g, .34, `stroke="${C.gd}" stroke-width="1.5"`);
+    else if (an.feasible && an.feasible.hiRate) s += rect(an.feasible.loRate == null ? lo : an.feasible.loRate, 100, C.g, .12, `stroke="${C.gd}" stroke-dasharray="5 4"`);
+    if (an.floorBand) { const fb = an.floorBand; s += rect(lo, an.lines.find(l => l.id === 'FL') ? an.lines.find(l => l.id === 'FL').rate : lo, C.r, .14); }
+    /* 선 + 라벨(겹침 방지: 3줄 순환) */
+    const ls = an.lines.slice().sort((a, b) => a.rate - b.rate); const rows = [34, 18, 50]; let k = 0;
+    ls.forEach(l => { const x = X(Math.min(hi, Math.max(lo, l.rate))); const col = l.src.key === 'rule' ? C.gd : l.src.key === 'measured' ? '#0e7490' : l.src.key === 'assume' ? '#b45309' : l.src.key === 'deflt' ? '#9a3412' : C.b; const sh = l.id.startsWith('M') ? '과거 1등' : (SHORT[l.id] || l.id); const yy = rows[k++ % 3];
+      s += `<line x1="${x}" x2="${x}" y1="${ay - bh / 2 - 6}" y2="${ay + bh / 2 + 6}" stroke="${col}" stroke-width="2.4"/><line x1="${x}" x2="${x}" y1="${yy + 4}" y2="${ay - bh / 2 - 6}" stroke="${col}" stroke-width=".8" stroke-dasharray="2 3"/>` + T(x, yy, sh + ' ' + l.rate + '%', {fill: col, bold: true, size: 10.5}); });
+    an.cands.forEach(c => { const x = X(Math.min(hi, Math.max(lo, c.rate))); const col = c.flags.includes('LOSS') ? C.r : C.t; s += `<path d="M${x - 6} ${ay + bh / 2 + 10}L${x + 6} ${ay + bh / 2 + 10}L${x} ${ay + bh / 2 + 21}Z" fill="${col}"/>` + T(x, ay + bh / 2 + 34, c.id, {bold: true, size: 10.5, fill: col}); });
+    [lo, Math.round((lo + hi) / 2 / 5) * 5, 100].forEach(r => { s += T(X(r), H - 22, r + '%', {size: 10, fill: C.m}); });
+    s += T(W / 2, H - 6, '기초금액 대비 투찰률 — 빨강: 적자 · 주황: 대외 안내 미달 · 초록: ' + (an.zone ? '공고 규칙 가능 구간' : '가능 범위(점선, 낙찰 구간 산출 불가)') + ' · 진한 빨강: 기초금액 초과', {size: 10, fill: C.m});
+    return svg(W, H, s, '상황별 투찰 구간');
+  }
+
+  const flagHtml = f => f.length ? f.map(x => `<span class="${FLAGTXT[x][1]}">${FLAGTXT[x][0]}</span>`).join(' · ') : '<span class="ok">이상 없음</span>';
+  function candRows(list, an, withName) {
+    const {won} = U; return list.map((c, i) => `<tr data-pick="${c.bid}" class="${c.flags.includes('LOSS') ? 'lossrow' : ''}" style="cursor:pointer" title="기능: 이 금액을 서류 작성 탭의 투찰금액으로 선택 · 결과: ③ 서류에 반영 · 사용시점: 금액을 정했을 때"><td>${U.esc(c.id)}</td>${withName ? `<td>${U.esc(c.name)}</td>` : ''}<td class="n">${c.rate}%</td><td class="n">${won(c.bid)}</td><td class="n">${won(c.supply)}</td><td class="n ${c.profit != null && c.profit < 0 ? 'bad' : ''}">${c.profit == null ? '확인 필요' : won(c.profit)}</td><td class="n">${c.profitPct == null ? '-' : c.profitPct.toFixed(2) + '%'}</td><td>${flagHtml(c.flags)}${c.inZone === true ? ' · <span class="ok">구간 안</span>' : ''}</td><td>${badge(c.src)}</td></tr>`).join('');
+  }
+
+  api.render = an => {
+    const {$, won, esc} = U; const out = $('stratOut'); const h = [];
+    if (!an.ok) { out.innerHTML = `<div class="card"><div class="bad">입력 확인 필요 — 구간을 계산하지 않았습니다 (빈칸·잘못된 값은 추측하지 않습니다)</div><div style="margin-top:8px">${an.errors.map(x => '· ' + esc(x)).join('<br>')}</div></div>`; return; }
+    const P0 = an.profile; const chip = (k, v) => `<span class="pill"><b>${esc(k)}</b> ${esc(v)}</span>`;
+    h.push(`<div class="card strat"><h2>상황 진단 · 전략 요약 <span class="small" style="font-weight:400">· 근거가 있는 숫자만 사용합니다</span></h2>
+      <div>${chip('① 기관', P0.orgName.split(' (')[0])}${chip('② 낙찰방식', P0.awardName)}${chip('③ 영업·독점', P0.salesName + (P0.urgent ? ' · 긴급' : '') + (P0.rebid ? ' · 재공고' : ''))}${chip('④ 과세·계약', (P0.tax === 'free' ? '면세' : '과세 ' + an.vatRate + '%') + ' · ' + P0.contractName)}${chip('⑤ 원가 분리', an.cost == null ? '실제 원가 미입력' : '실제 원가 ' + won(an.cost) + '원 (내부용)')}</div>
+      <div class="kpis" style="margin-top:14px">
+        <div class="kpi"><small>① 최저 적자 방어선</small><b>${an.defense ? won(an.defense.bid) + '원' : '원가 필요'}</b><em>${an.defense ? '기초금액의 ' + pct2(an.defense.rate) + ' · ' + esc(an.defense.why) : '실제 원가를 넣으면 계산'}</em><div>${an.defense ? badge(an.defense.src) : ''}</div></div>
+        <div class="kpi"><small>② 낙찰 가능 구간</small><b>${an.zone ? won(an.zone.lo) + ' ~ ' + won(an.zone.hi) + '원' : an.winStatus === 'nego' ? '가격 구간 없음(기술 평가)' : an.winStatus === 'blocked' ? '방어선과 겹침 없음' : '산출 불가'}</b><em>${an.zone ? '기초금액의 ' + pct2(an.zone.loRate) + ' ~ ' + pct2(an.zone.hiRate) : '근거 데이터 부족 → 숫자를 만들지 않음'}</em><div>${an.zone ? badge(an.zone.src) : '<span class="src src-none">근거 부족 · 아래 시뮬레이션 표로 직접 비교</span>'}</div></div>
+        <div class="kpi"><small>③ 상한 (기초금액)</small><b>${won(an.ref)}원</b><em>초과 투찰 = 무효 위험</em><div>${badge(an.src.rule)}</div></div></div>
+      ${an.reasons.map(x => `<div class="explainbox" style="background:#eff6ff;border-color:#bfdbfe">${esc(x)}</div>`).join('')}
+      ${an.warns.map(x => `<div class="explainbox" style="background:#fee2e2;border-color:#fecaca">${esc(x)}</div>`).join('')}
+      <p class="small">※ 이 화면은 내부용입니다 — 실제 원가·커미션·순이익은 .xls/.doc 서류에 출력되지 않으며, 출력 직전 검사에서 발견되면 내려받기가 차단됩니다.</p></div>`);
+    h.push(`<div class="card"><h2>구간 차트</h2><div class="chart">${chart(an)}</div><div class="small" style="margin-top:6px">선 색: ${badge(an.src.rule)} ${badge(an.src.input)} ${an.measured ? badge(an.src.measured) : ''} ${an.lines.some(l => l.src.key === 'assume') ? badge(an.src.assume) : ''}</div></div>`);
+    h.push(`<div class="card"><h2>후보 투찰안과 실제 순이익 <span class="small" style="font-weight:400">· 행을 누르면 그 금액을 서류에 반영</span></h2>${an.cands.length ? `<div class="scroll"><table id="candTbl"><thead><tr><th>안</th><th>설명</th><th>투찰률</th><th>투찰가(총액)</th><th>공급가액</th><th>실제 순이익(내부)</th><th>순이익률</th><th>판정</th><th>출처</th></tr></thead><tbody>${candRows(an.cands, an, true)}</tbody></table></div>` : '<div class="empty">후보가 없습니다. 목표 구간·직접 후보·목표 마진을 입력하세요.</div>'}</div>`);
+    h.push(`<details open><summary>시뮬레이션 표 — 투찰률을 ${an.step}%p 간격으로 직접 비교 (간격은 위 입력칸에서 조절)</summary><div class="inner"><p class="small">이 표의 모든 줄은 "기초금액 × 투찰률" 단순 계산입니다. 낙찰 확률을 뜻하지 않으며, 출처는 사용자가 입력한 원가·안내 기준과 공고의 기초금액입니다.</p><div class="scroll"><table id="gridTbl"><thead><tr><th>안</th><th>투찰률</th><th>투찰가(총액)</th><th>공급가액</th><th>실제 순이익(내부)</th><th>순이익률</th><th>판정</th><th>출처</th></tr></thead><tbody>${candRows(an.grid, an, false)}</tbody></table></div></div></details>`);
+    h.push(`<details><summary>이 숫자들의 근거 (계산에 쓴 층 ${an.layers.length}개)</summary><div class="inner">${an.layers.map(l => `<div style="margin-bottom:10px"><b>${esc(l.label)}</b> ${badge(l.src)}<div class="small">${esc(l.detail)}</div></div>`).join('')}<h3>선(라인) 목록</h3><div class="scroll"><table><thead><tr><th>선</th><th>금액</th><th>투찰률</th><th>출처</th><th>설명</th></tr></thead><tbody>${an.lines.map(l => `<tr><td>${esc(l.label)}</td><td class="n">${won(l.bid)}</td><td class="n">${l.rate}%</td><td>${badge(l.src)}</td><td class="small">${esc(l.detail)}</td></tr>`).join('')}</tbody></table></div></div></details>`);
+    out.innerHTML = h.join('');
+    out.querySelectorAll('[data-pick]').forEach(tr => tr.onclick = () => { const el = $('d_bid'); el.value = tr.dataset.pick; el.dataset.auto = '0'; U.toast('투찰금액 ' + won(Number(tr.dataset.pick)) + '원을 ③ 서류 작성에 반영했습니다'); U.log('전략표에서 투찰금액 선택: ' + won(Number(tr.dataset.pick))); });
+  };
+  api.run = () => { const an = api.compute(); api.render(an); U.log(`전략 진단: ${an.ok ? (an.zone ? '구간 ' + an.zone.lo + '~' + an.zone.hi : '구간 산출 불가(' + an.winStatus + ')') : '입력 확인 필요'}`); return an; };
+
+  /* ───────── 출력 서류 보안: 내부 원가·커미션 유출 차단 ───────── */
+  const toText = x => (Array.isArray(x) ? ST().leak.rowsToText(x) : ST().leak.htmlToText(x));
+  api.secrets = () => { api.compute(); return ST().leak.build(U.S.stratP, U.S.strat && U.S.strat.ok ? U.S.strat : null); };
+  api.guard = (name, content) => {
+    const sec = api.secrets(); const bid = Number(String(U.$('d_bid').value).replace(/[^\d]/g, '')) || 0; const tf = U.$('n_tax').value === 'free';
+    const sp = bid ? (tf ? bid : E().pricing.splitVat(bid, 10).supply) : 0; const allow = bid ? [bid, sp, bid - sp, Math.round(bid * 0.9), Math.round(bid / 1.1), Math.round(bid * 0.05), Math.ceil(bid * 0.05), Math.round(bid * 0.9 * 0.1)] : [];
+    const hits = ST().leak.scan(toText(content), sec, allow);
+    if (hits.length) { U.toast('내부 원가·커미션 정보가 서류에 섞여 있어 내려받기를 막았습니다 (' + hits.join(', ') + ')'); U.log('서류 출력 차단: ' + name + ' — ' + hits.join(' / ')); window.__BIDUI3_BLOCKED = (window.__BIDUI3_BLOCKED || []).concat([{name, hits}]); return false; }
+    return true;
+  };
+  api.redactLedger = row => { const sec = api.secrets(); const has = sec.amounts.size || sec.small.length || String(row[23] || row[24] || '') !== ''; if (!has) return row; U.toast('장부 1행: 원가·디스카운트 칸은 내부 정보라 비워서 내려받습니다'); return ST().redactLedger(row); };
 })();
 
 </script>
@@ -1640,9 +1979,10 @@ pre.log{white-space:pre-wrap;font-size:12px;color:var(--mute);margin:0;max-heigh
   }
 
   /* ───────── 계산 입력 ───────── */
-  const CF = ['list', 'cur', 'fx', 'costmode', 'disc', 'rates', 'people', 'safe', 'mid', 'min', 'mmin', 'mtgt', 'extra', 'ref', 'weight', 'k', 'other', 'pass', 'tech', 'pw', 'low', 'bids'];
-  const cget = () => { const o = {}; CF.forEach(k => o[k] = $('c_' + k).value); return o; };
-  function csave() { ls.set('wic02v2_cost', cget()); }
+  const CF = ['list', 'cur', 'fx', 'costmode', 'disc', 'rates', 'people', 'safe', 'mid', 'min', 'mmin', 'mtgt', 'extra', 'ref', 'weight', 'k', 'other', 'pass', 'tech', 'pw', 'low', 'bids', 'comm', 'guide', 'tlo', 'thi', 'smin', 'mrg', 'cdisc', 'cgap', 'step', 'trates'];
+  const cgetRaw = () => { const o = {}; CF.forEach(k => o[k] = $('c_' + k).value); return o; };
+  const cget = () => (window.__BIDUI3 && window.__BIDUI3.eff ? window.__BIDUI3.eff(cgetRaw()) : cgetRaw());
+  function csave() { ls.set('wic02v2_cost', cgetRaw()); }
   function cload() { const s = ls.get('wic02v2_cost', {}); CF.forEach(k => { const e = $('c_' + k); if (s[k] !== undefined) e.value = s[k]; e.addEventListener('change', () => { csave(); discLabel(); }); }); discLabel(); }
   function discLabel() { $('c_discLbl').firstChild.textContent = $('c_costmode').value === 'ledger' ? '원가 계수 (장부 \'발행사 디스카운트\' 열 값, 예 0.4)' : '발행사 할인율 (%)'; }
   function buildInp() {
@@ -1661,6 +2001,7 @@ pre.log{white-space:pre-wrap;font-size:12px;color:var(--mute);margin:0;max-heigh
     let s = `<line x1="${pl}" x2="${W - pr}" y1="${ay}" y2="${ay}" stroke="${C.m}" stroke-width="2"/>`;
     if (o.floorMax > o.floorMin) s += `<rect x="${X(o.floorMin)}" y="${ay - 16}" width="${Math.max(2, X(o.floorMax) - X(o.floorMin))}" height="32" fill="${C.a}" opacity=".28" rx="3"/>` + T((X(o.floorMin) + X(o.floorMax)) / 2, ay + 30, `하한가 변동 구간 ${short(o.floorMin)}~${short(o.floorMax)} (예가 ${rangeTxt(o)})`, {size: 10.5, fill: C.a});
     const tick = (v, col, label, yl, anchor) => `<line x1="${X(v)}" x2="${X(v)}" y1="${ay - 22}" y2="${ay + 22}" stroke="${col}" stroke-width="2.5"/>` + T(X(v), yl, label, {fill: col, bold: true, anchor: anchor || 'middle', size: 11});
+    { const st = S.strat; if (st && st.ok && st.award === 'floor' && st.zone) s += `<rect x="${X(st.zone.lo)}" y="${ay - 26}" width="${Math.max(2, X(st.zone.hi) - X(st.zone.lo))}" height="52" fill="${C.g}" opacity=".16" stroke="${C.gd}" stroke-dasharray="4 3" rx="4"/>` + T((X(st.zone.lo) + X(st.zone.hi)) / 2, ay - 30, '가능 구간(공고 규칙 · 방어선 반영)', {size: 10, fill: C.gd, bold: true}); }
     s += tick(o.est, C.b, '기준 ' + short(o.est), 24); s += tick(o.floorLimit, C.r, '낙찰하한가 ' + won(o.floorLimit), 168);
     if (cost !== null && cost !== undefined) s += tick(cost, C.gd, '원가 ' + won(cost), 188);
     recs.forEach(r => { const isSel = sel && sel.bid === r.bid; s += `<path d="M${X(r.bid) - 7} ${ay - 36}L${X(r.bid) + 7} ${ay - 36}L${X(r.bid)} ${ay - 24}Z" fill="${isSel ? C.b : C.t}"/>` + T(X(r.bid), ay - 42, r.id, {bold: true, fill: isSel ? C.b : C.t}); });
@@ -1755,7 +2096,7 @@ pre.log{white-space:pre-wrap;font-size:12px;color:var(--mute);margin:0;max-heigh
   }
   function syncBid(force) { const L = S.lastCalc; if (!L || !L.o || !S.sel) return; const t = splitTax(L.o, S.sel.bid).total; const el = $('d_bid'); if (force || !el.value || el.dataset.auto === '1') { el.value = String(t); el.dataset.auto = '1'; } }
   $('d_bid').addEventListener('input', () => { $('d_bid').dataset.auto = '0'; });
-  const calcDispatch = () => (window.__BIDUI2 && window.__BIDUI2._ready ? window.__BIDUI2.calc() : showCalc());
+  const calcDispatch = () => { if (window.__BIDUI3 && window.__BIDUI3.run) window.__BIDUI3.run(); return (window.__BIDUI2 && window.__BIDUI2._ready ? window.__BIDUI2.calc() : showCalc()); };
   $('calcBtn').onclick = calcDispatch;
   $('toCalc').onclick = () => { showTab(2); calcDispatch(); };
   $('calcClear').onclick = () => { ['list', 'fx', 'disc', 'rates'].forEach(k => $('c_' + k).value = ''); $('calcOut').innerHTML = '<div class="empty">공고 숫자를 입력한 뒤 [계산하기]를 누르세요.</div>'; S.sel = null; S.lastCalc = null; csave(); };
@@ -1789,8 +2130,9 @@ pre.log{white-space:pre-wrap;font-size:12px;color:var(--mute);margin:0;max-heigh
   $('itemTbl').addEventListener('input', e => { const tr = e.target.closest('tr'); if (!tr || !e.target.dataset.f) return; S.itemsDoc[+tr.dataset.i][e.target.dataset.f] = e.target.value; ls.set('wic02v2_items', S.itemsDoc); });
   $('itemTbl').addEventListener('click', e => { const b = e.target.closest('[data-del]'); if (!b) return; S.itemsDoc.splice(+b.dataset.del, 1); if (!S.itemsDoc.length) S.itemsDoc.push({name: '', pub: '', qty: '1', list: '', cur: 'KRW', fx: ''}); ls.set('wic02v2_items', S.itemsDoc); renderItems(); });
   $('itemAdd').onclick = () => { S.itemsDoc.push({name: '', pub: '', qty: '1', list: '', cur: 'KRW', fx: ''}); ls.set('wic02v2_items', S.itemsDoc); renderItems(); };
-  const dlDoc = (name, html) => WIC.download(name, new Blob(['﻿' + html], {type: 'application/msword;charset=utf-8'}));
-  const dlXls = (name, rows, sheet) => { const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), sheet); const out = XLSX.write(wb, {bookType: 'xls', type: 'array'}); WIC.download(name, new Blob([out], {type: 'application/vnd.ms-excel'})); };
+  const guardOK = (name, content) => !(window.__BIDUI3 && window.__BIDUI3.guard) || window.__BIDUI3.guard(name, content);
+  const dlDoc = (name, html) => { if (!guardOK(name, html)) return false; WIC.download(name, new Blob(['\ufeff' + html], {type: 'application/msword;charset=utf-8'})); return true; };
+  const dlXls = (name, rows, sheet) => { if (!guardOK(name, rows)) return false; const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), sheet); const out = XLSX.write(wb, {bookType: 'xls', type: 'array'}); WIC.download(name, new Blob([out], {type: 'application/vnd.ms-excel'})); };
   const safeName = s => str(s).replace(/[\\/:*?"<>|]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40) || '입찰';
   function preview(html) { $('prev').innerHTML = `<div class="small" style="margin-bottom:6px">미리보기 (내려받은 파일과 같은 내용)</div><iframe sandbox style="width:100%;height:430px;border:1px solid var(--line);border-radius:10px;background:#fff" srcdoc="${esc(html)}" title="서류 미리보기"></iframe>`; }
   function gen(kind) {
@@ -1804,7 +2146,7 @@ pre.log{white-space:pre-wrap;font-size:12px;color:var(--mute);margin:0;max-heigh
       else if (kind === 'bond') { const html = E.docBond(nn, co, bid); dlDoc('입찰보증금지급각서_' + safeName(n.no || n.title) + '.doc', html); preview(html); }
       else if (kind === 'payreq') { const html = E.docPayReq(nn, co, bid, taxfree); dlDoc('대금요청서_입력값_' + safeName(n.no || n.title) + '.doc', html); preview(html); }
       else if (kind === 'contract') { const html = E.docContract(nn, co, bid, base, F); dlDoc('계약입력카드_' + safeName(n.no || n.title) + '.doc', html); preview(html); }
-      else if (kind === 'ledger') { const c = cget(), L = S.lastCalc; const f = {base, floor: F, range: n.method === 'single' ? 0 : (num(n.range).s === 'ok' ? num(n.range).n : 2), company: n.org, cur: c.cur, list: c.list, fx: c.fx, coef: c.costmode === 'ledger' ? c.disc : '', model: (S.itemsDoc[0] && S.itemsDoc[0].name) || n.title, pub: (S.itemsDoc[0] && S.itemsDoc[0].pub) || ''}; const row = E.ledgerRow(nn, f, bid, L ? L.cost : null); const rows = [E.LEDGER_HEAD, row]; dlXls('입찰장부_1행_' + safeName(n.no || n.title) + '.xls', rows, 'Sheet1'); $('prev').innerHTML = '<div class="small" style="margin-bottom:6px">미리보기 (정본 26열)</div><div class="scroll"><table><thead><tr>' + E.LEDGER_HEAD.map(x => `<th>${esc(x)}</th>`).join('') + '</tr></thead><tbody><tr>' + row.map(x => `<td>${esc(x)}</td>`).join('') + '</tr></tbody></table></div>'; }
+      else if (kind === 'ledger') { const c = cget(), L = S.lastCalc; const f = {base, floor: F, range: n.method === 'single' ? 0 : (num(n.range).s === 'ok' ? num(n.range).n : 2), company: n.org, cur: c.cur, list: c.list, fx: c.fx, coef: c.costmode === 'ledger' ? c.disc : '', model: (S.itemsDoc[0] && S.itemsDoc[0].name) || n.title, pub: (S.itemsDoc[0] && S.itemsDoc[0].pub) || ''}; const row = (x => (window.__BIDUI3 ? window.__BIDUI3.redactLedger(x) : x))(E.ledgerRow(nn, f, bid, L ? L.cost : null)); const rows = [E.LEDGER_HEAD, row]; dlXls('입찰장부_1행_' + safeName(n.no || n.title) + '.xls', rows, 'Sheet1'); $('prev').innerHTML = '<div class="small" style="margin-bottom:6px">미리보기 (정본 26열)</div><div class="scroll"><table><thead><tr>' + E.LEDGER_HEAD.map(x => `<th>${esc(x)}</th>`).join('') + '</tr></thead><tbody><tr>' + row.map(x => `<td>${esc(x)}</td>`).join('') + '</tr></tbody></table></div>'; }
       toast('초안을 내려받았습니다' + (miss.length ? ' — 빈칸(확인 필요): ' + miss.join(', ') : '')); log('서류 초안 생성: ' + kind + (miss.length ? ' · 빈칸 ' + miss.join(',') : ''));
     } catch (e) { toast('생성 실패: ' + e.message); log('서류 생성 실패: ' + kind + ' ' + e.message); }
   }
@@ -1880,6 +2222,7 @@ pre.log{white-space:pre-wrap;font-size:12px;color:var(--mute);margin:0;max-heigh
   try { if (window.chrome && chrome.storage && chrome.storage.local && chrome.storage.local.get) chrome.storage.local.get('wic02_pending').then(r => { const p = r && r.wic02_pending; if (!p) return; chrome.storage.local.remove('wic02_pending'); try { const note = ingest('(공고 화면) ' + (p.title || p.url || ''), p.text || '', false); const k = applyEx(); renderEx(); renderChk(); toast(k ? '확장 프로그램에서 넘어온 공고 화면에서 ' + k + '칸을 자동 입력했습니다' : '넘어온 화면에서 읽은 값이 없습니다'); log('확장에서 수신: ' + note); } catch (e) { toast(e.message); } }); } catch (e) {}
   window.__BIDUI = {S, E, $, nget, cget, csave, buildInp, showTab, showCalc, renderChk0, toast, log, ls, ingest, applyEx, renderEx, syncBid, splitTax, rangeTxt, render, addRows, classify, esc, chkKey, checklistItems, AL, rowsFromText, toItem, norm, str, num, won, pct, svg, T, C, short, chartLine, EV_CASES, handleFiles};
   if (window.__BIDUI2 && window.__BIDUI2.init) window.__BIDUI2.init(window.__BIDUI);
+  if (window.__BIDUI3 && window.__BIDUI3.init) window.__BIDUI3.init(window.__BIDUI);
   log('02 입찰 도구 v3 시작');
 })();
 

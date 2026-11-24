@@ -1,0 +1,29 @@
+  <div class="card sim" id="stratCard">
+    <h2>상황 진단 · 투찰 구간 (범용) <span class="small" style="font-weight:400">· 5가지 조건을 고르면 근거 있는 숫자만으로 구간을 계산합니다</span></h2>
+    <p class="lead">낙찰방식은 ① 공고 정보에서 이어받습니다. 근거 데이터가 없는 구간은 숫자를 만들지 않고, 아래 입력칸(목표 마진·예상 경쟁)을 직접 조절하는 계산 표로 보여 줍니다. <b>실제 원가·커미션은 내부용</b>이며 서류에는 출력되지 않습니다.</p>
+    <div class="grid">
+      <label>발주 기관 유형<select id="s_org" title="기능: 기관 성격 분류 · 결과: 공고 진단 문구(숫자에는 반영하지 않음) · 사용시점: 기관을 확인한 뒤"><option value="auto">자동 (수요기관 이름으로 판별)</option><option value="research">출연연 자체 시스템 (KISTI·화연·ETRI)</option><option value="g2b">나라장터 (G2B)</option><option value="s2b">학교장터 (S2B)·대학</option><option value="d2b">국방(D2B)·공기업</option><option value="other">그 밖의 공공기관</option></select></label>
+      <label>기관 개찰 기록 불러오기<select id="s_orgkey" title="기능: 이 기관의 과거 개찰 실측 기록 사용 여부 · 결과: 기록이 있으면 실측 라벨로 표시 · 사용시점: 기관 확인 후"><option value="auto">자동 (기관 이름으로 판별)</option><option value="none">사용 안 함</option><option value="kisti">KISTI</option><option value="kric">한국화학연구원</option><option value="etri">ETRI</option></select></label>
+      <label>사전 영업·독점성<select id="s_sales" title="기능: 영업 상황 분류 · 결과: 진단 문구 · 사용시점: 사전 견적을 냈는지, 단독 공급인지 확인한 뒤"><option value="open">일반 공개경쟁</option><option value="prequote">사전 견적 제출 공고</option><option value="exclusive">발행사 단독 공급권</option><option value="nonexcl">발행사 비독점 공급권</option></select></label>
+      <label>계약 형태<select id="s_contract" title="기능: 납품·계약 방식 분류 · 결과: 진단 문구 · 사용시점: 공고 확인 후"><option value="single">단건 납품</option><option value="unit">단가계약</option><option value="annual">연간 구독</option></select></label>
+      <label><span><input type="checkbox" id="s_urgent" title="기능: 긴급 공고 표시 · 결과: 진단 문구에 주의 추가 · 사용시점: 제출 기한이 촉박할 때"> 긴급 공고</span><span><input type="checkbox" id="s_rebid" title="기능: 재공고 표시 · 결과: 직전 개찰 비교 안내 · 사용시점: 재공고일 때"> 재공고</span></label>
+    </div>
+    <h3>내부 원가 · 대외 안내 (분리 관리)</h3>
+    <div class="grid">
+      <label>실제 커미션 (%) — 내부용<input id="c_comm" type="text" inputmode="decimal" placeholder="예) 매입계수 0.55 → 45" title="기능: 발행사에서 실제로 받는 할인(커미션) · 결과: 실제 원가 = 정가×환율×(1−커미션) · 사용시점: 진짜 순이익을 볼 때(서류에 출력되지 않음)"></label>
+      <label>대외 안내 비율 (% 기초금액 대비, 선택)<input id="c_guide" type="text" inputmode="decimal" placeholder="예) 70" title="기능: 고객에게 안내한 조건 · 결과: 이 아래로 쓰면 경고 · 사용시점: 대외 약속이 있을 때"></label>
+      <label>목표 투찰 구간 — 아래 (%, 선택)<input id="c_tlo" type="text" inputmode="decimal" title="기능: 계획한 투찰률의 아래쪽 · 결과: 후보 T1 · 사용시점: 목표를 비교할 때"></label>
+      <label>목표 투찰 구간 — 위 (%, 선택)<input id="c_thi" type="text" inputmode="decimal" title="기능: 계획한 투찰률의 위쪽 · 결과: 후보 T2·T3 · 사용시점: 목표를 비교할 때"></label>
+      <label>최소 마진 (원가 대비 %)<input id="c_smin" type="text" inputmode="decimal" value="0" title="기능: 지켜야 할 최소 마진 · 결과: 적자 방어선 · 사용시점: 0% 도 가능"></label>
+      <label>직접 후보 투찰률 (%, 쉼표)<input id="c_trates" type="text" placeholder="예) 80, 83.5, 85" title="기능: 확인할 투찰률 직접 입력 · 결과: 후보 U1.. 와 순이익 · 사용시점: 특정 비율을 비교할 때"></label>
+    </div>
+    <h3>시뮬레이션 조절 (근거 데이터가 없을 때 직접 비교)</h3>
+    <div class="grid">
+      <label>목표 마진율 (원가 대비 %) <input id="rng_mrg" type="range" min="0" max="100" step="0.5" value="0" title="기능: 슬라이더로 목표 마진 조절 · 결과: 목표 마진 가격선 · 사용시점: 마진을 정하며 비교할 때"><input id="c_mrg" type="text" inputmode="decimal" title="기능: 목표 마진율 숫자 입력 · 결과: 슬라이더와 동기화 · 사용시점: 정확한 값을 넣을 때"></label>
+      <label>예상 경쟁 할인율 (기초금액 −%) — 가정 <input id="rng_cdisc" type="range" min="0" max="60" step="0.5" value="0" title="기능: 경쟁자가 기초금액보다 얼마나 낮게 쓸지 가정 · 결과: 경쟁 가정선 · 사용시점: 경쟁을 가정해 비교할 때(근거 데이터 아님)"><input id="c_cdisc" type="text" inputmode="decimal" title="기능: 예상 경쟁 할인율 숫자 입력 · 결과: 슬라이더와 동기화 · 사용시점: 가정값을 넣을 때"></label>
+      <label>경쟁보다 더 낮출 폭 (%p, 선택)<input id="c_cgap" type="text" inputmode="decimal" title="기능: 경쟁 가정가보다 더 내릴 폭 · 결과: 경쟁−폭 선 · 사용시점: 경쟁보다 앞서려 할 때"></label>
+      <label>시뮬레이션 표 간격 (%p)<input id="c_step" type="text" inputmode="decimal" value="5" title="기능: 표의 투찰률 간격 · 결과: 표 줄 수 · 사용시점: 더 촘촘히 보고 싶을 때"></label>
+    </div>
+    <div class="row" style="margin-top:20px"><button id="stratBtn" class="primary" title="기능: 5가지 조건과 원가로 구간·후보·순이익 계산 · 결과: 아래 요약·차트·표 · 사용시점: 입력을 바꾼 뒤">상황 진단·구간 계산</button><button id="stratClear" title="기능: 내부 원가·안내·시뮬레이션 입력 비우기 · 결과: 새 공고 준비 · 사용시점: 다른 공고로 바꿀 때">내부 원가·전략 입력 비우기</button></div>
+  </div>
+  <div id="stratOut"><div class="empty">[상황 진단·구간 계산] 또는 [계산하기]를 누르면 이곳에 구간 차트와 후보·순이익 표가 나옵니다.</div></div>

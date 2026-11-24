@@ -146,9 +146,10 @@
   }
 
   /* ───────── 계산 입력 ───────── */
-  const CF = ['list', 'cur', 'fx', 'costmode', 'disc', 'rates', 'people', 'safe', 'mid', 'min', 'mmin', 'mtgt', 'extra', 'ref', 'weight', 'k', 'other', 'pass', 'tech', 'pw', 'low', 'bids'];
-  const cget = () => { const o = {}; CF.forEach(k => o[k] = $('c_' + k).value); return o; };
-  function csave() { ls.set('wic02v2_cost', cget()); }
+  const CF = ['list', 'cur', 'fx', 'costmode', 'disc', 'rates', 'people', 'safe', 'mid', 'min', 'mmin', 'mtgt', 'extra', 'ref', 'weight', 'k', 'other', 'pass', 'tech', 'pw', 'low', 'bids', 'comm', 'guide', 'tlo', 'thi', 'smin', 'mrg', 'cdisc', 'cgap', 'step', 'trates'];
+  const cgetRaw = () => { const o = {}; CF.forEach(k => o[k] = $('c_' + k).value); return o; };
+  const cget = () => (window.__BIDUI3 && window.__BIDUI3.eff ? window.__BIDUI3.eff(cgetRaw()) : cgetRaw());
+  function csave() { ls.set('wic02v2_cost', cgetRaw()); }
   function cload() { const s = ls.get('wic02v2_cost', {}); CF.forEach(k => { const e = $('c_' + k); if (s[k] !== undefined) e.value = s[k]; e.addEventListener('change', () => { csave(); discLabel(); }); }); discLabel(); }
   function discLabel() { $('c_discLbl').firstChild.textContent = $('c_costmode').value === 'ledger' ? '원가 계수 (장부 \'발행사 디스카운트\' 열 값, 예 0.4)' : '발행사 할인율 (%)'; }
   function buildInp() {
@@ -167,6 +168,7 @@
     let s = `<line x1="${pl}" x2="${W - pr}" y1="${ay}" y2="${ay}" stroke="${C.m}" stroke-width="2"/>`;
     if (o.floorMax > o.floorMin) s += `<rect x="${X(o.floorMin)}" y="${ay - 16}" width="${Math.max(2, X(o.floorMax) - X(o.floorMin))}" height="32" fill="${C.a}" opacity=".28" rx="3"/>` + T((X(o.floorMin) + X(o.floorMax)) / 2, ay + 30, `하한가 변동 구간 ${short(o.floorMin)}~${short(o.floorMax)} (예가 ${rangeTxt(o)})`, {size: 10.5, fill: C.a});
     const tick = (v, col, label, yl, anchor) => `<line x1="${X(v)}" x2="${X(v)}" y1="${ay - 22}" y2="${ay + 22}" stroke="${col}" stroke-width="2.5"/>` + T(X(v), yl, label, {fill: col, bold: true, anchor: anchor || 'middle', size: 11});
+    { const st = S.strat; if (st && st.ok && st.award === 'floor' && st.zone) s += `<rect x="${X(st.zone.lo)}" y="${ay - 26}" width="${Math.max(2, X(st.zone.hi) - X(st.zone.lo))}" height="52" fill="${C.g}" opacity=".16" stroke="${C.gd}" stroke-dasharray="4 3" rx="4"/>` + T((X(st.zone.lo) + X(st.zone.hi)) / 2, ay - 30, '가능 구간(공고 규칙 · 방어선 반영)', {size: 10, fill: C.gd, bold: true}); }
     s += tick(o.est, C.b, '기준 ' + short(o.est), 24); s += tick(o.floorLimit, C.r, '낙찰하한가 ' + won(o.floorLimit), 168);
     if (cost !== null && cost !== undefined) s += tick(cost, C.gd, '원가 ' + won(cost), 188);
     recs.forEach(r => { const isSel = sel && sel.bid === r.bid; s += `<path d="M${X(r.bid) - 7} ${ay - 36}L${X(r.bid) + 7} ${ay - 36}L${X(r.bid)} ${ay - 24}Z" fill="${isSel ? C.b : C.t}"/>` + T(X(r.bid), ay - 42, r.id, {bold: true, fill: isSel ? C.b : C.t}); });
@@ -261,7 +263,7 @@
   }
   function syncBid(force) { const L = S.lastCalc; if (!L || !L.o || !S.sel) return; const t = splitTax(L.o, S.sel.bid).total; const el = $('d_bid'); if (force || !el.value || el.dataset.auto === '1') { el.value = String(t); el.dataset.auto = '1'; } }
   $('d_bid').addEventListener('input', () => { $('d_bid').dataset.auto = '0'; });
-  const calcDispatch = () => (window.__BIDUI2 && window.__BIDUI2._ready ? window.__BIDUI2.calc() : showCalc());
+  const calcDispatch = () => { if (window.__BIDUI3 && window.__BIDUI3.run) window.__BIDUI3.run(); return (window.__BIDUI2 && window.__BIDUI2._ready ? window.__BIDUI2.calc() : showCalc()); };
   $('calcBtn').onclick = calcDispatch;
   $('toCalc').onclick = () => { showTab(2); calcDispatch(); };
   $('calcClear').onclick = () => { ['list', 'fx', 'disc', 'rates'].forEach(k => $('c_' + k).value = ''); $('calcOut').innerHTML = '<div class="empty">공고 숫자를 입력한 뒤 [계산하기]를 누르세요.</div>'; S.sel = null; S.lastCalc = null; csave(); };
@@ -295,8 +297,9 @@
   $('itemTbl').addEventListener('input', e => { const tr = e.target.closest('tr'); if (!tr || !e.target.dataset.f) return; S.itemsDoc[+tr.dataset.i][e.target.dataset.f] = e.target.value; ls.set('wic02v2_items', S.itemsDoc); });
   $('itemTbl').addEventListener('click', e => { const b = e.target.closest('[data-del]'); if (!b) return; S.itemsDoc.splice(+b.dataset.del, 1); if (!S.itemsDoc.length) S.itemsDoc.push({name: '', pub: '', qty: '1', list: '', cur: 'KRW', fx: ''}); ls.set('wic02v2_items', S.itemsDoc); renderItems(); });
   $('itemAdd').onclick = () => { S.itemsDoc.push({name: '', pub: '', qty: '1', list: '', cur: 'KRW', fx: ''}); ls.set('wic02v2_items', S.itemsDoc); renderItems(); };
-  const dlDoc = (name, html) => WIC.download(name, new Blob(['﻿' + html], {type: 'application/msword;charset=utf-8'}));
-  const dlXls = (name, rows, sheet) => { const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), sheet); const out = XLSX.write(wb, {bookType: 'xls', type: 'array'}); WIC.download(name, new Blob([out], {type: 'application/vnd.ms-excel'})); };
+  const guardOK = (name, content) => !(window.__BIDUI3 && window.__BIDUI3.guard) || window.__BIDUI3.guard(name, content);
+  const dlDoc = (name, html) => { if (!guardOK(name, html)) return false; WIC.download(name, new Blob(['\ufeff' + html], {type: 'application/msword;charset=utf-8'})); return true; };
+  const dlXls = (name, rows, sheet) => { if (!guardOK(name, rows)) return false; const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), sheet); const out = XLSX.write(wb, {bookType: 'xls', type: 'array'}); WIC.download(name, new Blob([out], {type: 'application/vnd.ms-excel'})); };
   const safeName = s => str(s).replace(/[\\/:*?"<>|]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40) || '입찰';
   function preview(html) { $('prev').innerHTML = `<div class="small" style="margin-bottom:6px">미리보기 (내려받은 파일과 같은 내용)</div><iframe sandbox style="width:100%;height:430px;border:1px solid var(--line);border-radius:10px;background:#fff" srcdoc="${esc(html)}" title="서류 미리보기"></iframe>`; }
   function gen(kind) {
@@ -310,7 +313,7 @@
       else if (kind === 'bond') { const html = E.docBond(nn, co, bid); dlDoc('입찰보증금지급각서_' + safeName(n.no || n.title) + '.doc', html); preview(html); }
       else if (kind === 'payreq') { const html = E.docPayReq(nn, co, bid, taxfree); dlDoc('대금요청서_입력값_' + safeName(n.no || n.title) + '.doc', html); preview(html); }
       else if (kind === 'contract') { const html = E.docContract(nn, co, bid, base, F); dlDoc('계약입력카드_' + safeName(n.no || n.title) + '.doc', html); preview(html); }
-      else if (kind === 'ledger') { const c = cget(), L = S.lastCalc; const f = {base, floor: F, range: n.method === 'single' ? 0 : (num(n.range).s === 'ok' ? num(n.range).n : 2), company: n.org, cur: c.cur, list: c.list, fx: c.fx, coef: c.costmode === 'ledger' ? c.disc : '', model: (S.itemsDoc[0] && S.itemsDoc[0].name) || n.title, pub: (S.itemsDoc[0] && S.itemsDoc[0].pub) || ''}; const row = E.ledgerRow(nn, f, bid, L ? L.cost : null); const rows = [E.LEDGER_HEAD, row]; dlXls('입찰장부_1행_' + safeName(n.no || n.title) + '.xls', rows, 'Sheet1'); $('prev').innerHTML = '<div class="small" style="margin-bottom:6px">미리보기 (정본 26열)</div><div class="scroll"><table><thead><tr>' + E.LEDGER_HEAD.map(x => `<th>${esc(x)}</th>`).join('') + '</tr></thead><tbody><tr>' + row.map(x => `<td>${esc(x)}</td>`).join('') + '</tr></tbody></table></div>'; }
+      else if (kind === 'ledger') { const c = cget(), L = S.lastCalc; const f = {base, floor: F, range: n.method === 'single' ? 0 : (num(n.range).s === 'ok' ? num(n.range).n : 2), company: n.org, cur: c.cur, list: c.list, fx: c.fx, coef: c.costmode === 'ledger' ? c.disc : '', model: (S.itemsDoc[0] && S.itemsDoc[0].name) || n.title, pub: (S.itemsDoc[0] && S.itemsDoc[0].pub) || ''}; const row = (x => (window.__BIDUI3 ? window.__BIDUI3.redactLedger(x) : x))(E.ledgerRow(nn, f, bid, L ? L.cost : null)); const rows = [E.LEDGER_HEAD, row]; dlXls('입찰장부_1행_' + safeName(n.no || n.title) + '.xls', rows, 'Sheet1'); $('prev').innerHTML = '<div class="small" style="margin-bottom:6px">미리보기 (정본 26열)</div><div class="scroll"><table><thead><tr>' + E.LEDGER_HEAD.map(x => `<th>${esc(x)}</th>`).join('') + '</tr></thead><tbody><tr>' + row.map(x => `<td>${esc(x)}</td>`).join('') + '</tr></tbody></table></div>'; }
       toast('초안을 내려받았습니다' + (miss.length ? ' — 빈칸(확인 필요): ' + miss.join(', ') : '')); log('서류 초안 생성: ' + kind + (miss.length ? ' · 빈칸 ' + miss.join(',') : ''));
     } catch (e) { toast('생성 실패: ' + e.message); log('서류 생성 실패: ' + kind + ' ' + e.message); }
   }
@@ -386,5 +389,6 @@
   try { if (window.chrome && chrome.storage && chrome.storage.local && chrome.storage.local.get) chrome.storage.local.get('wic02_pending').then(r => { const p = r && r.wic02_pending; if (!p) return; chrome.storage.local.remove('wic02_pending'); try { const note = ingest('(공고 화면) ' + (p.title || p.url || ''), p.text || '', false); const k = applyEx(); renderEx(); renderChk(); toast(k ? '확장 프로그램에서 넘어온 공고 화면에서 ' + k + '칸을 자동 입력했습니다' : '넘어온 화면에서 읽은 값이 없습니다'); log('확장에서 수신: ' + note); } catch (e) { toast(e.message); } }); } catch (e) {}
   window.__BIDUI = {S, E, $, nget, cget, csave, buildInp, showTab, showCalc, renderChk0, toast, log, ls, ingest, applyEx, renderEx, syncBid, splitTax, rangeTxt, render, addRows, classify, esc, chkKey, checklistItems, AL, rowsFromText, toItem, norm, str, num, won, pct, svg, T, C, short, chartLine, EV_CASES, handleFiles};
   if (window.__BIDUI2 && window.__BIDUI2.init) window.__BIDUI2.init(window.__BIDUI);
+  if (window.__BIDUI3 && window.__BIDUI3.init) window.__BIDUI3.init(window.__BIDUI);
   log('02 입찰 도구 v3 시작');
 })();
