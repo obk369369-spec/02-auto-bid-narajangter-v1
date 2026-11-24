@@ -18,12 +18,12 @@ const TV = path.join(D, '..', '..', 'vendor', 'tesseract');
 ['tesseract.min.js', 'worker.min.js', 'tesseract-core-simd-lstm.wasm.js', 'kor.traineddata.gz', 'eng.traineddata.gz'].forEach(f => W('lib/ocr/' + f, fs.readFileSync(path.join(TV, f))));
 W('lib/ocr_init.js', "window.__OCR_URLS = {worker: chrome.runtime.getURL('lib/ocr/worker.min.js'), core: chrome.runtime.getURL('lib/ocr/tesseract-core-simd-lstm.wasm.js'), lang: chrome.runtime.getURL('lib/ocr')};");
 W('lib/ocr_glue.js', P.ocrGlue);
-W('pricing.js', P.pricing); W('strategy.js', P.strategy); W('ui3.js', P.ui3); W('fx.js', P.fx); W('ai.js', P.ai); W('ui4.js', P.ui4); W('ops.js', P.ops); W('ui2.js', P.ui2); W('lib/institution_core.js', P.instCore);
+W('pricing.js', P.pricing); W('strategy.js', P.strategy); W('ui3.js', P.ui3); W('scenarios.js', 'window.BIDSC=' + P.scen + ';'); W('fx.js', P.fx); W('ai.js', P.ai); W('ui4.js', P.ui4); W('ops.js', P.ops); W('ui2.js', P.ui2); W('lib/institution_core.js', P.instCore);
 /* 대용량 XLSX 작업자: 확장 페이지에서는 blob 작업자가 막히므로 확장 안의 파일로 둔다 */
 W('lib/inst_worker.js', xlsxJs + '\n' + P.instCore + "\nself.onmessage=event=>{try{const workbook=XLSX.read(event.data,{type:'array',dense:true,cellStyles:false,cellNF:false,cellHTML:false});const sheet=workbook.Sheets[workbook.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:'',raw:false});const result=WICInstitutionAccumulator.accumulateInstitutions(rows);self.postMessage({ok:true,result});}catch(error){self.postMessage({ok:false,error:String(error&&error.message||error)});}};");
 W('lib/inst_init.js', "window.__INST_WORKER_URL = chrome.runtime.getURL('lib/inst_worker.js'); window.__INST_CORE_SRC = '';");
 /* 앱 페이지: 본문 HTML 을 그대로 쓰되 <script src> 로 분리 */
-const scripts = ['lib/xlsx.full.min.js', 'lib/wic_core.js', 'lib/pdf.min.js', 'lib/cmaps.js', 'lib/pdf_init.js', 'lib/pdfjs_glue.js', 'lib/ocr/tesseract.min.js', 'lib/ocr_init.js', 'lib/ocr_glue.js', 'engine.js', 'pricing.js', 'strategy.js', 'fx.js', 'ai.js', 'ops.js', 'lib/institution_core.js', 'lib/inst_init.js', 'ui2.js', 'ui3.js', 'ui4.js', 'ui.js'];
+const scripts = ['lib/xlsx.full.min.js', 'lib/wic_core.js', 'lib/pdf.min.js', 'lib/cmaps.js', 'lib/pdf_init.js', 'lib/pdfjs_glue.js', 'lib/ocr/tesseract.min.js', 'lib/ocr_init.js', 'lib/ocr_glue.js', 'engine.js', 'pricing.js', 'strategy.js', 'fx.js', 'ai.js', 'ops.js', 'lib/institution_core.js', 'lib/inst_init.js', 'ui2.js', 'scenarios.js', 'ui3.js', 'ui4.js', 'ui.js'];
 W('app.html', '<!doctype html>\n<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">\n<title>02 입찰 도구</title>\n' + P.body + '\n' + scripts.map(s => `<script src="${s}"></script>`).join('\n') + '\n</body></html>\n');
 /* 확장 전용 스크립트 */
 W('sw.js', fs.readFileSync(path.join(D, 'ext', 'sw.js'), 'utf8')); W('content.js', fs.readFileSync(path.join(D, 'ext', 'content.js'), 'utf8'));

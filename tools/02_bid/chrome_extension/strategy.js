@@ -31,7 +31,7 @@
   };
   const SALES = {prequote: '사전 견적 제출 공고', exclusive: '발행사 단독 공급권', nonexcl: '발행사 비독점 공급권', open: '일반 공개경쟁'};
   const CONTRACT = {single: '단건 납품', unit: '단가계약', annual: '연간 구독'};
-  const AWARD = {lowest: '단순 최저가', floor: '복수예가 낙찰하한율제', eval: '적격심사', nego: '협상에 의한 계약(기술+가격)'};
+  const AWARD = {lowest: '단순 최저가', floor: '복수예가 낙찰하한율제', eval: '적격심사제', nego: '협상에 의한 계약(기술+가격)'};
   function detectOrg(text) { const t = String(text || ''); for (const k of ['g2b', 'research', 's2b', 'd2b']) { if (ORG_TYPES[k].hint && ORG_TYPES[k].hint.test(t)) return k; } return 'other'; }
   function detectOrgKey(text) { const t = String(text || ''); if (/KISTI|한국과학기술정보연구원/i.test(t)) return 'kisti'; if (/한국화학연구원|KRICT/i.test(t)) return 'kric'; if (/ETRI|한국전자통신연구원/i.test(t)) return 'etri'; return ''; }
 

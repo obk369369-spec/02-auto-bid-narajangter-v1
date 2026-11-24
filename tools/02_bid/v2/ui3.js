@@ -24,6 +24,48 @@
     ['c_comm', 'c_guide', 'c_tlo', 'c_thi', 'c_smin', 'c_cgap', 'c_step', 'c_trates'].forEach(id => $(id).addEventListener('input', () => { U.csave(); live(); }));
     $('stratBtn').onclick = () => { api.run(); };
     $('stratClear').onclick = () => { ['c_comm', 'c_guide', 'c_tlo', 'c_thi', 'c_mrg', 'c_cdisc', 'c_cgap', 'c_trates'].forEach(id => $(id).value = ''); $('rng_mrg').value = 0; $('rng_cdisc').value = 0; $('c_smin').value = '0'; $('c_step').value = '5'; U.csave(); U.S.strat = null; $('stratOut').innerHTML = '<div class="empty">내부 원가·안내 기준을 비웠습니다. 값을 입력한 뒤 [상황 진단·구간 계산]을 누르세요.</div>'; U.toast('내부 원가·전략 입력을 비웠습니다'); };
+    bindAward(); fillScenarioMenu();
+  };
+
+  /* ───────── 낙찰방식(선정방법) 선택 → ② 계산·전략·추가 입력 즉시 연동 ───────── */
+  const AWLAB = {floor: '복수예가·낙찰하한율제', lowest: '최저가 낙찰제', eval: '적격심사제', nego: '협상에 의한 계약'};
+  const AWHINT = {
+    floor: '낙찰하한율(%)·예가범위를 공고문 값대로 입력하세요.',
+    lowest: '최저가: 낙찰하한율 없음 — 기초금액 이하에서 가장 낮은 금액이 낙찰됩니다(하한율·예가범위 칸은 꺼집니다).',
+    eval: '적격심사제: 낙찰하한율 대신 ②의 [적격심사] 기준율·배점·통과점수로 계산합니다(하한율 칸은 꺼집니다).',
+    nego: '협상에 의한 계약: 기술+가격 합산 평가 — ②의 [협상] 칸을 사용하고 하한율 칸은 꺼집니다.',
+    '': '공고문의 낙찰방식(선정방법)을 선택하세요. 고르기 전에는 계산하지 않습니다(하한율을 입력하면 복수예가로 계산).'
+  };
+  const GROUP = {lowest: '[최저가]', eval: '[적격심사]', nego: '[협상]'};
+  let lastAward = null;
+  api.syncAward = () => {
+    const {$} = U; const a = $('n_award').value; const off = a !== '' && a !== 'floor';
+    ['n_floor', 'n_range', 'n_rlo', 'n_rhi', 'n_method'].forEach(id => { const e = $(id); e.disabled = off; e.parentElement.style.opacity = off ? '.5' : ''; });
+    $('n_floor').placeholder = a === 'lowest' ? '최저가: 하한율 없음' : a === 'eval' ? '적격심사: 하한율 대신 ② 평가표' : a === 'nego' ? '협상계약: 하한율 없음' : '예) 88 또는 87.745';
+    $('awardHint').textContent = AWHINT[a] || AWHINT['']; $('awardNow').innerHTML = a ? `현재 낙찰방식: <b>${AWLAB[a]}</b> — ${AWHINT[a]}` : `<span class="warn">낙찰방식 미선택</span> — ${AWHINT['']}`;
+    const det = $('awardExtra'); if (det) { if (off) det.open = true; det.querySelectorAll('label').forEach(l => { const m = /^\[[^\]]+\]/.exec(l.textContent.trim()); l.style.opacity = !m || (GROUP[a] && m[0] === GROUP[a]) ? '' : '.38'; }); }
+    if (lastAward !== null && lastAward !== a) { U.nsave(); const out = $('calcOut'); if (out && out.querySelector('.card')) $('calcBtn').click(); else if (U.S.strat) api.run(); U.log('낙찰방식 변경: ' + (AWLAB[lastAward] || '미선택') + ' → ' + (AWLAB[a] || '미선택')); }
+    lastAward = a;
+  };
+  function bindAward() { const {$} = U; $('n_award').addEventListener('change', api.syncAward); api.syncAward(); setInterval(() => { if ($('n_award').value !== lastAward) api.syncAward(); }, 250); /* 문서 자동 판별·불러오기 등 코드로 값이 바뀌는 경우도 따라감 */ }
+
+  /* ───────── 대표 시나리오 불러오기 (①·② 모든 입력칸) ───────── */
+  const SCIDS = ['S1_KRICT_024', 'S2_KISTI_FLOOR', 'S4_G2B_EVAL', 'S5_NEGO'];
+  function fillScenarioMenu() {
+    const {$} = U; const sel = $('scSel'); const all = window.BIDSC || []; sel.innerHTML = '<option value="">[대표 시나리오 불러오기]</option>';
+    SCIDS.forEach((id, i) => { const sc = all.find(x => x.id === id); if (sc) sel.insertAdjacentHTML('beforeend', `<option value="${id}">사례 ${i + 1} · ${U.esc(sc.name.replace(/^\[예시\]\s*/, ''))}${sc.real ? ' (실제 사례)' : ' (가상 예시값)'}</option>`); });
+    sel.onchange = () => { if (sel.value) { api.loadScenario(sel.value); sel.value = ''; } };
+  }
+  api.loadScenario = id => {
+    const {$} = U; const sc = (window.BIDSC || []).find(x => x.id === id); if (!sc) { U.toast('시나리오를 찾지 못했습니다'); return false; }
+    ['title', 'no', 'org', 'due', 'open', 'supply', 'vatamt', 'total', 'qty', 'base', 'basis', 'floor', 'range', 'rlo', 'rhi', 'method', 'award', 'pub', 'bond', 'tax', 'vat'].forEach(k => { const e = $('n_' + k); if (e.tagName === 'SELECT') e.selectedIndex = 0; else e.value = k === 'vat' ? '10' : ''; e.classList.remove('auto'); const t = e.parentElement.querySelector('.autotag'); if (t) t.remove(); });
+    Object.keys(sc.n).forEach(k => { const e = $('n_' + k); if (e) e.value = sc.n[k]; });
+    ['list', 'fx', 'disc', 'rates', 'comm', 'guide', 'tlo', 'thi', 'mrg', 'cdisc', 'cgap', 'trates', 'extra', 'ref', 'weight', 'k', 'other', 'pass', 'tech', 'pw', 'low', 'bids'].forEach(k => { const e = $('c_' + k); if (e) e.value = ''; });
+    $('c_cur').value = 'KRW'; $('c_smin').value = '0'; $('c_step').value = '5'; $('rng_mrg').value = 0; $('rng_cdisc').value = 0;
+    Object.keys(sc.c).forEach(k => { const e = $('c_' + k); if (e) e.value = sc.c[k]; }); if (sc.c.mrg) $('rng_mrg').value = sc.c.mrg; if (sc.c.cdisc) $('rng_cdisc').value = sc.c.cdisc;
+    $('s_org').value = sc.s.org; $('s_orgkey').value = sc.s.orgKey || 'none'; $('s_sales').value = sc.s.sales; $('s_contract').value = sc.s.contract; $('s_urgent').checked = !!sc.s.urgent; $('s_rebid').checked = !!sc.s.rebid;
+    U.S.fxMeta = null; $('fxInfo').textContent = ''; U.nsave(); U.csave(); api.syncAward(); U.ls.set(SKEY, {s_org: sc.s.org, s_orgkey: sc.s.orgKey || 'none', s_sales: sc.s.sales, s_contract: sc.s.contract, s_urgent: !!sc.s.urgent, s_rebid: !!sc.s.rebid});
+    U.showTab(2); $('calcBtn').click(); U.toast('사례를 불러왔습니다: ' + sc.name + (sc.c.fx ? ' — 환율 ' + sc.c.fx + ' 은(는) 예시/시험값이니 [실시간 환율 불러오기]로 바꾸세요' : '')); U.log('대표 시나리오 불러오기: ' + id); return true;
   };
 
   function profileOf(n) {

@@ -356,7 +356,7 @@
   async function sha(t) { try { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, '0')).join(''); } catch (e) { return 'sha256-unavailable'; } }
   $('verifyBtn').onclick = async () => {
     const res = EV_CASES.map(([name, exp, fn]) => { let act; try { act = String(fn()); } catch (e) { act = '예외: ' + e.message; } return {name, expected: exp, actual: act, pass: act === exp}; });
-    const cur = S.lastCalc ? E.reverify(S.lastCalc.o).map(c => ({name: '[현재 계산] ' + c.name, expected: c.expected, actual: c.actual, pass: c.pass})) : [];
+    const cur = S.lastCalc && S.lastCalc.o ? E.reverify(S.lastCalc.o).map(c => ({name: '[현재 계산] ' + c.name, expected: c.expected, actual: c.actual, pass: c.pass})) : [];
     const all = res.concat(cur), nf = all.filter(c => !c.pass).length;
     $('vTbl').querySelector('tbody').innerHTML = all.map(c => `<tr><td>${esc(c.name)}</td><td class="n">${esc(c.expected)}</td><td class="n">${esc(c.actual)}</td><td class="${c.pass ? 'ok' : 'bad'}">${c.pass ? 'PASS' : 'FAIL'}</td></tr>`).join('');
     const ev = {tool: '02_bid', version: 'v2', time: new Date().toISOString(), total: all.length, pass: all.length - nf, fail: nf, verdict: nf ? 'FAIL' : 'PASS', currentCalcIncluded: !!cur.length, cases: all};
@@ -377,7 +377,7 @@
     S.dup += dup; log(`반영: 신규 ${added} / 중복 ${dup}`); render(); S.pending = persist(); return S.pending;
   }
   async function loadSaved() { try { const st = await db.get('state'); if (st) { S.items = st.items || []; S.dup = st.dup || 0; log(`복원: ${S.items.length}건`); } } catch (e) { log('복원 실패: ' + e.message); } render(); }
-  $('addBtn').onclick = () => { const t = $('paste').value; if (!t.trim()) return; const rows = rowsFromText(t); $('paste').value = ''; return addRows(rows); };
+  $('addBtn').onclick = () => { const t = $('paste').value; if (!t.trim()) { toast('붙여넣을 공고 목록이 비어 있습니다 — 엑셀·나라장터 목록을 복사해 붙여넣으세요'); return; } const rows = rowsFromText(t); $('paste').value = ''; return addRows(rows); };
   $('listInput').onchange = async e => { for (const f of e.target.files) { const p = await WIC.readFile(f); if (p && p.rows) await addRows(p.rows); } e.target.value = ''; };
   $('resetBtn').onclick = async () => { S.items = []; S.dup = 0; try { await db.clear(); } catch (e) {} render(); log('누적 초기화'); };
   const lines = () => { const head = ['분류', '공고번호', '공고명', '수요기관', '마감일', '기초금액', '하한가(추정)', '권장 입찰금액', '비고']; return [head, ...S.items.map(i => [i.cls, i.no, i.name, i.org, i.due, i.base, i.floor || '', i.bidv || i.bid, i.note])]; };
@@ -387,7 +387,7 @@
   nload(); cload(); coload(); cfgLoad(); renderListStats(); renderEx(); loadSaved(); renderChk();
   /* 크롬 확장에서 넘어온 공고 화면 글자를 받아 자동 입력 (확장 프로그램 환경에서만 동작) */
   try { if (window.chrome && chrome.storage && chrome.storage.local && chrome.storage.local.get) chrome.storage.local.get('wic02_pending').then(r => { const p = r && r.wic02_pending; if (!p) return; chrome.storage.local.remove('wic02_pending'); try { const note = ingest('(공고 화면) ' + (p.title || p.url || ''), p.text || '', false); const k = applyEx(); renderEx(); renderChk(); toast(k ? '확장 프로그램에서 넘어온 공고 화면에서 ' + k + '칸을 자동 입력했습니다' : '넘어온 화면에서 읽은 값이 없습니다'); log('확장에서 수신: ' + note); } catch (e) { toast(e.message); } }); } catch (e) {}
-  window.__BIDUI = {S, E, $, nget, cget, csave, buildInp, showTab, showCalc, renderChk0, toast, log, ls, ingest, applyEx, renderEx, syncBid, splitTax, rangeTxt, render, addRows, classify, esc, chkKey, checklistItems, AL, rowsFromText, toItem, norm, str, num, won, pct, svg, T, C, short, chartLine, EV_CASES, handleFiles};
+  window.__BIDUI = {S, E, $, nget, nsave, cget, csave, buildInp, showTab, showCalc, renderChk0, toast, log, ls, ingest, applyEx, renderEx, syncBid, splitTax, rangeTxt, render, addRows, classify, esc, chkKey, checklistItems, AL, rowsFromText, toItem, norm, str, num, won, pct, svg, T, C, short, chartLine, EV_CASES, handleFiles};
   if (window.__BIDUI2 && window.__BIDUI2.init) window.__BIDUI2.init(window.__BIDUI);
   if (window.__BIDUI3 && window.__BIDUI3.init) window.__BIDUI3.init(window.__BIDUI);
   if (window.__BIDUI4 && window.__BIDUI4.init) window.__BIDUI4.init(window.__BIDUI);

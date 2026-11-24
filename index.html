@@ -442,13 +442,14 @@ tr.lossrow td{background:#fef2f2}
       <label>기초금액 (공고문 표기, 원)<input id="n_base" type="text" inputmode="numeric" title="기능: 공고의 기초금액 · 결과: 하한가·투찰가 계산의 기준 · 사용시점: 필수"></label>
       <label>기초금액 계산 기준<select id="n_basis" title="기능: 기초금액을 어떻게 쓸지 선택 · 결과: 예정가격 기준 결정 · 사용시점: 공고의 부가세 표기를 확인한 뒤">
         <option value="asis">그대로 사용 (부가세 포함 입찰 · 입찰장부 방식)</option><option value="incl">부가세 포함 금액 → 예정가격은 부가세 제외로 환산</option><option value="est">이미 부가세 제외 금액(추정가격)</option></select></label>
+      <label class="wide" id="awardLbl">낙찰방식 (선정방법) — 공고문대로 고르세요<select id="n_award" title="기능: 공고의 낙찰자 결정방식(선정방법) 선택 · 결과: ② 계산·전략 엔진과 낙찰방식별 추가 입력이 이 선택대로 바뀌고, 최저가면 낙찰하한율 칸이 꺼짐 · 사용시점: 공고문의 선정방법을 확인한 뒤(공고 문구로 자동 판별되면 미리 선택됨)"><option value="">(확인 필요 — 공고문을 보고 선택)</option><option value="floor">복수예가·낙찰하한율제</option><option value="lowest">최저가 낙찰제</option><option value="eval">적격심사제</option><option value="nego">협상에 의한 계약</option></select><span id="awardHint" class="small" style="font-weight:400"></span></label>
       <label>낙찰하한율 (%) — 공고문 값<input id="n_floor" type="text" inputmode="decimal" placeholder="예) 88 또는 87.745" title="기능: 낙찰 하한 비율 · 결과: 낙찰하한가 = 예정가격 × 하한율 · 사용시점: 필수(추측 금지, 공고문 값)"></label>
       <label>예비가격 변동폭 ± (%)<input id="n_range" type="text" inputmode="decimal" placeholder="예) 2 · 조달청 ±2, 지자체 ±3" title="기능: 복수예비가격 범위 · 결과: 하한가 변동 구간 · 사용시점: 복수예가 공고일 때"></label>
       <label>예가 하한 −(%) · 비대칭일 때만<input id="n_rlo" type="text" inputmode="decimal" placeholder="예) 3" title="기능: 예가범위가 −3%~+0%처럼 비대칭일 때 아래쪽 폭 · 결과: 하한가 구간 계산 · 사용시점: 공고에 비대칭 범위가 있을 때"></label>
       <label>예가 상한 +(%) · 비대칭일 때만<input id="n_rhi" type="text" inputmode="decimal" placeholder="예) 0" title="기능: 예가범위의 위쪽 폭 · 결과: 하한가 구간 계산 · 사용시점: 공고에 비대칭 범위가 있을 때"></label>
-      <label>낙찰자 결정방식 (자동 판별)<select id="n_award" title="기능: 공고 문구로 자동 판별한 낙찰방식 · 결과: ②의 계산 방식이 분기됨(하한율제/최저가/적격심사/협상) · 사용시점: 자동 입력 후 확인"><option value="">(확인 필요)</option><option value="floor">복수예가·낙찰하한율제</option><option value="lowest">최저가 낙찰제</option><option value="eval">적격심사</option><option value="nego">협상에 의한 계약</option></select></label>
+      
       <label>발행사<input id="n_pub" type="text" title="기능: 보고서 발행사 · 결과: 제조사 칸·공급권한 대조 · 사용시점: 자동 입력 후 확인"></label>
-      <label>예정가격 결정방식<select id="n_method" title="기능: 예정가격 방식 · 결과: 모의 계산 방식 결정 · 사용시점: 공고문 확인 후"><option value="">(확인 필요)</option><option value="multi">복수예비가격 (15개 중 2개 선택)</option><option value="single">단일 예가 (기초금액 = 예정가격)</option></select></label>
+      <label>예정가격 결정방식 (복수예가일 때만)<select id="n_method" title="기능: 예정가격 방식 · 결과: 모의 계산 방식 결정 · 사용시점: 공고문 확인 후"><option value="">(확인 필요)</option><option value="multi">복수예비가격 (15개 중 2개 선택)</option><option value="single">단일 예가 (기초금액 = 예정가격)</option></select></label>
       <label>입찰보증금율 (%) — 없으면 비움<input id="n_bond" type="text" inputmode="decimal" title="기능: 입찰보증금 비율 · 결과: 보증금액 계산 · 사용시점: 공고에 비율이 있을 때"></label>
       <label>품목 부가세 구분<select id="n_tax" title="기능: 면세/과세 구분 · 결과: 공급가액·부가세 분리 · 사용시점: 품목 확인 후"><option value="">(확인 필요)</option><option value="free">면세 (도서·학술지·정기간행물)</option><option value="tax">과세 (그 외)</option></select></label>
       <label>부가세율 (%)<input id="n_vat" type="text" inputmode="decimal" value="10" title="기능: 과세 품목의 부가세율 · 결과: 공급가액 분리 · 사용시점: 과세 품목일 때"></label>
@@ -484,6 +485,7 @@ tr.lossrow td{background:#fef2f2}
     <h2>원가·전략 입력 <span class="small" style="font-weight:400">· 공고 숫자는 ①에서 이어받습니다</span></h2>
     <p class="lead">정가·환율·원가 계수를 넣으면 마진까지 계산합니다. 비워 두면 하한가와 권장 투찰 구간만 계산하고 마진은 "확인 필요"로 남습니다.</p>
     <div class="explainbox" id="calcHead"></div>
+    <div id="awardNow" class="small" style="margin:6px 0 12px"></div>
     <div class="grid" id="calcForm">
       <label>보고서 정가 (외화 또는 원)<input id="c_list" type="text" inputmode="decimal" title="기능: 발행사 정가 · 결과: 원가 계산 · 사용시점: 마진을 보고 싶을 때"></label>
       <label>정가 통화<select id="c_cur" title="기능: 정가 통화 · 결과: 환율 적용 여부 · 사용시점: 정가 입력 시"><option>KRW</option><option>USD</option><option>EUR</option><option>GBP</option><option>JPY</option></select></label>
@@ -496,7 +498,7 @@ tr.lossrow td{background:#fef2f2}
       <label>중간 전략 마진 (%)<input id="c_mid" type="text" inputmode="decimal" value="5" title="기능: 원가 위 마진 비율 · 결과: 중간 전략 금액 · 사용시점: 전략 비교"></label>
       <label>공격적 전략 최소마진 (%)<input id="c_min" type="text" inputmode="decimal" value="0" title="기능: 최소 마진 · 결과: 공격적 전략 금액 · 사용시점: 전략 비교"></label>
     </div>
-    <details style="margin-top:18px;border:0;background:none"><summary style="padding:8px 0;font-size:13px" title="기능: 최저가·적격심사·협상계약에 필요한 추가 입력 · 결과: 방식별 계산 · 사용시점: ① 낙찰방식이 해당 방식일 때">낙찰방식별 추가 입력 (최저가 · 적격심사 · 협상계약)</summary>
+    <details id="awardExtra" style="margin-top:18px;border:0;background:none"><summary style="padding:8px 0;font-size:13px" title="기능: 최저가·적격심사·협상계약에 필요한 추가 입력 · 결과: 방식별 계산 · 사용시점: ① 낙찰방식이 해당 방식일 때">낙찰방식별 추가 입력 (최저가 · 적격심사 · 협상계약)</summary>
       <div class="grid" style="margin-top:10px">
         <label>[최저가] 최소 마진 (원가 대비 %)<input id="c_mmin" type="text" inputmode="decimal" value="8" title="기능: 지켜야 할 최소 마진 · 결과: A안(최저가 도전) 금액 · 사용시점: 최저가 낙찰제"></label>
         <label>[최저가] 목표 마진 (원가 대비 %)<input id="c_mtgt" type="text" inputmode="decimal" value="15" title="기능: 목표 마진 · 결과: B안 금액 · 사용시점: 최저가 낙찰제"></label>
@@ -511,7 +513,7 @@ tr.lossrow td{background:#fef2f2}
         <label>[협상] 예상 최저 입찰가 (원)<input id="c_low" type="text" inputmode="numeric" title="기능: 경쟁 최저가 가정 · 결과: 가격점수 · 사용시점: 협상에 의한 계약"></label>
         <label>[협상] 비교할 입찰가들 (쉼표)<input id="c_bids" type="text" title="기능: 점수를 볼 입찰가 목록 · 결과: 총점 표 · 사용시점: 협상에 의한 계약"></label>
       </div></details>
-    <div class="row" style="margin-top:22px"><button id="calcBtn" class="primary" title="기능: 하한가·권장 투찰가·마진 계산과 그래프 그리기 · 결과: 아래 결과 영역 갱신 · 사용시점: 입력을 바꾼 뒤">계산하기</button><button id="exLoad" title="기능: 예시 값을 불러오기 · 결과: 화면 동작 확인 · 사용시점: 사용법을 익히거나 검증할 때">장부 사례 불러오기</button><button id="calcClear" title="기능: 원가 입력칸 비우기 · 결과: 새 계산 준비 · 사용시점: 다른 공고로 바꿀 때">원가 칸 비우기</button><span id="calcMsg" class="small"></span></div>
+    <div class="row" style="margin-top:22px"><button id="calcBtn" class="primary" title="기능: 하한가·권장 투찰가·마진 계산과 그래프 그리기 · 결과: 아래 결과 영역 갱신 · 사용시점: 입력을 바꾼 뒤">계산하기</button><button id="exLoad" title="기능: 예시 값을 불러오기 · 결과: 화면 동작 확인 · 사용시점: 사용법을 익히거나 검증할 때">장부 사례 불러오기</button><select id="scSel" title="기능: 대표 시나리오(사례 1~4)를 골라 ①·② 모든 입력칸을 한 번에 채움 · 결과: 공고 정보·원가·상황이 채워지고 바로 계산됨 · 사용시점: 사용법을 익히거나 비슷한 공고를 빠르게 비교할 때"><option value="">[대표 시나리오 불러오기]</option></select><button id="calcClear" title="기능: 원가 입력칸 비우기 · 결과: 새 계산 준비 · 사용시점: 다른 공고로 바꿀 때">원가 칸 비우기</button><span id="calcMsg" class="small"></span></div>
   </div>
   <div class="card sim" id="stratCard">
     <h2>상황 진단 · 투찰 구간 (범용) <span class="small" style="font-weight:400">· 5가지 조건을 고르면 근거 있는 숫자만으로 구간을 계산합니다</span></h2>
@@ -634,10 +636,10 @@ tr.lossrow td{background:#fef2f2}
   <div class="card"><h2>입찰 건 보관함 <span class="small" style="font-weight:400">· 예전 버전(index 예전)의 입찰 건·품목 등록 기능 통합</span></h2>
     <p class="lead">현재 ① 공고 정보와 ③ 품목을 한 건으로 저장하고, 나중에 검색해 다시 불러옵니다. 데이터는 이 브라우저에만 저장됩니다.</p>
     <div class="row" style="margin-bottom:14px"><span id="sumCount" class="pill">저장 0건</span><span id="sumToday" class="pill">오늘 0건</span><span id="sumLast" class="pill">최근 기관 -</span></div>
-    <div class="grid"><label>기관<input id="bx_org" type="text"></label><label>공고명<input id="bx_title" type="text"></label><label>마감<input id="bx_due" type="text"></label><label>예산(원)<input id="bx_budget" type="text"></label>
-      <label>구분<select id="bx_type"><option>입찰</option><option>내부안내</option><option>제외(X)</option><option>확인필요</option></select></label><label>상태<select id="bx_status"><option>검토중</option><option>투찰완료</option><option>낙찰</option><option>탈락</option><option>유찰</option><option>포기</option></select></label><label>담당자<input id="bx_contact" type="text"></label><label>순위<input id="bx_rank" type="text" inputmode="numeric" title="기능: 개찰 결과 순위 · 결과: 이력 분석 · 사용시점: 개찰 후"></label><label>낙찰금액(원)<input id="bx_win" type="text" inputmode="numeric" title="기능: 기록된 낙찰금액 · 결과: 사정율 역산 · 사용시점: 개찰 후"></label><label>낙찰하한율(%)<input id="bx_floor" type="text" inputmode="decimal" title="기능: 그 공고의 낙찰하한율 · 결과: 사정율 역산 · 사용시점: 개찰 후"></label><label class="wide">메모<input id="bx_note" type="text"></label></div>
+    <div class="grid"><label>기관<input id="bx_org" type="text" title="기능: 보관할 발주기관 · 결과: 보관함 목록과 검색 대상 · 사용시점: 저장 전"></label><label>공고명<input id="bx_title" type="text" title="기능: 보관할 공고명 · 결과: 보관함 목록과 검색 대상 · 사용시점: 저장 전"></label><label>마감<input id="bx_due" type="text" title="기능: 입찰마감일시 메모 · 결과: 보관함 표에 표시 · 사용시점: 저장 전"></label><label>예산(원)<input id="bx_budget" type="text" title="기능: 기초금액(예산) · 결과: 보관함 표와 사정율 역산에 사용 · 사용시점: 저장 전"></label>
+      <label>구분<select id="bx_type" title="기능: 입찰·내부안내 등 분류 · 결과: 보관함 표에 표시 · 사용시점: 저장 전"><option>입찰</option><option>내부안내</option><option>제외(X)</option><option>확인필요</option></select></label><label>상태<select id="bx_status" title="기능: 진행 상태(검토중·투찰·낙찰 등) · 결과: 보관함 표에 표시 · 사용시점: 상태가 바뀔 때"><option>검토중</option><option>투찰완료</option><option>낙찰</option><option>탈락</option><option>유찰</option><option>포기</option></select></label><label>담당자<input id="bx_contact" type="text" title="기능: 담당자 메모 · 결과: 보관함 검색 대상 · 사용시점: 저장 전"></label><label>순위<input id="bx_rank" type="text" inputmode="numeric" title="기능: 개찰 결과 순위 · 결과: 이력 분석 · 사용시점: 개찰 후"></label><label>낙찰금액(원)<input id="bx_win" type="text" inputmode="numeric" title="기능: 기록된 낙찰금액 · 결과: 사정율 역산 · 사용시점: 개찰 후"></label><label>낙찰하한율(%)<input id="bx_floor" type="text" inputmode="decimal" title="기능: 그 공고의 낙찰하한율 · 결과: 사정율 역산 · 사용시점: 개찰 후"></label><label class="wide">메모<input id="bx_note" type="text" title="기능: 자유 메모 · 결과: 보관함 검색 대상 · 사용시점: 저장 전"></label></div>
     <div class="row" style="margin-top:16px"><button id="bx_fill" title="기능: ①공고 정보와 ③품목을 이 칸에 채움 · 결과: 저장 준비 · 사용시점: 현재 공고를 저장하려 할 때">현재 공고·품목 가져오기</button><button id="bx_save" class="primary" title="기능: 이 건 저장(같은 기관+공고명은 덮어씀) · 결과: 아래 목록 갱신 · 사용시점: 정리했을 때">저장</button><button id="bx_clear" title="기능: 입력칸 비우기 · 결과: 새 건 준비 · 사용시점: 새로 입력할 때">비우기</button></div>
-    <div class="row" style="margin-top:22px"><input id="bx_search" type="text" placeholder="기관·공고명·메모 검색" style="min-width:260px"><button id="bx_find" title="기능: 검색 · 결과: 일치 건만 표시 · 사용시점: 찾을 때">검색</button><button id="bx_reset" title="기능: 검색 해제 · 결과: 전체 표시 · 사용시점: 전체를 볼 때">전체</button></div>
+    <div class="row" style="margin-top:22px"><input id="bx_search" type="text" placeholder="기관·공고명·메모 검색" style="min-width:260px" title="기능: 보관함에서 기관·공고명·메모 검색 · 결과: 일치하는 건만 표시 · 사용시점: 많이 쌓였을 때"><button id="bx_find" title="기능: 검색 · 결과: 일치 건만 표시 · 사용시점: 찾을 때">검색</button><button id="bx_reset" title="기능: 검색 해제 · 결과: 전체 표시 · 사용시점: 전체를 볼 때">전체</button></div>
     <div class="scroll" style="margin-top:12px"><table><thead><tr><th>기관</th><th>공고명</th><th>마감</th><th>예산</th><th>구분</th><th>상태</th><th>품목</th><th></th></tr></thead><tbody id="bx_body"></tbody></table></div>
     <div class="empty" id="bx_empty" style="margin-top:12px">저장된 입찰 건이 없습니다.</div></div></section>
 </main>
@@ -1306,7 +1308,7 @@ tr.lossrow td{background:#fef2f2}
   };
   const SALES = {prequote: '사전 견적 제출 공고', exclusive: '발행사 단독 공급권', nonexcl: '발행사 비독점 공급권', open: '일반 공개경쟁'};
   const CONTRACT = {single: '단건 납품', unit: '단가계약', annual: '연간 구독'};
-  const AWARD = {lowest: '단순 최저가', floor: '복수예가 낙찰하한율제', eval: '적격심사', nego: '협상에 의한 계약(기술+가격)'};
+  const AWARD = {lowest: '단순 최저가', floor: '복수예가 낙찰하한율제', eval: '적격심사제', nego: '협상에 의한 계약(기술+가격)'};
   function detectOrg(text) { const t = String(text || ''); for (const k of ['g2b', 'research', 's2b', 'd2b']) { if (ORG_TYPES[k].hint && ORG_TYPES[k].hint.test(t)) return k; } return 'other'; }
   function detectOrgKey(text) { const t = String(text || ''); if (/KISTI|한국과학기술정보연구원/i.test(t)) return 'kisti'; if (/한국화학연구원|KRICT/i.test(t)) return 'kric'; if (/ETRI|한국전자통신연구원/i.test(t)) return 'etri'; return ''; }
 
@@ -1732,7 +1734,7 @@ tr.lossrow td{background:#fef2f2}
   'use strict';
   let U = null; const B = () => window.BIDENG, P = () => window.BIDENG.pricing, O = () => window.BIDENG.ops; const api = window.__BIDUI2 = {};
   const CLSCOL = {'자동 수집': '#0e7490', '자동 작성': '#2563eb', '자동 검사': '#047857', '사용자 인증 필요': '#b45309', '법적 확인 필요': '#7c3aed', '수동 처리': '#64748b'};
-  const AWNAME = {floor: '복수예가·낙찰하한율제', lowest: '최저가 낙찰제', eval: '적격심사', nego: '협상에 의한 계약'};
+  const AWNAME = {floor: '복수예가·낙찰하한율제', lowest: '최저가 낙찰제', eval: '적격심사제', nego: '협상에 의한 계약'};
   api.init = u => { U = u; api._ready = true; U.S.hist = U.ls.get('wic02v3_hist', {}); U.S.instHist = U.ls.get('wic02v3_inst', {}); bindBox(); bindXlsx(); bindDocInputs(); renderBox(); kistiCard(); };
 
   /* ───────── 변경 감지 · 기관 이력 ───────── */
@@ -1849,9 +1851,9 @@ tr.lossrow td{background:#fef2f2}
     const {$, S, ls, toast, nget, esc} = U;
     $('bx_fill').onclick = () => { const n = nget(); fillBox({org: n.org, title: n.title, due: n.due, budget: n.base, type: U.classify(n.title || '').cls, status: '검토중', floor: n.floor}); toast('현재 공고 정보를 가져왔습니다 (품목 ' + (S.itemsDoc || []).filter(i => i.name).length + '건 포함 저장)'); };
     $('bx_clear').onclick = () => fillBox({});
-    $('bx_save').onclick = () => { const b = {org: $('bx_org').value.trim(), title: $('bx_title').value.trim(), due: $('bx_due').value, budget: $('bx_budget').value, type: $('bx_type').value, status: $('bx_status').value, contact: $('bx_contact').value, note: $('bx_note').value, rank: $('bx_rank').value, win: $('bx_win').value, floor: $('bx_floor').value, items: JSON.parse(JSON.stringify((S.itemsDoc || []).filter(i => i.name))), ts: new Date().toISOString()}; if (!b.org && !b.title) { toast('기관 또는 공고명을 입력하세요'); return; } b.id = 'b' + (b.org + '|' + b.title).split('').reduce((h, ch) => (Math.imul(h, 31) + ch.charCodeAt(0)) >>> 0, 7); const all = box().filter(x => x.id !== b.id); all.push(b); ls.set(BK, all); renderBox(); toast('저장했습니다 (같은 기관+공고명은 덮어씀)'); };
+    $('bx_save').onclick = () => { const b = {org: $('bx_org').value.trim(), title: $('bx_title').value.trim(), due: $('bx_due').value, budget: $('bx_budget').value, type: $('bx_type').value, status: $('bx_status').value, contact: $('bx_contact').value, note: $('bx_note').value, rank: $('bx_rank').value, win: $('bx_win').value, floor: $('bx_floor').value, items: JSON.parse(JSON.stringify((S.itemsDoc || []).filter(i => i.name))), ts: new Date().toISOString(), n: nget()}; if (!b.org && !b.title) { toast('기관 또는 공고명을 입력하세요'); return; } b.id = 'b' + (b.org + '|' + b.title).split('').reduce((h, ch) => (Math.imul(h, 31) + ch.charCodeAt(0)) >>> 0, 7); const all = box().filter(x => x.id !== b.id); all.push(b); ls.set(BK, all); renderBox(); toast('저장했습니다 (같은 기관+공고명은 덮어씀)'); };
     $('bx_find').onclick = () => { const q = $('bx_search').value.trim().toLowerCase(); renderBox(q ? box().filter(b => [b.org, b.title, b.note, b.contact].join(' ').toLowerCase().includes(q)) : null); }; $('bx_reset').onclick = () => { $('bx_search').value = ''; renderBox(); };
-    $('bx_body').addEventListener('click', e => { const l = e.target.closest('[data-bxload]'), d = e.target.closest('[data-bxdel]'); if (l) { const b = box().find(x => x.id === l.dataset.bxload); if (!b) return; fillBox(b); const set = (id, v) => { $(id).value = v; $(id).classList.remove('auto'); }; set('n_org', b.org); set('n_title', b.title); set('n_due', b.due); if (b.budget) set('n_base', String(b.budget).replace(/[^\d]/g, '')); if (b.items && b.items.length) { S.itemsDoc = JSON.parse(JSON.stringify(b.items)); ls.set('wic02v2_items', S.itemsDoc); } U.S.items; toast('① 공고 정보와 ③ 품목으로 불러왔습니다'); } else if (d) { ls.set(BK, box().filter(x => x.id !== d.dataset.bxdel)); renderBox(); } });
+    $('bx_body').addEventListener('click', e => { const l = e.target.closest('[data-bxload]'), d = e.target.closest('[data-bxdel]'); if (l) { const b = box().find(x => x.id === l.dataset.bxload); if (!b) return; fillBox(b); const set = (id, v) => { $(id).value = v; $(id).classList.remove('auto'); }; set('n_org', b.org); set('n_title', b.title); set('n_due', b.due); if (b.budget) set('n_base', String(b.budget).replace(/[^\d]/g, '')); if (b.n) { Object.keys(b.n).forEach(k => { const e = $('n_' + k); if (e && b.n[k] !== undefined && b.n[k] !== null) { e.value = b.n[k]; e.classList.remove('auto'); } }); if (window.__BIDUI3 && window.__BIDUI3.syncAward) window.__BIDUI3.syncAward(); if (U.nsave) U.nsave(); } if (b.items && b.items.length) { S.itemsDoc = JSON.parse(JSON.stringify(b.items)); ls.set('wic02v2_items', S.itemsDoc); } U.S.items; toast('① 공고 정보와 ③ 품목으로 불러왔습니다'); } else if (d) { ls.set(BK, box().filter(x => x.id !== d.dataset.bxdel)); renderBox(); } });
   }
 
   /* ───────── 대용량 나라장터 XLSX 기관 누적 (원격 저장소 기능 보존: #fileInput · window.__TOOL002_LAST_RESULT__) ───────── */
@@ -1883,6 +1885,8 @@ tr.lossrow td{background:#fef2f2}
 })();
 
 </script>
+<script>/* scenarios */
+window.BIDSC=[{"id":"S1_KRICT_024","name":"[예시] 연구기관 · 최저가 · 사전견적 · 비과세","real":false,"n":{"org":"예시연구원","no":"EX-2026-0001","title":"Example Market Report 2026","base":"10000000","basis":"asis","floor":"","award":"lowest","tax":"free","vat":"10","pub":"Example Publisher","due":"2026. 12. 01.(월) 10:00"},"c":{"list":"3000","cur":"USD","fx":"1300","costmode":"ledger","disc":"","comm":"30","guide":"60","tlo":"75","thi":"85","smin":"0","spread":"2","trates":""},"s":{"org":"research","orgKey":"none","sales":"prequote","contract":"single","urgent":false,"rebid":false},"note":"가상 예시값 (실제 공고·원가 아님). 환율 1,300 도 예시"},{"id":"S2_KISTI_FLOOR","name":"[예시] 연구기관 · 복수예가 낙찰하한율제 88% · (-1)~(+1)","real":false,"n":{"org":"예시연구원","no":"EX-2026-0002","title":"Example Floor-rate Report","base":"3000000","basis":"asis","floor":"88","range":"1","rlo":"","rhi":"","method":"multi","award":"floor","tax":"tax","vat":"10"},"c":{"list":"2000","cur":"USD","fx":"1300","costmode":"ledger","disc":"","comm":"20","guide":"","tlo":"","thi":"","smin":"0","spread":"2","trates":""},"s":{"org":"research","orgKey":"none","sales":"open","contract":"single","urgent":false,"rebid":false},"note":"가상 예시값. 공개 본에는 실측 개찰 기록이 없어 \"반영 0\" 으로 표시된다"},{"id":"S3_UNIV_OPEN","name":"[예시] 대학·공공기관 일반 공개경쟁 · 최저가 · 과세","real":false,"n":{"org":"OO대학교","no":"EX-2026-0003","title":"해외 시장조사 보고서 구매(예시)","base":"10000000","basis":"incl","floor":"","award":"lowest","tax":"tax","vat":"10"},"c":{"list":"3000","cur":"USD","fx":"1400","costmode":"ledger","disc":"","comm":"30","guide":"","tlo":"","thi":"","smin":"3","spread":"2","trates":""},"s":{"org":"s2b","orgKey":"","sales":"open","contract":"single","urgent":false,"rebid":false},"note":"가상 예시값"},{"id":"S4_G2B_EVAL","name":"[예시] 나라장터 적격심사(기본 평가표) · 과세","real":false,"n":{"org":"조달청 수요기관","no":"EX-2026-0004","title":"해외 데이터베이스 구독(예시)","base":"100000000","basis":"incl","floor":"","award":"eval","tax":"tax","vat":"10"},"c":{"list":"60000000","cur":"KRW","fx":"","costmode":"ledger","disc":"","comm":"0","guide":"","tlo":"","thi":"","smin":"0","spread":"2","trates":""},"s":{"org":"g2b","orgKey":"","sales":"open","contract":"annual","urgent":false,"rebid":false},"note":"가상 예시값 — 조달청 물품 적격심사 기본값(70−2×|88−x|, 통과 85, 기타 30)"},{"id":"S5_NEGO","name":"[예시] 국방·공기업 협상에 의한 계약","real":false,"n":{"org":"국방 OO","no":"EX-2026-0005","title":"시장조사 구매(예시)","base":"50000000","basis":"incl","floor":"","award":"nego","tax":"tax","vat":"10"},"c":{"list":"20000000","cur":"KRW","fx":"","costmode":"ledger","disc":"","comm":"10","guide":"","tlo":"","thi":"","smin":"0","spread":"2","trates":""},"s":{"org":"d2b","orgKey":"","sales":"nonexcl","contract":"unit","urgent":false,"rebid":true},"note":"가상 예시값 — 협상은 가격 구간을 산출하지 않음을 확인"}];</script>
 <script>/* ui3 */
 /* 02 입찰 도구 v3.2 — 상황 진단·전략 구간 화면 (ui2.js 다음, ui.js 앞에서 로드. ui.js 가 끝에서 init(U) 를 호출한다)
    · 5가지 변수 입력 → E.strategy.analyze → 근거 라벨이 붙은 구간 차트·후보표·시뮬레이션 표
@@ -1910,6 +1914,48 @@ tr.lossrow td{background:#fef2f2}
     ['c_comm', 'c_guide', 'c_tlo', 'c_thi', 'c_smin', 'c_cgap', 'c_step', 'c_trates'].forEach(id => $(id).addEventListener('input', () => { U.csave(); live(); }));
     $('stratBtn').onclick = () => { api.run(); };
     $('stratClear').onclick = () => { ['c_comm', 'c_guide', 'c_tlo', 'c_thi', 'c_mrg', 'c_cdisc', 'c_cgap', 'c_trates'].forEach(id => $(id).value = ''); $('rng_mrg').value = 0; $('rng_cdisc').value = 0; $('c_smin').value = '0'; $('c_step').value = '5'; U.csave(); U.S.strat = null; $('stratOut').innerHTML = '<div class="empty">내부 원가·안내 기준을 비웠습니다. 값을 입력한 뒤 [상황 진단·구간 계산]을 누르세요.</div>'; U.toast('내부 원가·전략 입력을 비웠습니다'); };
+    bindAward(); fillScenarioMenu();
+  };
+
+  /* ───────── 낙찰방식(선정방법) 선택 → ② 계산·전략·추가 입력 즉시 연동 ───────── */
+  const AWLAB = {floor: '복수예가·낙찰하한율제', lowest: '최저가 낙찰제', eval: '적격심사제', nego: '협상에 의한 계약'};
+  const AWHINT = {
+    floor: '낙찰하한율(%)·예가범위를 공고문 값대로 입력하세요.',
+    lowest: '최저가: 낙찰하한율 없음 — 기초금액 이하에서 가장 낮은 금액이 낙찰됩니다(하한율·예가범위 칸은 꺼집니다).',
+    eval: '적격심사제: 낙찰하한율 대신 ②의 [적격심사] 기준율·배점·통과점수로 계산합니다(하한율 칸은 꺼집니다).',
+    nego: '협상에 의한 계약: 기술+가격 합산 평가 — ②의 [협상] 칸을 사용하고 하한율 칸은 꺼집니다.',
+    '': '공고문의 낙찰방식(선정방법)을 선택하세요. 고르기 전에는 계산하지 않습니다(하한율을 입력하면 복수예가로 계산).'
+  };
+  const GROUP = {lowest: '[최저가]', eval: '[적격심사]', nego: '[협상]'};
+  let lastAward = null;
+  api.syncAward = () => {
+    const {$} = U; const a = $('n_award').value; const off = a !== '' && a !== 'floor';
+    ['n_floor', 'n_range', 'n_rlo', 'n_rhi', 'n_method'].forEach(id => { const e = $(id); e.disabled = off; e.parentElement.style.opacity = off ? '.5' : ''; });
+    $('n_floor').placeholder = a === 'lowest' ? '최저가: 하한율 없음' : a === 'eval' ? '적격심사: 하한율 대신 ② 평가표' : a === 'nego' ? '협상계약: 하한율 없음' : '예) 88 또는 87.745';
+    $('awardHint').textContent = AWHINT[a] || AWHINT['']; $('awardNow').innerHTML = a ? `현재 낙찰방식: <b>${AWLAB[a]}</b> — ${AWHINT[a]}` : `<span class="warn">낙찰방식 미선택</span> — ${AWHINT['']}`;
+    const det = $('awardExtra'); if (det) { if (off) det.open = true; det.querySelectorAll('label').forEach(l => { const m = /^\[[^\]]+\]/.exec(l.textContent.trim()); l.style.opacity = !m || (GROUP[a] && m[0] === GROUP[a]) ? '' : '.38'; }); }
+    if (lastAward !== null && lastAward !== a) { U.nsave(); const out = $('calcOut'); if (out && out.querySelector('.card')) $('calcBtn').click(); else if (U.S.strat) api.run(); U.log('낙찰방식 변경: ' + (AWLAB[lastAward] || '미선택') + ' → ' + (AWLAB[a] || '미선택')); }
+    lastAward = a;
+  };
+  function bindAward() { const {$} = U; $('n_award').addEventListener('change', api.syncAward); api.syncAward(); setInterval(() => { if ($('n_award').value !== lastAward) api.syncAward(); }, 250); /* 문서 자동 판별·불러오기 등 코드로 값이 바뀌는 경우도 따라감 */ }
+
+  /* ───────── 대표 시나리오 불러오기 (①·② 모든 입력칸) ───────── */
+  const SCIDS = ['S1_KRICT_024', 'S2_KISTI_FLOOR', 'S4_G2B_EVAL', 'S5_NEGO'];
+  function fillScenarioMenu() {
+    const {$} = U; const sel = $('scSel'); const all = window.BIDSC || []; sel.innerHTML = '<option value="">[대표 시나리오 불러오기]</option>';
+    SCIDS.forEach((id, i) => { const sc = all.find(x => x.id === id); if (sc) sel.insertAdjacentHTML('beforeend', `<option value="${id}">사례 ${i + 1} · ${U.esc(sc.name.replace(/^\[예시\]\s*/, ''))}${sc.real ? ' (실제 사례)' : ' (가상 예시값)'}</option>`); });
+    sel.onchange = () => { if (sel.value) { api.loadScenario(sel.value); sel.value = ''; } };
+  }
+  api.loadScenario = id => {
+    const {$} = U; const sc = (window.BIDSC || []).find(x => x.id === id); if (!sc) { U.toast('시나리오를 찾지 못했습니다'); return false; }
+    ['title', 'no', 'org', 'due', 'open', 'supply', 'vatamt', 'total', 'qty', 'base', 'basis', 'floor', 'range', 'rlo', 'rhi', 'method', 'award', 'pub', 'bond', 'tax', 'vat'].forEach(k => { const e = $('n_' + k); if (e.tagName === 'SELECT') e.selectedIndex = 0; else e.value = k === 'vat' ? '10' : ''; e.classList.remove('auto'); const t = e.parentElement.querySelector('.autotag'); if (t) t.remove(); });
+    Object.keys(sc.n).forEach(k => { const e = $('n_' + k); if (e) e.value = sc.n[k]; });
+    ['list', 'fx', 'disc', 'rates', 'comm', 'guide', 'tlo', 'thi', 'mrg', 'cdisc', 'cgap', 'trates', 'extra', 'ref', 'weight', 'k', 'other', 'pass', 'tech', 'pw', 'low', 'bids'].forEach(k => { const e = $('c_' + k); if (e) e.value = ''; });
+    $('c_cur').value = 'KRW'; $('c_smin').value = '0'; $('c_step').value = '5'; $('rng_mrg').value = 0; $('rng_cdisc').value = 0;
+    Object.keys(sc.c).forEach(k => { const e = $('c_' + k); if (e) e.value = sc.c[k]; }); if (sc.c.mrg) $('rng_mrg').value = sc.c.mrg; if (sc.c.cdisc) $('rng_cdisc').value = sc.c.cdisc;
+    $('s_org').value = sc.s.org; $('s_orgkey').value = sc.s.orgKey || 'none'; $('s_sales').value = sc.s.sales; $('s_contract').value = sc.s.contract; $('s_urgent').checked = !!sc.s.urgent; $('s_rebid').checked = !!sc.s.rebid;
+    U.S.fxMeta = null; $('fxInfo').textContent = ''; U.nsave(); U.csave(); api.syncAward(); U.ls.set(SKEY, {s_org: sc.s.org, s_orgkey: sc.s.orgKey || 'none', s_sales: sc.s.sales, s_contract: sc.s.contract, s_urgent: !!sc.s.urgent, s_rebid: !!sc.s.rebid});
+    U.showTab(2); $('calcBtn').click(); U.toast('사례를 불러왔습니다: ' + sc.name + (sc.c.fx ? ' — 환율 ' + sc.c.fx + ' 은(는) 예시/시험값이니 [실시간 환율 불러오기]로 바꾸세요' : '')); U.log('대표 시나리오 불러오기: ' + id); return true;
   };
 
   function profileOf(n) {
@@ -2426,7 +2472,7 @@ tr.lossrow td{background:#fef2f2}
   async function sha(t) { try { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, '0')).join(''); } catch (e) { return 'sha256-unavailable'; } }
   $('verifyBtn').onclick = async () => {
     const res = EV_CASES.map(([name, exp, fn]) => { let act; try { act = String(fn()); } catch (e) { act = '예외: ' + e.message; } return {name, expected: exp, actual: act, pass: act === exp}; });
-    const cur = S.lastCalc ? E.reverify(S.lastCalc.o).map(c => ({name: '[현재 계산] ' + c.name, expected: c.expected, actual: c.actual, pass: c.pass})) : [];
+    const cur = S.lastCalc && S.lastCalc.o ? E.reverify(S.lastCalc.o).map(c => ({name: '[현재 계산] ' + c.name, expected: c.expected, actual: c.actual, pass: c.pass})) : [];
     const all = res.concat(cur), nf = all.filter(c => !c.pass).length;
     $('vTbl').querySelector('tbody').innerHTML = all.map(c => `<tr><td>${esc(c.name)}</td><td class="n">${esc(c.expected)}</td><td class="n">${esc(c.actual)}</td><td class="${c.pass ? 'ok' : 'bad'}">${c.pass ? 'PASS' : 'FAIL'}</td></tr>`).join('');
     const ev = {tool: '02_bid', version: 'v2', time: new Date().toISOString(), total: all.length, pass: all.length - nf, fail: nf, verdict: nf ? 'FAIL' : 'PASS', currentCalcIncluded: !!cur.length, cases: all};
@@ -2447,7 +2493,7 @@ tr.lossrow td{background:#fef2f2}
     S.dup += dup; log(`반영: 신규 ${added} / 중복 ${dup}`); render(); S.pending = persist(); return S.pending;
   }
   async function loadSaved() { try { const st = await db.get('state'); if (st) { S.items = st.items || []; S.dup = st.dup || 0; log(`복원: ${S.items.length}건`); } } catch (e) { log('복원 실패: ' + e.message); } render(); }
-  $('addBtn').onclick = () => { const t = $('paste').value; if (!t.trim()) return; const rows = rowsFromText(t); $('paste').value = ''; return addRows(rows); };
+  $('addBtn').onclick = () => { const t = $('paste').value; if (!t.trim()) { toast('붙여넣을 공고 목록이 비어 있습니다 — 엑셀·나라장터 목록을 복사해 붙여넣으세요'); return; } const rows = rowsFromText(t); $('paste').value = ''; return addRows(rows); };
   $('listInput').onchange = async e => { for (const f of e.target.files) { const p = await WIC.readFile(f); if (p && p.rows) await addRows(p.rows); } e.target.value = ''; };
   $('resetBtn').onclick = async () => { S.items = []; S.dup = 0; try { await db.clear(); } catch (e) {} render(); log('누적 초기화'); };
   const lines = () => { const head = ['분류', '공고번호', '공고명', '수요기관', '마감일', '기초금액', '하한가(추정)', '권장 입찰금액', '비고']; return [head, ...S.items.map(i => [i.cls, i.no, i.name, i.org, i.due, i.base, i.floor || '', i.bidv || i.bid, i.note])]; };
@@ -2457,7 +2503,7 @@ tr.lossrow td{background:#fef2f2}
   nload(); cload(); coload(); cfgLoad(); renderListStats(); renderEx(); loadSaved(); renderChk();
   /* 크롬 확장에서 넘어온 공고 화면 글자를 받아 자동 입력 (확장 프로그램 환경에서만 동작) */
   try { if (window.chrome && chrome.storage && chrome.storage.local && chrome.storage.local.get) chrome.storage.local.get('wic02_pending').then(r => { const p = r && r.wic02_pending; if (!p) return; chrome.storage.local.remove('wic02_pending'); try { const note = ingest('(공고 화면) ' + (p.title || p.url || ''), p.text || '', false); const k = applyEx(); renderEx(); renderChk(); toast(k ? '확장 프로그램에서 넘어온 공고 화면에서 ' + k + '칸을 자동 입력했습니다' : '넘어온 화면에서 읽은 값이 없습니다'); log('확장에서 수신: ' + note); } catch (e) { toast(e.message); } }); } catch (e) {}
-  window.__BIDUI = {S, E, $, nget, cget, csave, buildInp, showTab, showCalc, renderChk0, toast, log, ls, ingest, applyEx, renderEx, syncBid, splitTax, rangeTxt, render, addRows, classify, esc, chkKey, checklistItems, AL, rowsFromText, toItem, norm, str, num, won, pct, svg, T, C, short, chartLine, EV_CASES, handleFiles};
+  window.__BIDUI = {S, E, $, nget, nsave, cget, csave, buildInp, showTab, showCalc, renderChk0, toast, log, ls, ingest, applyEx, renderEx, syncBid, splitTax, rangeTxt, render, addRows, classify, esc, chkKey, checklistItems, AL, rowsFromText, toItem, norm, str, num, won, pct, svg, T, C, short, chartLine, EV_CASES, handleFiles};
   if (window.__BIDUI2 && window.__BIDUI2.init) window.__BIDUI2.init(window.__BIDUI);
   if (window.__BIDUI3 && window.__BIDUI3.init) window.__BIDUI3.init(window.__BIDUI);
   if (window.__BIDUI4 && window.__BIDUI4.init) window.__BIDUI4.init(window.__BIDUI);
