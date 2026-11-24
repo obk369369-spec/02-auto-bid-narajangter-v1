@@ -390,5 +390,6 @@
   window.__BIDUI = {S, E, $, nget, cget, csave, buildInp, showTab, showCalc, renderChk0, toast, log, ls, ingest, applyEx, renderEx, syncBid, splitTax, rangeTxt, render, addRows, classify, esc, chkKey, checklistItems, AL, rowsFromText, toItem, norm, str, num, won, pct, svg, T, C, short, chartLine, EV_CASES, handleFiles};
   if (window.__BIDUI2 && window.__BIDUI2.init) window.__BIDUI2.init(window.__BIDUI);
   if (window.__BIDUI3 && window.__BIDUI3.init) window.__BIDUI3.init(window.__BIDUI);
+  if (window.__BIDUI4 && window.__BIDUI4.init) window.__BIDUI4.init(window.__BIDUI);
   log('02 입찰 도구 v3 시작');
 })();

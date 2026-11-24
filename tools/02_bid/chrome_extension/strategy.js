@@ -17,7 +17,8 @@
     measured: {key: 'measured', label: '실측 데이터 기반 (우리 장부·KISTI 개찰)', cls: 'src-meas'},
     input: {key: 'input', label: '사용자 입력 조건 기반', cls: 'src-input'},
     assume: {key: 'assume', label: '사용자 가정 (시뮬레이션 · 근거 데이터 아님)', cls: 'src-assume'},
-    deflt: {key: 'deflt', label: '기본 평가표 (공고 평가표 값으로 교체 필요)', cls: 'src-def'}
+    deflt: {key: 'deflt', label: '기본 평가표 (공고 평가표 값으로 교체 필요)', cls: 'src-def'},
+    ai: {key: 'ai', label: 'AI 제안 (근거 데이터 아님 · 검증 필요)', cls: 'src-ai'}
   };
 
   /* ───────── 변수 ① 발주 기관 유형 · ③ 영업/독점성 · ④ 계약 조건: 공고 성격 진단용 분류(숫자를 만들지 않는다) ───────── */

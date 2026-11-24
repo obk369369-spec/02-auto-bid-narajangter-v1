@@ -384,6 +384,7 @@ pre.log{white-space:pre-wrap;font-size:12px;color:var(--mute);margin:0;max-heigh
 .src{display:inline-block;padding:1px 9px;border-radius:99px;font-size:11px;font-weight:700;white-space:normal;line-height:1.5;margin:2px 4px 2px 0}
 .src-rule{background:#d1fae5;color:#065f46}.src-meas{background:#cffafe;color:#155e75}.src-input{background:#dbeafe;color:#1e40af}.src-assume{background:#fef3c7;color:#92400e}.src-def{background:#ffedd5;color:#9a3412}.src-none{background:#f1f5f9;color:#475569}
 tr.lossrow td{background:#fef2f2}
+.src-ai{background:#fce7f3;color:#9d174d}
 .sim input[type=range]{width:100%;padding:0}
 @media(max-width:720px){main{padding:16px 12px 60px}.card{padding:18px 16px}.top{padding:10px 12px}.charts{grid-template-columns:1fr}details>.inner{padding:4px 14px 20px}}
 @media print{.top,.toast,button{display:none!important}.pane{display:block!important}}
@@ -486,7 +487,7 @@ tr.lossrow td{background:#fef2f2}
     <div class="grid" id="calcForm">
       <label>보고서 정가 (외화 또는 원)<input id="c_list" type="text" inputmode="decimal" title="기능: 발행사 정가 · 결과: 원가 계산 · 사용시점: 마진을 보고 싶을 때"></label>
       <label>정가 통화<select id="c_cur" title="기능: 정가 통화 · 결과: 환율 적용 여부 · 사용시점: 정가 입력 시"><option>KRW</option><option>USD</option><option>EUR</option><option>GBP</option><option>JPY</option></select></label>
-      <label>원화 환율 (1 외화 = 원)<input id="c_fx" type="text" inputmode="decimal" placeholder="예) 1169" title="기능: 환율 · 결과: 원화 원가 환산 · 사용시점: 외화 정가일 때"></label>
+      <label>원화 환율 (1 외화 = 원)<input id="c_fx" type="text" inputmode="decimal" placeholder="예) 1169" title="기능: 환율 · 결과: 원화 원가 환산 · 사용시점: 외화 정가일 때"><span class="row" style="gap:8px;margin-top:2px"><button id="fxBtn" type="button" class="sm" title="기능: 공개 환율 피드에서 현재 환율을 불러와 환율 칸에 입력 · 결과: 환율과 출처·기준 시각 표시(오프라인이면 직접 입력) · 사용시점: 외화 정가일 때">실시간 환율 불러오기</button></span><span id="fxInfo" class="small" style="font-weight:400"></span></label>
       <label>원가 계산 방식<select id="c_costmode" title="기능: 원가 산식 선택 · 결과: 원가 = 정가×환율×계수(장부) 또는 ×(1−할인율) · 사용시점: 평소 쓰는 방식 선택"><option value="ledger">장부 방식: 정가 × 환율 × 계수</option><option value="disc">할인율 방식: 정가 × 환율 × (1 − 할인율)</option></select></label>
       <label id="c_discLbl">원가 계수 (장부 '발행사 디스카운트' 열 값, 예 0.4)<input id="c_disc" type="text" inputmode="decimal" title="기능: 정가 대비 매입 비율 또는 할인율 · 결과: 원가 · 사용시점: 계약 조건 확인 후"></label>
       <label>투찰률 후보 (쉼표, 비우면 하한율+α 자동)<input id="c_rates" type="text" placeholder="예) 88.1, 88.2" title="기능: 확인할 투찰률 목록 · 결과: 투찰률별 표·그래프 · 사용시점: 직접 비교하고 싶을 때"></label>
@@ -541,6 +542,36 @@ tr.lossrow td{background:#fef2f2}
     <div class="row" style="margin-top:20px"><button id="stratBtn" class="primary" title="기능: 5가지 조건과 원가로 구간·후보·순이익 계산 · 결과: 아래 요약·차트·표 · 사용시점: 입력을 바꾼 뒤">상황 진단·구간 계산</button><button id="stratClear" title="기능: 내부 원가·안내·시뮬레이션 입력 비우기 · 결과: 새 공고 준비 · 사용시점: 다른 공고로 바꿀 때">내부 원가·전략 입력 비우기</button></div>
   </div>
   <div id="stratOut"><div class="empty">[상황 진단·구간 계산] 또는 [계산하기]를 누르면 이곳에 구간 차트와 후보·순이익 표가 나옵니다.</div></div>
+  <details id="cfgCard" style="margin-bottom:24px">
+    <summary title="기능: 환율 조회 방식과 AI 키를 설정 · 결과: 이 PC 브라우저에만 저장 · 사용시점: 처음 한 번">⚙ 환율·AI 설정 <span class="small" style="font-weight:400">· 키는 이 PC 브라우저(localStorage)에만 저장되고 서류·저장소·서버에는 올라가지 않습니다</span></summary>
+    <div class="inner sim">
+      <h3>실시간 환율</h3>
+      <div class="grid">
+        <label>조회 순서<select id="fx_prov" title="기능: 키 없이 쓰는 환율 피드의 우선순위 · 결과: 앞 피드가 실패하면 다음 피드로 자동 전환 · 사용시점: 평소엔 기본값"><option value="er">open.er-api.com → frankfurter.app</option><option value="frank">frankfurter.app(ECB) → open.er-api.com</option></select></label>
+        <label>한국수출입은행 인증키 (선택)<input id="fx_key" type="password" autocomplete="off" placeholder="있으면 고시환율을 먼저 조회" title="기능: 수출입은행 고시환율 API 인증키 · 결과: 매매기준율을 우선 조회 · 사용시점: 은행 고시 기준 환율이 필요할 때(이 브라우저에만 저장)"></label>
+        <label><span><input type="checkbox" id="fx_auto" checked title="기능: 외화를 고르면 환율이 비어 있을 때만 자동 조회 · 결과: 직접 입력한 값은 덮어쓰지 않음 · 사용시점: 평소 켜 둠"> 외화를 고르면 환율 자동 조회 (빈칸일 때만)</span></label>
+      </div>
+      <p class="small">불러온 값은 <b>시장 환율(중간값)</b>이며 기준 시각·출처가 환율 칸 아래에 표시됩니다. 하나은행·관세청 고시환율은 공개 API 규격을 확인하지 못해 연결하지 않았습니다(HOLD). 수출입은행 API 는 브라우저 보안(CORS) 때문에 막힐 수 있고 실제 키로 시험하지 못했습니다 — 막히면 키 없는 피드로 자동 전환됩니다. 오프라인이면 환율을 직접 입력하세요.</p>
+      <h3>AI 분석 연결</h3>
+      <div class="grid">
+        <label>AI 제공사<select id="ai_prov" title="기능: 사용할 AI 제공사 · 결과: 요청 형식이 제공사에 맞게 바뀜 · 사용시점: 키를 가진 제공사 선택"><option value="claude">Claude (Anthropic)</option><option value="gemini">Gemini (Google)</option></select></label>
+        <label>모델 이름<input id="ai_model" type="text" placeholder="claude-sonnet-5-5" title="기능: 사용할 모델 ID · 결과: 요청의 model 값 · 사용시점: 계정에서 쓸 수 있는 모델로 바꿀 때(Gemini 기본값은 미검증)"></label>
+        <label>API 키<input id="ai_key" type="password" autocomplete="off" placeholder="sk-ant-… 또는 AIza…" title="기능: 내 AI 계정의 API 키 · 결과: 이 브라우저에만 저장, 분석 요청 헤더로만 전달 · 사용시점: AI 분석을 쓸 때 한 번"></label>
+      </div>
+      <div class="row" style="margin-top:14px"><button id="aiSave" class="primary" title="기능: AI 설정 저장 · 결과: localStorage 에만 기록 · 사용시점: 키·모델을 바꾼 뒤">AI 설정 저장</button><button id="aiClear" title="기능: 저장된 API 키 삭제 · 결과: 이 브라우저에서 키 제거 · 사용시점: 공용 PC 사용 후">API 키 지우기</button><span id="aiCfgMsg" class="small"></span></div>
+      <p class="small">키는 코드·화면 결과·서류(.xls/.doc)·CSV·Evidence·URL 어디에도 넣지 않으며, GitHub 와 어떤 서버에도 올라가지 않습니다. 분석 요청은 선택한 제공사 서버로만 직접 전송됩니다.</p>
+    </div>
+  </details>
+  <div class="card sim" id="aiCard">
+    <h2>AI 심층 입찰 전략 분석 <span class="small" style="font-weight:400">· 버튼 한 번으로 공고문 맥락 + 기관 특성 + 원가 + 대외 안내를 입체 분석</span></h2>
+    <p class="lead">고정 조건문이 아니라 AI 가 공고문 원문을 읽고 ① 숨은 리스크·참가자격 주의사항 ② 경쟁 강도 ③ 시나리오별 투찰 전략을 구조화해 제시합니다. <b>AI 의 숫자는 "근거 데이터 아님"</b>이며, AI 가 제안한 투찰률은 도구가 다시 계산(금액·순이익)하고 AI 가 인용한 공고 문구는 원문과 대조해 표시합니다.</p>
+    <div class="row" style="flex-direction:column;align-items:flex-start;gap:8px">
+      <label style="font-weight:400"><input type="checkbox" id="ai_cost" checked title="기능: 실제 원가·대외 안내·도구 계산 결과도 AI 에 보낼지 선택 · 결과: 끄면 공고문·기관 정보만 전송 · 사용시점: 내부 원가를 외부로 보내고 싶지 않을 때"> 실제 원가·대외 안내·도구 계산 결과(내부 정보)도 AI 에 보냄</label>
+      <label style="font-weight:400"><input type="checkbox" id="ai_consent" title="기능: 외부 AI 서버로 전송됨을 확인 · 결과: 체크해야 분석 버튼이 동작 · 사용시점: 분석 전 매번"> 공고문 원문과 위 정보가 선택한 AI 제공사 서버로 전송됨을 이해합니다</label>
+    </div>
+    <div class="row" style="margin-top:16px"><button id="aiBtn" class="primary" title="기능: 현재 공고를 AI 로 심층 분석 · 결과: 리스크·경쟁 강도·시나리오 카드 · 사용시점: 상황 진단을 끝낸 뒤">AI 심층 입찰 전략 분석</button><span id="aiMsg" class="small"></span></div>
+  </div>
+  <div id="aiOut"></div>
   <div id="calcOut"><div class="empty">공고 숫자(기초금액·낙찰하한율)를 ①에서 입력한 뒤 [계산하기]를 누르세요.</div></div>
 </section>
 
@@ -1261,7 +1292,8 @@ tr.lossrow td{background:#fef2f2}
     measured: {key: 'measured', label: '실측 데이터 기반 (우리 장부·KISTI 개찰)', cls: 'src-meas'},
     input: {key: 'input', label: '사용자 입력 조건 기반', cls: 'src-input'},
     assume: {key: 'assume', label: '사용자 가정 (시뮬레이션 · 근거 데이터 아님)', cls: 'src-assume'},
-    deflt: {key: 'deflt', label: '기본 평가표 (공고 평가표 값으로 교체 필요)', cls: 'src-def'}
+    deflt: {key: 'deflt', label: '기본 평가표 (공고 평가표 값으로 교체 필요)', cls: 'src-def'},
+    ai: {key: 'ai', label: 'AI 제안 (근거 데이터 아님 · 검증 필요)', cls: 'src-ai'}
   };
 
   /* ───────── 변수 ① 발주 기관 유형 · ③ 영업/독점성 · ④ 계약 조건: 공고 성격 진단용 분류(숫자를 만들지 않는다) ───────── */
@@ -1437,6 +1469,133 @@ tr.lossrow td{background:#fef2f2}
 
   const api = {SRC, ORG_TYPES, SALES, CONTRACT, AWARD, KEYWORDS, detectOrg, detectOrgKey, measuredFor, internalCost, analyze, fromForm, redactLedger, leak: {build: buildSecrets, scan, rowsToText, htmlToText}};
   E.strategy = api; if (typeof module !== 'undefined') module.exports = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>/* fx */
+/* 실시간 환율 조회 (v3.3) — API 키 없이 쓰는 공개 피드 2종 + (선택) 수출입은행 고시환율 API 키
+   [안전] ① 요청에는 통화 코드만 실린다(공고·원가·고객 정보 없음) ② 실패·오프라인이면 아무것도 바꾸지 않고 수동 입력을 유지 ③ 불러온 값에는 출처·기준 시각을 항상 붙인다
+   [주의] 아래 피드는 "시장 환율(중간값)"이다. 하나은행 등 은행 고시환율(전신환 매도율 등)이 아니며, 실제 결제 환율은 거래 은행 기준으로 확인해야 한다.
+   미검증(HOLD): 수출입은행 API 는 이 PC 에서 실제 키로 호출해 보지 못했다(응답 규격은 공식 문서 기준 구현). 하나은행·관세청은 공개 API 규격을 확인하지 못해 연결하지 않았다. */
+(function (g) {
+  'use strict';
+  const E = g.BIDENG || {}; const pad = n => String(n).padStart(2, '0');
+  const ymd = d => d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate());
+  const DISCLAIMER = '시장 환율(중간값)입니다. 은행 고시환율·실제 결제환율과 다를 수 있으니 거래 은행 기준으로 확인하세요.';
+  const PROVIDERS = {
+    er: {
+      id: 'er', name: 'open.er-api.com', kind: '시장 환율(중간값) · 키 없음',
+      url: cur => 'https://open.er-api.com/v6/latest/' + encodeURIComponent(cur),
+      parse: j => { if (!j || j.result !== 'success' || !j.rates || typeof j.rates.KRW !== 'number') throw new Error('응답 형식이 다름'); const asOf = j.time_last_update_unix ? new Date(j.time_last_update_unix * 1000).toISOString().replace('T', ' ').slice(0, 16) + ' UTC' : (j.time_last_update_utc || ''); return {rate: j.rates.KRW, asOf}; }
+    },
+    frank: {
+      id: 'frank', name: 'frankfurter.app (ECB 기준)', kind: '유럽중앙은행 참조환율 · 키 없음',
+      url: cur => 'https://api.frankfurter.app/latest?from=' + encodeURIComponent(cur) + '&to=KRW',
+      parse: j => { if (!j || !j.rates || typeof j.rates.KRW !== 'number') throw new Error('응답 형식이 다름'); return {rate: j.rates.KRW, asOf: (j.date || '') + ' (ECB 기준일)'}; }
+    },
+    koreaexim: {
+      id: 'koreaexim', name: '한국수출입은행 고시환율', kind: '매매기준율 · 인증키 필요',
+      needsKey: true,
+      url: (cur, key, date) => 'https://www.koreaexim.go.kr/site/program/financial/exchangeJSON?authkey=' + encodeURIComponent(key) + '&searchdate=' + date + '&data=AP01',
+      parse: (j, cur) => { if (!Array.isArray(j)) throw new Error('응답 형식이 다름'); if (!j.length) throw new Error('고시 데이터 없음(휴일·영업시간 전일 수 있음)'); const row = j.find(r => r && (r.cur_unit === cur || r.cur_unit === cur + '(100)')); if (!row) throw new Error(cur + ' 고시 없음'); const v = parseFloat(String(row.deal_bas_r).replace(/,/g, '')); if (!(v > 0)) throw new Error('매매기준율 값 오류'); return {rate: row.cur_unit.endsWith('(100)') ? v / 100 : v, asOf: '고시 매매기준율 ' + (row.__date || '')}; }
+    }
+  };
+  function withTimeout(fetchImpl, url, ms) {
+    const ctl = typeof AbortController !== 'undefined' ? new AbortController() : null; const timer = setTimeout(() => { if (ctl) ctl.abort(); }, ms);
+    const p = fetchImpl(url, ctl ? {signal: ctl.signal, cache: 'no-store'} : {cache: 'no-store'}); return Promise.resolve(p).then(r => { clearTimeout(timer); return r; }, e => { clearTimeout(timer); throw e; });
+  }
+  /* 환율 조회: 순서 = (수출입은행 키가 있으면 먼저) → open.er-api.com → frankfurter.app. 하나라도 성공하면 끝. */
+  async function fetchRate(cur, cfg, fetchImpl, now) {
+    cfg = cfg || {}; const f = fetchImpl || (typeof fetch !== 'undefined' ? fetch.bind(g) : null); const errors = []; const t0 = now || new Date();
+    if (!/^[A-Z]{3}$/.test(cur || '')) return {ok: false, errors: [{provider: '-', msg: '통화 코드가 올바르지 않음'}]};
+    if (cur === 'KRW') return {ok: false, noNeed: true, errors: [{provider: '-', msg: '원화(KRW)는 환율이 필요 없습니다'}]};
+    if (!f) return {ok: false, errors: [{provider: '-', msg: '이 환경에서는 네트워크 조회를 쓸 수 없음'}]};
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return {ok: false, offline: true, errors: [{provider: '-', msg: '오프라인 상태입니다'}]};
+    const order = []; if (cfg.koreaeximKey) order.push('koreaexim'); if (cfg.provider === 'frank') order.push('frank', 'er'); else order.push('er', 'frank');
+    for (const id of order) {
+      const P = PROVIDERS[id];
+      try {
+        let url, shown; if (P.needsKey) { /* 휴일이면 최대 5일 전까지 거슬러 조회 */ let found = null, lastErr = null; for (let back = 0; back < 6 && !found; back++) { const d = new Date(t0.getTime() - back * 86400000); const dt = ymd(d); const u = P.url(cur, cfg.koreaeximKey, dt); try { const r = await withTimeout(f, u, 8000); if (!r.ok) throw new Error('HTTP ' + r.status); const j = await r.json(); if (Array.isArray(j) && j.length) { j.forEach(r0 => { r0.__date = dt.slice(0, 4) + '-' + dt.slice(4, 6) + '-' + dt.slice(6, 8); }); found = P.parse(j, cur); } else lastErr = new Error('고시 데이터 없음'); } catch (e) { lastErr = e; if (e && e.name === 'AbortError') break; } } if (!found) throw lastErr || new Error('조회 실패'); const out = found; shown = 'https://www.koreaexim.go.kr/site/program/financial/exchangeJSON?authkey=****&data=AP01'; return finish(P, cur, out, shown, t0); }
+        url = P.url(cur); const r = await withTimeout(f, url, 8000); if (!r.ok) throw new Error('HTTP ' + r.status); const j = await r.json(); const out = P.parse(j, cur); return finish(P, cur, out, url, t0);
+      } catch (e) { errors.push({provider: P.name, msg: e && e.name === 'AbortError' ? '시간 초과(8초)' : String((e && e.message) || e).slice(0, 120)}); }
+    }
+    return {ok: false, errors};
+  }
+  function finish(P, cur, out, url, t0) {
+    if (!(out.rate > 0) || !isFinite(out.rate)) throw new Error('환율 값이 올바르지 않음');
+    const dec = cur === 'JPY' ? 4 : 2; return {ok: true, rate: Number(out.rate.toFixed(dec)), raw: out.rate, cur, source: P.name, kind: P.kind, asOf: out.asOf, fetchedAt: t0.toISOString().replace('T', ' ').slice(0, 19) + ' UTC', url, disclaimer: DISCLAIMER};
+  }
+  const api = {PROVIDERS, DISCLAIMER, fetchRate};
+  E.fx = api; g.BIDENG = E; if (typeof module !== 'undefined') module.exports = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>/* ai */
+/* AI 심층 입찰 전략 분석 (v3.3) — 사용자가 입력한 자신의 API 키(Claude 또는 Gemini)로 공고문·기관·원가·대외 안내를 보내 구조화된 분석을 받는다.
+   [보안] 키는 이 브라우저의 localStorage('wic02_ai_cfg')에만 저장된다. 코드·저장소·서류·화면 결과·URL·CSV·Evidence 어디에도 넣지 않으며, 요청 헤더로만 제공사에 전달된다(Claude: x-api-key / Gemini: x-goog-api-key — URL 쿼리에 넣지 않음).
+   [근거 규칙] AI 의 숫자는 "AI 제안(근거 데이터 아님 · 검증 필요)"로 표시한다. AI 가 제안한 투찰률은 엔진이 다시 계산해(금액·순이익) 보여 주고, AI 가 인용한 공고 원문 문구는 실제 원문에 있는지 대조해 "원문 확인됨/원문에서 찾지 못함"을 붙인다.
+   미검증(HOLD): 이 PC 에서 실제 API 키로 제공사 서버를 호출해 보지 못했다 — 요청·응답 형식은 공식 문서 기준 구현이며, 시험은 모의 응답(stub)으로 했다. */
+(function (g) {
+  'use strict';
+  const E = g.BIDENG || {};
+  const PROVIDERS = {
+    claude: {id: 'claude', name: 'Claude (Anthropic)', endpoint: 'https://api.anthropic.com/v1/messages', defaultModel: 'claude-sonnet-5-5', keyHint: 'sk-ant-…'},
+    gemini: {id: 'gemini', name: 'Gemini (Google)', endpoint: m => 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(m) + ':generateContent', defaultModel: 'gemini-2.5-flash', keyHint: 'AIza…', modelUnverified: true}
+  };
+  const MAX_NOTICE_CHARS = 60000;
+  const SCHEMA = '{"hidden_risks":[{"title":"","detail":"","evidence_quote":"공고문 원문에서 그대로 인용(없으면 빈 문자열)"}],"eligibility_cautions":[{"title":"","detail":"","evidence_quote":""}],"competition":{"level":"낮음|보통|높음|판단불가","reasons":[""],"basis":"어떤 제공 자료에 근거했는지"},"scenarios":[{"name":"","bid_rate_percent":null,"rationale":"","assumptions":[""],"risks":[""]}],"missing_info":[""]}';
+  const SYSTEM = [
+    '당신은 대한민국 공공기관 해외 시장조사 보고서·학술자료 입찰을 돕는 분석 보조자입니다. 사용자가 제공한 자료만 근거로 삼으세요.',
+    '규칙: (1) 제공되지 않은 통계·확률·평균 낙찰률·경쟁사 정보를 지어내지 마세요. 모르면 "판단불가" 또는 "확인 필요"라고 쓰세요. (2) evidence_quote 는 공고문 원문에서 글자 그대로 복사한 문구만 넣으세요(없으면 빈 문자열). (3) bid_rate_percent 는 기초금액 대비 투찰률(%)이며, 제공된 낙찰하한율·적자 방어선·대외 안내선과 모순되면 안 됩니다. 근거를 모르면 null. (4) 낙찰을 보장하는 표현을 쓰지 마세요.',
+    '반드시 아래 JSON 스키마 하나만, 설명·코드펜스 없이 출력하세요: ' + SCHEMA
+  ].join('\n');
+
+  function clip(text, max) { const s = String(text || ''); return s.length > max ? {text: s.slice(0, max), clipped: true, total: s.length} : {text: s, clipped: false, total: s.length}; }
+  /* 프롬프트 구성: 공고문 원문 + 공고 정보 + 기관·상황 진단 + (선택) 원가·대외 안내·엔진 계산 결과 */
+  function buildPrompt(o) {
+    const n = o.notice || {}, docs = o.docs || [], an = o.strat, prof = an && an.profile; const parts = [];
+    parts.push('[공고 정보(사용자 입력)]\n' + ['공고번호', 'title:공고명', 'org:수요기관', 'due:입찰마감', 'base:기초금액(원)', 'basis:기초금액 기준', 'floor:낙찰하한율(%)', 'range:예가범위(%)', 'award:낙찰방식', 'tax:부가세구분(free=면세)', 'pub:발행사'].map(k => { const [kk, lab] = k.includes(':') ? k.split(':') : ['no', k]; return lab + ': ' + (n[kk] === undefined || n[kk] === '' ? '(입력 없음)' : n[kk]); }).join('\n'));
+    if (prof) parts.push('[상황 진단(도구 계산)]\n기관 유형: ' + prof.orgName + '\n낙찰방식: ' + prof.awardName + '\n영업 조건: ' + prof.salesName + (prof.urgent ? ' · 긴급' : '') + (prof.rebid ? ' · 재공고' : '') + '\n과세/계약: ' + (prof.tax === 'free' ? '면세' : '과세') + ' · ' + prof.contractName);
+    if (o.includeCost && an && an.ok) {
+      const lines = ['실제 원가(내부): ' + (an.cost == null ? '(미입력)' : an.cost + '원'), '대외 안내 비율: ' + (an.guide == null ? '(없음)' : an.guide + '% (기초금액 대비)'), '적자 방어선: ' + (an.breakEven ? an.breakEven.bid + '원 (기초금액의 ' + an.breakEven.rate + '%)' : '(원가 미입력)'), '기초금액 상한: ' + an.ref + '원'];
+      if (an.zone) lines.push('도구가 공고 규칙으로 계산한 가능 구간: ' + an.zone.lo + '~' + an.zone.hi + '원 (' + an.zone.loRate + '%~' + an.zone.hiRate + '%) — 출처: ' + an.zone.src.label); else lines.push('낙찰 가능 구간: 산출 불가(' + an.winStatus + ') — 근거 데이터 부족');
+      parts.push('[원가·대외 안내·도구 계산(내부 정보)]\n' + lines.join('\n'));
+    } else parts.push('[원가·대외 안내] 사용자가 AI 로 보내지 않기로 함');
+    const text = docs.map(d => '--- ' + d.name + ' ---\n' + d.text).join('\n\n'); const c = clip(text, MAX_NOTICE_CHARS);
+    parts.push('[공고문 원문' + (docs.length ? '' : ' — 올린 문서 없음') + (c.clipped ? ' — 앞 ' + MAX_NOTICE_CHARS + '자만 전송(전체 ' + c.total + '자)' : '') + ']\n' + (c.text || '(없음)'));
+    parts.push('위 자료만으로 JSON 스키마에 맞춰 분석하세요. 시나리오는 2~4개, 각 시나리오에 근거(rationale)와 가정(assumptions)을 쓰세요.');
+    return {system: SYSTEM, user: parts.join('\n\n'), clipped: c.clipped, totalChars: c.total};
+  }
+  function buildRequest(cfg, prompt) {
+    const P = PROVIDERS[cfg.provider]; if (!P) throw new Error('지원하지 않는 제공사'); const model = (cfg.model || P.defaultModel).trim();
+    if (cfg.provider === 'claude') return {url: P.endpoint, init: {method: 'POST', headers: {'content-type': 'application/json', 'x-api-key': cfg.key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true'}, body: JSON.stringify({model, max_tokens: 4096, system: prompt.system, messages: [{role: 'user', content: prompt.user}]})}};
+    return {url: P.endpoint(model), init: {method: 'POST', headers: {'content-type': 'application/json', 'x-goog-api-key': cfg.key}, body: JSON.stringify({systemInstruction: {parts: [{text: prompt.system}]}, contents: [{role: 'user', parts: [{text: prompt.user}]}], generationConfig: {responseMimeType: 'application/json', maxOutputTokens: 4096}})}};
+  }
+  const HTTPMSG = {400: '요청이 거부됨(모델명·요청 형식 확인)', 401: 'API 키가 올바르지 않음', 403: '권한 없음(키·결제·허용 도메인 확인)', 404: '모델 또는 주소를 찾지 못함(모델명 확인)', 429: '요청 한도 초과 — 잠시 후 다시'};
+  async function run(cfg, prompt, fetchImpl) {
+    const f = fetchImpl || (typeof fetch !== 'undefined' ? fetch.bind(g) : null); if (!f) return {ok: false, error: '이 환경에서는 네트워크 호출을 쓸 수 없음'};
+    if (!cfg || !cfg.key) return {ok: false, error: 'API 키가 없습니다 — 설정에서 입력하세요'};
+    const req = buildRequest(cfg, prompt); let res;
+    try { res = await f(req.url, req.init); } catch (e) { return {ok: false, error: '네트워크 오류(오프라인이거나 제공사에 연결할 수 없음): ' + String((e && e.message) || e).slice(0, 100)}; }
+    if (!res.ok) { let body = ''; try { body = (await res.text()).slice(0, 200); } catch (e) { /* ignore */ } body = body.split(cfg.key).join('****'); return {ok: false, error: 'HTTP ' + res.status + ' — ' + (HTTPMSG[res.status] || '제공사 오류') + (body ? ' · ' + body : ''), status: res.status}; }
+    let j; try { j = await res.json(); } catch (e) { return {ok: false, error: '응답을 읽을 수 없음'}; }
+    const text = cfg.provider === 'claude' ? (j && j.content && j.content[0] && j.content[0].text) : (j && j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts && j.candidates[0].content.parts.map(p => p.text || '').join(''));
+    if (!text) return {ok: false, error: '응답에 분석 내용이 없음', raw: JSON.stringify(j).slice(0, 400)};
+    return {ok: true, text, model: (j && j.model) || cfg.model || PROVIDERS[cfg.provider].defaultModel, usage: j && (j.usage || j.usageMetadata) || null};
+  }
+  function parse(text) {
+    let s = String(text || '').trim(); s = s.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, ''); const a = s.indexOf('{'), b = s.lastIndexOf('}'); if (a < 0 || b <= a) return {ok: false, error: 'JSON 을 찾지 못함', raw: String(text).slice(0, 600)};
+    let o; try { o = JSON.parse(s.slice(a, b + 1)); } catch (e) { return {ok: false, error: 'JSON 형식 오류', raw: String(text).slice(0, 600)}; }
+    const arr = x => (Array.isArray(x) ? x : []), str = x => (x == null ? '' : String(x));
+    const risks = x => arr(x).map(r => ({title: str(r && r.title), detail: str(r && r.detail), quote: str(r && r.evidence_quote)})).filter(r => r.title || r.detail);
+    const comp = o.competition || {}; const lv = ['낮음', '보통', '높음', '판단불가'].includes(str(comp.level)) ? str(comp.level) : '판단불가';
+    return {ok: true, risks: risks(o.hidden_risks), cautions: risks(o.eligibility_cautions), competition: {level: lv, reasons: arr(comp.reasons).map(str).filter(Boolean), basis: str(comp.basis)}, scenarios: arr(o.scenarios).map(s0 => ({name: str(s0 && s0.name), rate: (s0 && typeof s0.bid_rate_percent === 'number' && isFinite(s0.bid_rate_percent) && s0.bid_rate_percent > 0 && s0.bid_rate_percent <= 100) ? s0.bid_rate_percent : null, rationale: str(s0 && s0.rationale), assumptions: arr(s0 && s0.assumptions).map(str).filter(Boolean), risks: arr(s0 && s0.risks).map(str).filter(Boolean)})).filter(s1 => s1.name || s1.rationale), missing: arr(o.missing_info).map(str).filter(Boolean)};
+  }
+  /* AI 가 인용한 문구가 실제 공고문 원문에 있는지 대조(공백·개행 무시) */
+  const squash = s => String(s || '').replace(/\s+/g, '').replace(/[“”"'‘’]/g, '');
+  function quoteStatus(quote, noticeText) { const q = squash(quote); if (!q) return 'none'; return squash(noticeText).includes(q) ? 'found' : 'missing'; }
+  const api = {PROVIDERS, MAX_NOTICE_CHARS, buildPrompt, buildRequest, run, parse, quoteStatus};
+  E.ai = api; g.BIDENG = E; if (typeof module !== 'undefined') module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);
 
 </script>
@@ -1806,6 +1965,7 @@ tr.lossrow td{background:#fef2f2}
         <div class="kpi"><small>③ 상한 (기초금액)</small><b>${won(an.ref)}원</b><em>초과 투찰 = 무효 위험</em><div>${badge(an.src.rule)}</div></div></div>
       ${an.reasons.map(x => `<div class="explainbox" style="background:#eff6ff;border-color:#bfdbfe">${esc(x)}</div>`).join('')}
       ${an.warns.map(x => `<div class="explainbox" style="background:#fee2e2;border-color:#fecaca">${esc(x)}</div>`).join('')}
+      ${(m => (an.cost != null && U.$('c_cur').value !== 'KRW') ? `<p class="small">환율 출처: ${m && String(m.rate) === String(U.$('c_fx').value) ? esc(m.source) + ' · 기준 ' + esc(m.asOf) + ' · 조회 ' + esc(m.fetchedAt) + ' (시장 환율 · 은행 고시환율 아님)' : '수동 입력'}</p>` : '')(U.S.fxMeta)}
       <p class="small">※ 이 화면은 내부용입니다 — 실제 원가·커미션·순이익은 .xls/.doc 서류에 출력되지 않으며, 출력 직전 검사에서 발견되면 내려받기가 차단됩니다.</p></div>`);
     h.push(`<div class="card"><h2>구간 차트</h2><div class="chart">${chart(an)}</div><div class="small" style="margin-top:6px">선 색: ${badge(an.src.rule)} ${badge(an.src.input)} ${an.measured ? badge(an.src.measured) : ''} ${an.lines.some(l => l.src.key === 'assume') ? badge(an.src.assume) : ''}</div></div>`);
     h.push(`<div class="card"><h2>후보 투찰안과 실제 순이익 <span class="small" style="font-weight:400">· 행을 누르면 그 금액을 서류에 반영</span></h2>${an.cands.length ? `<div class="scroll"><table id="candTbl"><thead><tr><th>안</th><th>설명</th><th>투찰률</th><th>투찰가(총액)</th><th>공급가액</th><th>실제 순이익(내부)</th><th>순이익률</th><th>판정</th><th>출처</th></tr></thead><tbody>${candRows(an.cands, an, true)}</tbody></table></div>` : '<div class="empty">후보가 없습니다. 목표 구간·직접 후보·목표 마진을 입력하세요.</div>'}</div>`);
@@ -1823,10 +1983,87 @@ tr.lossrow td{background:#fef2f2}
     const sec = api.secrets(); const bid = Number(String(U.$('d_bid').value).replace(/[^\d]/g, '')) || 0; const tf = U.$('n_tax').value === 'free';
     const sp = bid ? (tf ? bid : E().pricing.splitVat(bid, 10).supply) : 0; const allow = bid ? [bid, sp, bid - sp, Math.round(bid * 0.9), Math.round(bid / 1.1), Math.round(bid * 0.05), Math.ceil(bid * 0.05), Math.round(bid * 0.9 * 0.1)] : [];
     const hits = ST().leak.scan(toText(content), sec, allow);
+    /* API 키(환율 인증키·AI 키)가 서류에 섞이는 것도 차단 */
+    ['wic02_ai_cfg', 'wic02_fx_cfg'].forEach(k => { const o = U.ls.get(k, {}) || {}; [o.key, o.koreaeximKey].forEach(v => { if (v && String(v).length >= 8 && toText(content).includes(v)) hits.push('API 키'); }); });
     if (hits.length) { U.toast('내부 원가·커미션 정보가 서류에 섞여 있어 내려받기를 막았습니다 (' + hits.join(', ') + ')'); U.log('서류 출력 차단: ' + name + ' — ' + hits.join(' / ')); window.__BIDUI3_BLOCKED = (window.__BIDUI3_BLOCKED || []).concat([{name, hits}]); return false; }
     return true;
   };
   api.redactLedger = row => { const sec = api.secrets(); const has = sec.amounts.size || sec.small.length || String(row[23] || row[24] || '') !== ''; if (!has) return row; U.toast('장부 1행: 원가·디스카운트 칸은 내부 정보라 비워서 내려받습니다'); return ST().redactLedger(row); };
+})();
+
+</script>
+<script>/* ui4 */
+/* 02 입찰 도구 v3.3 — 실시간 환율 조회 · AI 심층 입찰 전략 분석 화면 (ui3.js 다음, ui.js 앞에서 로드. ui.js 가 끝에서 init(U) 호출)
+   키 보안: 모든 설정(환율 인증키·AI 키)은 localStorage 'wic02_fx_cfg' / 'wic02_ai_cfg' 에만 저장한다. 화면 결과·서류·CSV·Evidence·URL 에는 넣지 않는다. */
+(() => {
+  'use strict';
+  const api = window.__BIDUI4 = {}; let U = null; const E = () => window.BIDENG;
+  const FXK = 'wic02_fx_cfg', AIK = 'wic02_ai_cfg', FXLAST = 'wic02_fx_last';
+  const netFetch = (u, i) => window.fetch(u, i); /* 호출 시점에 window.fetch 를 읽는다(시험에서 모의 가능) */
+  const esc = s => U.esc(s);
+  const fxCfg = () => Object.assign({provider: 'er', koreaeximKey: '', auto: true}, U.ls.get(FXK, {}));
+  const aiCfg = () => Object.assign({provider: 'claude', model: '', key: ''}, U.ls.get(AIK, {}));
+
+  api.init = u => {
+    U = u; const {$, ls} = U; const fc = fxCfg(), ac = aiCfg();
+    $('fx_prov').value = fc.provider; $('fx_key').value = fc.koreaeximKey || ''; $('fx_auto').checked = !!fc.auto; $('ai_prov').value = ac.provider; $('ai_model').value = ac.model || ''; $('ai_key').value = ac.key || '';
+    $('ai_model').placeholder = E().ai.PROVIDERS[ac.provider].defaultModel; showCfgMsg();
+    const saveFx = () => ls.set(FXK, {provider: $('fx_prov').value, koreaeximKey: $('fx_key').value.trim(), auto: $('fx_auto').checked});
+    ['fx_prov', 'fx_key', 'fx_auto'].forEach(id => $(id).addEventListener('change', saveFx));
+    $('ai_prov').addEventListener('change', () => { $('ai_model').placeholder = E().ai.PROVIDERS[$('ai_prov').value].defaultModel; });
+    $('aiSave').onclick = () => { ls.set(AIK, {provider: $('ai_prov').value, model: $('ai_model').value.trim(), key: $('ai_key').value.trim()}); showCfgMsg(); U.toast('AI 설정을 이 브라우저에 저장했습니다'); };
+    $('aiClear').onclick = () => { ls.set(AIK, {provider: $('ai_prov').value, model: $('ai_model').value.trim(), key: ''}); $('ai_key').value = ''; showCfgMsg(); U.toast('저장된 API 키를 지웠습니다'); };
+    $('fxBtn').onclick = () => api.fetchFx(true);
+    $('c_cur').addEventListener('change', () => { const c = fxCfg(); if (c.auto && $('c_cur').value !== 'KRW' && !$('c_fx').value.trim()) api.fetchFx(false); else if ($('c_cur').value === 'KRW') $('fxInfo').textContent = '원화(KRW)는 환율이 필요 없습니다'; });
+    $('c_fx').addEventListener('input', () => { const m = U.S.fxMeta; if (m && String($('c_fx').value) !== String(m.rate)) { U.S.fxMeta = null; $('fxInfo').innerHTML = '<span class="small">수동 입력한 환율입니다</span>'; } });
+    $('aiBtn').onclick = () => api.runAi();
+    const last = ls.get(FXLAST, null); if (last) $('fxInfo').innerHTML = `<span class="small">마지막 성공 조회(참고): ${esc(last.cur)} ${esc(String(last.rate))} · ${esc(last.source)} · 조회 ${esc(last.fetchedAt)}</span>`;
+  };
+  function showCfgMsg() { const c = aiCfg(); U.$('aiCfgMsg').textContent = c.key ? '키 저장됨 (●●●●) · ' + E().ai.PROVIDERS[c.provider].name + ' · 이 브라우저에만 보관' : '저장된 키 없음'; }
+
+  /* ───────── 실시간 환율 ───────── */
+  api.fetchFx = async manual => {
+    const {$, toast, log} = U; const cur = $('c_cur').value; const info = $('fxInfo');
+    if (cur === 'KRW') { info.textContent = '원화(KRW)는 환율이 필요 없습니다 — 정가 통화를 외화로 바꾸세요'; if (manual) toast('통화가 원화입니다'); return null; }
+    info.textContent = '환율 조회 중…'; const btn = $('fxBtn'); btn.disabled = true;
+    const r = await E().fx.fetchRate(cur, fxCfg(), netFetch); btn.disabled = false;
+    if (r.ok) {
+      if (!manual && $('c_fx').value.trim()) { info.textContent = '직접 입력한 환율이 있어 덮어쓰지 않았습니다'; return r; } /* 자동 조회는 사용자가 쓴 값을 절대 덮어쓰지 않는다 */
+      $('c_fx').value = String(r.rate); U.csave(); U.S.fxMeta = {rate: r.rate, cur: r.cur, source: r.source, asOf: r.asOf, fetchedAt: r.fetchedAt}; U.ls.set(FXLAST, U.S.fxMeta);
+      info.innerHTML = `<b>${esc(String(r.rate))}</b> 원/${esc(cur)} · 출처 ${esc(r.source)} · 기준 ${esc(r.asOf)} · 조회 ${esc(r.fetchedAt)}<br><span class="small">${esc(r.disclaimer)}</span>`;
+      toast('환율 ' + r.rate + ' (' + r.source + ')'); log('환율 조회: ' + cur + ' ' + r.rate + ' / ' + r.source + ' / 기준 ' + r.asOf); return r;
+    }
+    const last = U.ls.get(FXLAST, null);
+    info.innerHTML = `<span class="warn">환율을 불러오지 못했습니다 — 환율 칸에 직접 입력하세요.</span> <span class="small">(${esc(r.errors.map(e => e.provider + ': ' + e.msg).join(' · '))})${last ? ' · 마지막 성공 조회(참고, 자동 입력 안 함): ' + esc(last.cur) + ' ' + esc(String(last.rate)) + ' · ' + esc(last.fetchedAt) : ''}</span>`;
+    if (manual) toast(r.offline ? '오프라인입니다 — 환율을 직접 입력하세요' : '환율 조회 실패 — 직접 입력하세요'); log('환율 조회 실패: ' + r.errors.map(e => e.provider + ' ' + e.msg).join(' / ')); return r;
+  };
+
+  /* ───────── AI 심층 분석 ───────── */
+  const noticeText = () => (U.S.docs || []).map(d => d.text).join('\n');
+  const qBadge = st => (st === 'found' ? '<span class="src src-rule">원문 확인됨</span>' : st === 'missing' ? '<span class="src src-assume">원문에서 찾지 못함 (AI 추정)</span>' : '<span class="src src-none">원문 인용 없음</span>');
+  function riskList(list, nt) { return list.length ? list.map(r => `<div style="margin-bottom:12px"><b>${esc(r.title)}</b> ${qBadge(E().ai.quoteStatus(r.quote, nt))}<div class="small" style="color:#334155;font-size:13px">${esc(r.detail)}</div>${r.quote ? `<div class="small" style="border-left:3px solid #cbd5e1;padding-left:8px;margin-top:4px">“${esc(r.quote)}”</div>` : ''}</div>`).join('') : '<div class="small">AI 가 제시한 항목이 없습니다.</div>'; }
+  api.runAi = async () => {
+    const {$, won} = U; const msg = $('aiMsg'); const out = $('aiOut'); const cfg = aiCfg();
+    if (!cfg.key) { msg.innerHTML = '<span class="warn">AI 키가 없습니다 — 위 [환율·AI 설정]에서 키를 입력하고 저장하세요.</span>'; $('cfgCard').open = true; return; }
+    if (!$('ai_consent').checked) { msg.innerHTML = '<span class="warn">외부 AI 서버로 전송됨을 이해한다는 항목을 체크해야 분석합니다.</span>'; return; }
+    const an = window.__BIDUI3 ? window.__BIDUI3.compute() : null; const includeCost = $('ai_cost').checked && an && an.ok;
+    const prompt = E().ai.buildPrompt({notice: U.nget(), docs: U.S.docs || [], strat: an && an.ok ? an : null, includeCost});
+    msg.textContent = '분석 중… (' + E().ai.PROVIDERS[cfg.provider].name + ' 서버로 전송됨)'; $('aiBtn').disabled = true; out.innerHTML = '';
+    const res = await E().ai.run(cfg, prompt, netFetch); $('aiBtn').disabled = false;
+    if (!res.ok) { msg.innerHTML = '<span class="bad">분석 실패</span>'; out.innerHTML = `<div class="card"><div class="bad">AI 분석을 하지 못했습니다</div><div style="margin-top:8px">${esc(res.error)}</div><p class="small">키·모델 이름·네트워크를 확인하세요. 이 도구의 다른 계산은 그대로 쓸 수 있습니다.</p></div>`; U.log('AI 분석 실패: ' + res.error); return; }
+    const parsed = E().ai.parse(res.text);
+    if (!parsed.ok) { msg.innerHTML = '<span class="warn">응답을 구조화하지 못했습니다</span>'; out.innerHTML = `<div class="card"><div class="warn">AI 응답을 표로 바꾸지 못했습니다 (${esc(parsed.error)}) — 원문을 그대로 보여 줍니다.</div><pre class="log">${esc(parsed.raw || '')}</pre></div>`; return; }
+    msg.textContent = '분석 완료 · ' + (res.model || '') + (prompt.clipped ? ' · 공고문은 앞부분만 전송됨' : '');
+    /* AI 가 제안한 투찰률 → 엔진이 다시 계산(금액·순이익·경고) */
+    let rows = {}; if (an && an.ok && U.S.stratP) { const rates = parsed.scenarios.map(s => s.rate).filter(r => r != null); if (rates.length) { const a2 = E().strategy.analyze(Object.assign({}, U.S.stratP, {custom: rates})); if (a2.ok) a2.cands.forEach(c => { rows[c.rate] = c; }); } }
+    const nt = noticeText(); const h = [];
+    h.push(`<div class="card"><h2>AI 심층 입찰 전략 분석 결과 <span class="src src-ai">AI 제안 (근거 데이터 아님 · 검증 필요)</span></h2><p class="small">제공사 ${esc(E().ai.PROVIDERS[cfg.provider].name)} · 모델 ${esc(res.model || '')}${prompt.clipped ? ' · 공고문 ' + prompt.totalChars + '자 중 앞 ' + E().ai.MAX_NOTICE_CHARS + '자만 전송' : ''}${includeCost ? ' · 내부 원가·대외 안내 포함 전송' : ' · 내부 원가 미전송'}. 이 결과는 서류에 자동 반영되지 않고 화면에만 표시됩니다.</p></div>`);
+    h.push(`<div class="card"><h2>① 숨은 리스크 · 참가자격 주의사항</h2>${riskList(parsed.risks.concat(parsed.cautions.map(c => Object.assign({}, c, {title: '[참가자격] ' + c.title}))), nt)}</div>`);
+    const lvCls = {낮음: 'src-rule', 보통: 'src-def', 높음: 'src-assume', 판단불가: 'src-none'}[parsed.competition.level];
+    h.push(`<div class="card"><h2>② 경쟁 강도 진단 <span class="small" style="font-weight:400">· AI 추정</span></h2><div><span class="src ${lvCls}" style="font-size:13px">${esc(parsed.competition.level)}</span></div>${parsed.competition.reasons.map(r => `<div class="small" style="font-size:13px;color:#334155">· ${esc(r)}</div>`).join('')}<div class="small" style="margin-top:6px">근거로 든 자료: ${esc(parsed.competition.basis || '(밝히지 않음)')}</div></div>`);
+    h.push(`<div class="card"><h2>③ 시나리오별 권장 투찰 전략</h2>${parsed.scenarios.length ? `<div class="scroll"><table id="aiScTbl"><thead><tr><th>시나리오</th><th>AI 제안 투찰률</th><th>도구가 계산한 투찰가</th><th>실제 순이익(내부)</th><th>검증</th><th>근거</th><th>가정·위험</th></tr></thead><tbody>${parsed.scenarios.map(s => { const c = s.rate != null ? rows[Math.round(s.rate * 1000) / 1000] : null; return `<tr><td><b>${esc(s.name)}</b></td><td class="n">${s.rate == null ? '-' : s.rate + '%'}</td><td class="n">${c ? won(c.bid) + '원' : (s.rate == null ? '-' : '계산 불가(입력 필요)')}</td><td class="n ${c && c.profit != null && c.profit < 0 ? 'bad' : ''}">${c && c.profit != null ? won(c.profit) : '확인 필요'}</td><td>${c ? (c.flags.length ? c.flags.map(f => `<span class="warn">${esc(f)}</span>`).join(' ') : '<span class="ok">방어선·상한 이상 없음</span>') : '-'}</td><td class="small" style="font-size:12.5px;color:#334155">${esc(s.rationale)}</td><td class="small">${s.assumptions.map(x => '가정: ' + esc(x)).join('<br>')}${s.risks.length ? '<br>' + s.risks.map(x => '위험: ' + esc(x)).join('<br>') : ''}</td></tr>`; }).join('')}</tbody></table></div><p class="small" style="margin-top:8px">투찰가·순이익은 AI 가 아니라 이 도구의 계산 엔진이 AI 가 제안한 투찰률로 다시 계산한 값입니다. 투찰률 자체는 ${'<span class="src src-ai">AI 제안 (근거 데이터 아님 · 검증 필요)</span>'}입니다.</p>` : '<div class="small">시나리오가 없습니다.</div>'}${parsed.missing.length ? `<h3>AI 가 부족하다고 한 정보</h3>${parsed.missing.map(m => `<div class="small" style="font-size:13px">· ${esc(m)}</div>`).join('')}` : ''}</div>`);
+    out.innerHTML = h.join(''); U.log('AI 분석 완료: ' + (res.model || '') + ' / 시나리오 ' + parsed.scenarios.length + '건');
+  };
 })();
 
 </script>
@@ -2223,6 +2460,7 @@ tr.lossrow td{background:#fef2f2}
   window.__BIDUI = {S, E, $, nget, cget, csave, buildInp, showTab, showCalc, renderChk0, toast, log, ls, ingest, applyEx, renderEx, syncBid, splitTax, rangeTxt, render, addRows, classify, esc, chkKey, checklistItems, AL, rowsFromText, toItem, norm, str, num, won, pct, svg, T, C, short, chartLine, EV_CASES, handleFiles};
   if (window.__BIDUI2 && window.__BIDUI2.init) window.__BIDUI2.init(window.__BIDUI);
   if (window.__BIDUI3 && window.__BIDUI3.init) window.__BIDUI3.init(window.__BIDUI);
+  if (window.__BIDUI4 && window.__BIDUI4.init) window.__BIDUI4.init(window.__BIDUI);
   log('02 입찰 도구 v3 시작');
 })();
 

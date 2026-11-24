@@ -84,6 +84,7 @@ pre.log{white-space:pre-wrap;font-size:12px;color:var(--mute);margin:0;max-heigh
 .src{display:inline-block;padding:1px 9px;border-radius:99px;font-size:11px;font-weight:700;white-space:normal;line-height:1.5;margin:2px 4px 2px 0}
 .src-rule{background:#d1fae5;color:#065f46}.src-meas{background:#cffafe;color:#155e75}.src-input{background:#dbeafe;color:#1e40af}.src-assume{background:#fef3c7;color:#92400e}.src-def{background:#ffedd5;color:#9a3412}.src-none{background:#f1f5f9;color:#475569}
 tr.lossrow td{background:#fef2f2}
+.src-ai{background:#fce7f3;color:#9d174d}
 .sim input[type=range]{width:100%;padding:0}
 @media(max-width:720px){main{padding:16px 12px 60px}.card{padding:18px 16px}.top{padding:10px 12px}.charts{grid-template-columns:1fr}details>.inner{padding:4px 14px 20px}}
 @media print{.top,.toast,button{display:none!important}.pane{display:block!important}}
@@ -186,7 +187,7 @@ tr.lossrow td{background:#fef2f2}
     <div class="grid" id="calcForm">
       <label>보고서 정가 (외화 또는 원)<input id="c_list" type="text" inputmode="decimal" title="기능: 발행사 정가 · 결과: 원가 계산 · 사용시점: 마진을 보고 싶을 때"></label>
       <label>정가 통화<select id="c_cur" title="기능: 정가 통화 · 결과: 환율 적용 여부 · 사용시점: 정가 입력 시"><option>KRW</option><option>USD</option><option>EUR</option><option>GBP</option><option>JPY</option></select></label>
-      <label>원화 환율 (1 외화 = 원)<input id="c_fx" type="text" inputmode="decimal" placeholder="예) 1169" title="기능: 환율 · 결과: 원화 원가 환산 · 사용시점: 외화 정가일 때"></label>
+      <label>원화 환율 (1 외화 = 원)<input id="c_fx" type="text" inputmode="decimal" placeholder="예) 1169" title="기능: 환율 · 결과: 원화 원가 환산 · 사용시점: 외화 정가일 때"><span class="row" style="gap:8px;margin-top:2px"><button id="fxBtn" type="button" class="sm" title="기능: 공개 환율 피드에서 현재 환율을 불러와 환율 칸에 입력 · 결과: 환율과 출처·기준 시각 표시(오프라인이면 직접 입력) · 사용시점: 외화 정가일 때">실시간 환율 불러오기</button></span><span id="fxInfo" class="small" style="font-weight:400"></span></label>
       <label>원가 계산 방식<select id="c_costmode" title="기능: 원가 산식 선택 · 결과: 원가 = 정가×환율×계수(장부) 또는 ×(1−할인율) · 사용시점: 평소 쓰는 방식 선택"><option value="ledger">장부 방식: 정가 × 환율 × 계수</option><option value="disc">할인율 방식: 정가 × 환율 × (1 − 할인율)</option></select></label>
       <label id="c_discLbl">원가 계수 (장부 '발행사 디스카운트' 열 값, 예 0.4)<input id="c_disc" type="text" inputmode="decimal" title="기능: 정가 대비 매입 비율 또는 할인율 · 결과: 원가 · 사용시점: 계약 조건 확인 후"></label>
       <label>투찰률 후보 (쉼표, 비우면 하한율+α 자동)<input id="c_rates" type="text" placeholder="예) 88.1, 88.2" title="기능: 확인할 투찰률 목록 · 결과: 투찰률별 표·그래프 · 사용시점: 직접 비교하고 싶을 때"></label>
@@ -241,6 +242,36 @@ tr.lossrow td{background:#fef2f2}
     <div class="row" style="margin-top:20px"><button id="stratBtn" class="primary" title="기능: 5가지 조건과 원가로 구간·후보·순이익 계산 · 결과: 아래 요약·차트·표 · 사용시점: 입력을 바꾼 뒤">상황 진단·구간 계산</button><button id="stratClear" title="기능: 내부 원가·안내·시뮬레이션 입력 비우기 · 결과: 새 공고 준비 · 사용시점: 다른 공고로 바꿀 때">내부 원가·전략 입력 비우기</button></div>
   </div>
   <div id="stratOut"><div class="empty">[상황 진단·구간 계산] 또는 [계산하기]를 누르면 이곳에 구간 차트와 후보·순이익 표가 나옵니다.</div></div>
+  <details id="cfgCard" style="margin-bottom:24px">
+    <summary title="기능: 환율 조회 방식과 AI 키를 설정 · 결과: 이 PC 브라우저에만 저장 · 사용시점: 처음 한 번">⚙ 환율·AI 설정 <span class="small" style="font-weight:400">· 키는 이 PC 브라우저(localStorage)에만 저장되고 서류·저장소·서버에는 올라가지 않습니다</span></summary>
+    <div class="inner sim">
+      <h3>실시간 환율</h3>
+      <div class="grid">
+        <label>조회 순서<select id="fx_prov" title="기능: 키 없이 쓰는 환율 피드의 우선순위 · 결과: 앞 피드가 실패하면 다음 피드로 자동 전환 · 사용시점: 평소엔 기본값"><option value="er">open.er-api.com → frankfurter.app</option><option value="frank">frankfurter.app(ECB) → open.er-api.com</option></select></label>
+        <label>한국수출입은행 인증키 (선택)<input id="fx_key" type="password" autocomplete="off" placeholder="있으면 고시환율을 먼저 조회" title="기능: 수출입은행 고시환율 API 인증키 · 결과: 매매기준율을 우선 조회 · 사용시점: 은행 고시 기준 환율이 필요할 때(이 브라우저에만 저장)"></label>
+        <label><span><input type="checkbox" id="fx_auto" checked title="기능: 외화를 고르면 환율이 비어 있을 때만 자동 조회 · 결과: 직접 입력한 값은 덮어쓰지 않음 · 사용시점: 평소 켜 둠"> 외화를 고르면 환율 자동 조회 (빈칸일 때만)</span></label>
+      </div>
+      <p class="small">불러온 값은 <b>시장 환율(중간값)</b>이며 기준 시각·출처가 환율 칸 아래에 표시됩니다. 하나은행·관세청 고시환율은 공개 API 규격을 확인하지 못해 연결하지 않았습니다(HOLD). 수출입은행 API 는 브라우저 보안(CORS) 때문에 막힐 수 있고 실제 키로 시험하지 못했습니다 — 막히면 키 없는 피드로 자동 전환됩니다. 오프라인이면 환율을 직접 입력하세요.</p>
+      <h3>AI 분석 연결</h3>
+      <div class="grid">
+        <label>AI 제공사<select id="ai_prov" title="기능: 사용할 AI 제공사 · 결과: 요청 형식이 제공사에 맞게 바뀜 · 사용시점: 키를 가진 제공사 선택"><option value="claude">Claude (Anthropic)</option><option value="gemini">Gemini (Google)</option></select></label>
+        <label>모델 이름<input id="ai_model" type="text" placeholder="claude-sonnet-5-5" title="기능: 사용할 모델 ID · 결과: 요청의 model 값 · 사용시점: 계정에서 쓸 수 있는 모델로 바꿀 때(Gemini 기본값은 미검증)"></label>
+        <label>API 키<input id="ai_key" type="password" autocomplete="off" placeholder="sk-ant-… 또는 AIza…" title="기능: 내 AI 계정의 API 키 · 결과: 이 브라우저에만 저장, 분석 요청 헤더로만 전달 · 사용시점: AI 분석을 쓸 때 한 번"></label>
+      </div>
+      <div class="row" style="margin-top:14px"><button id="aiSave" class="primary" title="기능: AI 설정 저장 · 결과: localStorage 에만 기록 · 사용시점: 키·모델을 바꾼 뒤">AI 설정 저장</button><button id="aiClear" title="기능: 저장된 API 키 삭제 · 결과: 이 브라우저에서 키 제거 · 사용시점: 공용 PC 사용 후">API 키 지우기</button><span id="aiCfgMsg" class="small"></span></div>
+      <p class="small">키는 코드·화면 결과·서류(.xls/.doc)·CSV·Evidence·URL 어디에도 넣지 않으며, GitHub 와 어떤 서버에도 올라가지 않습니다. 분석 요청은 선택한 제공사 서버로만 직접 전송됩니다.</p>
+    </div>
+  </details>
+  <div class="card sim" id="aiCard">
+    <h2>AI 심층 입찰 전략 분석 <span class="small" style="font-weight:400">· 버튼 한 번으로 공고문 맥락 + 기관 특성 + 원가 + 대외 안내를 입체 분석</span></h2>
+    <p class="lead">고정 조건문이 아니라 AI 가 공고문 원문을 읽고 ① 숨은 리스크·참가자격 주의사항 ② 경쟁 강도 ③ 시나리오별 투찰 전략을 구조화해 제시합니다. <b>AI 의 숫자는 "근거 데이터 아님"</b>이며, AI 가 제안한 투찰률은 도구가 다시 계산(금액·순이익)하고 AI 가 인용한 공고 문구는 원문과 대조해 표시합니다.</p>
+    <div class="row" style="flex-direction:column;align-items:flex-start;gap:8px">
+      <label style="font-weight:400"><input type="checkbox" id="ai_cost" checked title="기능: 실제 원가·대외 안내·도구 계산 결과도 AI 에 보낼지 선택 · 결과: 끄면 공고문·기관 정보만 전송 · 사용시점: 내부 원가를 외부로 보내고 싶지 않을 때"> 실제 원가·대외 안내·도구 계산 결과(내부 정보)도 AI 에 보냄</label>
+      <label style="font-weight:400"><input type="checkbox" id="ai_consent" title="기능: 외부 AI 서버로 전송됨을 확인 · 결과: 체크해야 분석 버튼이 동작 · 사용시점: 분석 전 매번"> 공고문 원문과 위 정보가 선택한 AI 제공사 서버로 전송됨을 이해합니다</label>
+    </div>
+    <div class="row" style="margin-top:16px"><button id="aiBtn" class="primary" title="기능: 현재 공고를 AI 로 심층 분석 · 결과: 리스크·경쟁 강도·시나리오 카드 · 사용시점: 상황 진단을 끝낸 뒤">AI 심층 입찰 전략 분석</button><span id="aiMsg" class="small"></span></div>
+  </div>
+  <div id="aiOut"></div>
   <div id="calcOut"><div class="empty">공고 숫자(기초금액·낙찰하한율)를 ①에서 입력한 뒤 [계산하기]를 누르세요.</div></div>
 </section>
 

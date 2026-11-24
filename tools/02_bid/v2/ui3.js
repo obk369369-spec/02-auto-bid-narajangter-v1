@@ -79,6 +79,7 @@
         <div class="kpi"><small>③ 상한 (기초금액)</small><b>${won(an.ref)}원</b><em>초과 투찰 = 무효 위험</em><div>${badge(an.src.rule)}</div></div></div>
       ${an.reasons.map(x => `<div class="explainbox" style="background:#eff6ff;border-color:#bfdbfe">${esc(x)}</div>`).join('')}
       ${an.warns.map(x => `<div class="explainbox" style="background:#fee2e2;border-color:#fecaca">${esc(x)}</div>`).join('')}
+      ${(m => (an.cost != null && U.$('c_cur').value !== 'KRW') ? `<p class="small">환율 출처: ${m && String(m.rate) === String(U.$('c_fx').value) ? esc(m.source) + ' · 기준 ' + esc(m.asOf) + ' · 조회 ' + esc(m.fetchedAt) + ' (시장 환율 · 은행 고시환율 아님)' : '수동 입력'}</p>` : '')(U.S.fxMeta)}
       <p class="small">※ 이 화면은 내부용입니다 — 실제 원가·커미션·순이익은 .xls/.doc 서류에 출력되지 않으며, 출력 직전 검사에서 발견되면 내려받기가 차단됩니다.</p></div>`);
     h.push(`<div class="card"><h2>구간 차트</h2><div class="chart">${chart(an)}</div><div class="small" style="margin-top:6px">선 색: ${badge(an.src.rule)} ${badge(an.src.input)} ${an.measured ? badge(an.src.measured) : ''} ${an.lines.some(l => l.src.key === 'assume') ? badge(an.src.assume) : ''}</div></div>`);
     h.push(`<div class="card"><h2>후보 투찰안과 실제 순이익 <span class="small" style="font-weight:400">· 행을 누르면 그 금액을 서류에 반영</span></h2>${an.cands.length ? `<div class="scroll"><table id="candTbl"><thead><tr><th>안</th><th>설명</th><th>투찰률</th><th>투찰가(총액)</th><th>공급가액</th><th>실제 순이익(내부)</th><th>순이익률</th><th>판정</th><th>출처</th></tr></thead><tbody>${candRows(an.cands, an, true)}</tbody></table></div>` : '<div class="empty">후보가 없습니다. 목표 구간·직접 후보·목표 마진을 입력하세요.</div>'}</div>`);
@@ -96,6 +97,8 @@
     const sec = api.secrets(); const bid = Number(String(U.$('d_bid').value).replace(/[^\d]/g, '')) || 0; const tf = U.$('n_tax').value === 'free';
     const sp = bid ? (tf ? bid : E().pricing.splitVat(bid, 10).supply) : 0; const allow = bid ? [bid, sp, bid - sp, Math.round(bid * 0.9), Math.round(bid / 1.1), Math.round(bid * 0.05), Math.ceil(bid * 0.05), Math.round(bid * 0.9 * 0.1)] : [];
     const hits = ST().leak.scan(toText(content), sec, allow);
+    /* API 키(환율 인증키·AI 키)가 서류에 섞이는 것도 차단 */
+    ['wic02_ai_cfg', 'wic02_fx_cfg'].forEach(k => { const o = U.ls.get(k, {}) || {}; [o.key, o.koreaeximKey].forEach(v => { if (v && String(v).length >= 8 && toText(content).includes(v)) hits.push('API 키'); }); });
     if (hits.length) { U.toast('내부 원가·커미션 정보가 서류에 섞여 있어 내려받기를 막았습니다 (' + hits.join(', ') + ')'); U.log('서류 출력 차단: ' + name + ' — ' + hits.join(' / ')); window.__BIDUI3_BLOCKED = (window.__BIDUI3_BLOCKED || []).concat([{name, hits}]); return false; }
     return true;
   };
